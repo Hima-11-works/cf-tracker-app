@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getRecentSubmissions, statusFromVerdict } from "@/lib/codeforces";
+import { getRecentSubmissions, getUserInfo, statusFromVerdict } from "@/lib/codeforces";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
@@ -33,7 +33,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const [{ data: problems, error: problemsError }, { data: saved, error: savedError }] = await Promise.all([
+    const profilePromise = getUserInfo(user.codeforces_handle)
+      .then((profile) => ({ profile, warning: null as string | null }))
+      .catch((error) => {
+        console.error("Codeforces profile request failed:", error);
+        return { profile: null, warning: "Codeforces rating is temporarily unavailable." };
+      });
+
+    const [{ data: problems, error: problemsError }, { data: saved, error: savedError }, profileResult] = await Promise.all([
       supabase
         .from("problems")
         .select("id, contest_id, problem_index, name, rating, section, order_index")
@@ -42,6 +49,7 @@ export async function GET(request: NextRequest) {
         .from("problem_progress")
         .select("problem_id, status, accepted_at, last_checked_at")
         .eq("codeforces_handle", user.codeforces_handle),
+      profilePromise,
     ]);
 
     if (problemsError || savedError) throw problemsError || savedError;
@@ -130,12 +138,16 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    const warnings = [profileResult.warning, refreshWarning].filter(Boolean);
     return NextResponse.json({
       handle: user.codeforces_handle,
+      rating: profileResult.profile?.rating ?? null,
+      rank: profileResult.profile?.rank ?? null,
+      profileAvailable: profileResult.profile !== null,
       problems: result,
       solvedCount: result.filter((problem) => problem.status === "accepted").length,
       problemCount: result.length,
-      warning: refreshWarning,
+      warning: warnings.length > 0 ? warnings.join(" ") : null,
     });
   } catch (error) {
     console.error("User sheet request failed:", error);
