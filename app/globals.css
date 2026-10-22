@@ -366,7 +366,7 @@ button { color: inherit; }
 .problem-input { min-height: 38px; padding: 7px 8px; font-size: 12px; }
 .problem-input.mono { font-family: var(--mono); }
 .admin-add-grid { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(120px, 0.45fr) auto; gap: 8px; margin-top: 14px; }
-.admin-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 22px; margin-top: 20px; border-top: 1px solid var(--line-dark); }
+.admin-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; }
 .admin-actions span { color: var(--muted); font-size: 12px; }
 .login-panel { width: min(100%, 490px); margin: 16px auto 0; padding: 28px 0; border-bottom: 1px solid var(--line-dark); }
 .login-panel .toolbar-controls { justify-content: flex-start; }
