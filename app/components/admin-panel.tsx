@@ -177,9 +177,6 @@ export function AdminPanel() {
   if (isAdmin && !hasLoadedAdminData) {
     return (
       <>
-        <section className="page-heading">
-          <div><h1>Admin</h1><p>Loading the saved roster and probation sheet.</p></div>
-        </section>
         <section className="login-panel" aria-live="polite">
           <h2>{error ? "Tracker data didn’t load" : "Loading tracker data"}</h2>
           <p>{error || "Your saved whitelist and problem sheet will appear here shortly."}</p>
@@ -194,13 +191,6 @@ export function AdminPanel() {
 
   return (
     <>
-      <section className="page-heading">
-        <div>
-          <h1>Admin</h1>
-          <p>Manage who appears on the leaderboard and which problems belong to the probation sheet.</p>
-        </div>
-      </section>
-
       {!isAdmin ? (
         <section className="login-panel">
           <h2>Admin sign in</h2>

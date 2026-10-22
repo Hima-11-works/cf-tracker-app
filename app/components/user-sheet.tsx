@@ -23,6 +23,18 @@ const statusLabels: Record<ProblemStatus, string> = {
   wrong_answer: "Wrong answer",
 };
 
+const LAST_HANDLE_STORAGE_KEY = "cf-probation-last-handle";
+
+function rememberHandle(value: string) {
+  const clean = value.trim();
+  try {
+    if (clean) window.localStorage.setItem(LAST_HANDLE_STORAGE_KEY, clean);
+    else window.localStorage.removeItem(LAST_HANDLE_STORAGE_KEY);
+  } catch {
+    // Keep the lookup usable when browser storage is unavailable.
+  }
+}
+
 function formatAcceptedDate(value: string | null) {
   if (!value) return "—";
   return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
@@ -44,6 +56,7 @@ export function UserSheet() {
       return;
     }
     setHandle(clean);
+    rememberHandle(clean);
     setLoading(true);
     setError("");
     setWarning("");
@@ -62,8 +75,18 @@ export function UserSheet() {
   }, []);
 
   useEffect(() => {
-    const initialHandle = new URLSearchParams(window.location.search).get("handle");
-    if (initialHandle) void lookup(initialHandle);
+    const initialHandle = new URLSearchParams(window.location.search).get("handle")?.trim();
+    if (initialHandle) {
+      void lookup(initialHandle);
+      return;
+    }
+
+    try {
+      const savedHandle = window.localStorage.getItem(LAST_HANDLE_STORAGE_KEY)?.trim();
+      if (savedHandle) setHandle(savedHandle);
+    } catch {
+      // Keep the form usable when browser storage is unavailable.
+    }
   }, [lookup]);
 
   const groups = useMemo(() => {
@@ -83,14 +106,6 @@ export function UserSheet() {
 
   return (
     <>
-      <section className="page-heading">
-        <div>
-          <h1>User sheet</h1>
-          <p>Look up a whitelisted handle to see each problem's latest result and accepted date.</p>
-        </div>
-        {sheet ? <div className="heading-count">Codeforces profile · <a className="inline-link" href={`https://codeforces.com/profile/${encodeURIComponent(sheet.handle)}`} target="_blank" rel="noreferrer">Open profile</a></div> : null}
-      </section>
-
       <section className="lookup-row" aria-label="Find a user">
         <div className="lookup-intro">
           <strong>Find a probation sheet</strong>
@@ -103,7 +118,11 @@ export function UserSheet() {
               id="codeforces-handle"
               className="text-input"
               value={handle}
-              onChange={(event) => setHandle(event.target.value)}
+              onChange={(event) => {
+                const nextHandle = event.target.value;
+                setHandle(nextHandle);
+                rememberHandle(nextHandle);
+              }}
               placeholder="Enter a handle"
               autoComplete="off"
               autoCapitalize="none"
