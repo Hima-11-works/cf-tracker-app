@@ -177,9 +177,6 @@ export function AdminPanel() {
   if (isAdmin && !hasLoadedAdminData) {
     return (
       <>
-        <section className="page-heading">
-          <div><h1>Admin</h1><p>Loading the saved roster and probation sheet.</p></div>
-        </section>
         <section className="login-panel" aria-live="polite">
           <h2>{error ? "Tracker data didn’t load" : "Loading tracker data"}</h2>
           <p>{error || "Your saved whitelist and problem sheet will appear here shortly."}</p>
@@ -194,13 +191,6 @@ export function AdminPanel() {
 
   return (
     <>
-      <section className="page-heading">
-        <div>
-          <h1>Admin</h1>
-          <p>Manage who appears on the leaderboard and which problems belong to the probation sheet.</p>
-        </div>
-      </section>
-
       {!isAdmin ? (
         <section className="login-panel">
           <h2>Admin sign in</h2>
@@ -222,6 +212,10 @@ export function AdminPanel() {
           </div>
 
           <div>
+            <div className="admin-actions">
+              <span>Saving replaces the active whitelist and sheet order. Removing sheet problems deletes their saved results.</span>
+              <button className="button" type="button" onClick={() => void save()} disabled={busy || lookingUpProblem}>{busy ? "Saving…" : "Save changes"}</button>
+            </div>
             <div className="admin-grid">
               <section className="admin-section">
                 <h2>Whitelist</h2>
@@ -273,10 +267,6 @@ export function AdminPanel() {
 
             {error ? <p className="form-error" role="alert">{error}</p> : null}
             {notice ? <p className="form-success" role="status">{notice}</p> : null}
-            <div className="admin-actions">
-              <span>Saving replaces the active whitelist and sheet order. Removing sheet problems deletes their saved results.</span>
-              <button className="button" type="button" onClick={() => void save()} disabled={busy || lookingUpProblem}>{busy ? "Saving…" : "Save changes"}</button>
-            </div>
           </div>
         </>
       )}

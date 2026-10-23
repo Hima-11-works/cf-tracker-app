@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { ProgressCharts } from "./progress-charts";
 
 type ProblemStatus = "not_attempted" | "accepted" | "tle_mle" | "wrong_answer";
 type Problem = {
@@ -14,7 +15,16 @@ type Problem = {
   status: ProblemStatus;
   acceptedAt: string | null;
 };
-type Sheet = { handle: string; problems: Problem[]; solvedCount: number; problemCount: number; warning?: string | null };
+type Sheet = {
+  handle: string;
+  rating: number | null;
+  rank: string | null;
+  profileAvailable: boolean;
+  problems: Problem[];
+  solvedCount: number;
+  problemCount: number;
+  warning?: string | null;
+};
 
 const statusLabels: Record<ProblemStatus, string> = {
   not_attempted: "Not attempted",
@@ -22,6 +32,39 @@ const statusLabels: Record<ProblemStatus, string> = {
   tle_mle: "TLE / MLE",
   wrong_answer: "Wrong answer",
 };
+
+const LAST_HANDLE_STORAGE_KEY = "cf-probation-last-handle";
+const codeforcesRanks = new Set([
+  "newbie",
+  "pupil",
+  "specialist",
+  "expert",
+  "candidate master",
+  "master",
+  "international master",
+  "grandmaster",
+  "international grandmaster",
+  "legendary grandmaster",
+]);
+
+function rankSlug(rank: string | null) {
+  const normalized = rank?.trim().toLowerCase() ?? "";
+  return codeforcesRanks.has(normalized) ? normalized.replaceAll(" ", "-") : "unrated";
+}
+
+function displayRank(rank: string) {
+  return rank.replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function rememberHandle(value: string) {
+  const clean = value.trim();
+  try {
+    if (clean) window.localStorage.setItem(LAST_HANDLE_STORAGE_KEY, clean);
+    else window.localStorage.removeItem(LAST_HANDLE_STORAGE_KEY);
+  } catch {
+    // Keep the lookup usable when browser storage is unavailable.
+  }
+}
 
 function formatAcceptedDate(value: string | null) {
   if (!value) return "—";
@@ -44,6 +87,7 @@ export function UserSheet() {
       return;
     }
     setHandle(clean);
+    rememberHandle(clean);
     setLoading(true);
     setError("");
     setWarning("");
@@ -62,8 +106,18 @@ export function UserSheet() {
   }, []);
 
   useEffect(() => {
-    const initialHandle = new URLSearchParams(window.location.search).get("handle");
-    if (initialHandle) void lookup(initialHandle);
+    const initialHandle = new URLSearchParams(window.location.search).get("handle")?.trim();
+    if (initialHandle) {
+      void lookup(initialHandle);
+      return;
+    }
+
+    try {
+      const savedHandle = window.localStorage.getItem(LAST_HANDLE_STORAGE_KEY)?.trim();
+      if (savedHandle) setHandle(savedHandle);
+    } catch {
+      // Keep the form usable when browser storage is unavailable.
+    }
   }, [lookup]);
 
   const groups = useMemo(() => {
@@ -83,14 +137,6 @@ export function UserSheet() {
 
   return (
     <>
-      <section className="page-heading">
-        <div>
-          <h1>User sheet</h1>
-          <p>Look up a whitelisted handle to see each problem's latest result and accepted date.</p>
-        </div>
-        {sheet ? <div className="heading-count">Codeforces profile · <a className="inline-link" href={`https://codeforces.com/profile/${encodeURIComponent(sheet.handle)}`} target="_blank" rel="noreferrer">Open profile</a></div> : null}
-      </section>
-
       <section className="lookup-row" aria-label="Find a user">
         <div className="lookup-intro">
           <strong>Find a probation sheet</strong>
@@ -103,7 +149,11 @@ export function UserSheet() {
               id="codeforces-handle"
               className="text-input"
               value={handle}
-              onChange={(event) => setHandle(event.target.value)}
+              onChange={(event) => {
+                const nextHandle = event.target.value;
+                setHandle(nextHandle);
+                rememberHandle(nextHandle);
+              }}
               placeholder="Enter a handle"
               autoComplete="off"
               autoCapitalize="none"
@@ -124,7 +174,13 @@ export function UserSheet() {
         <>
           <section className="user-summary" aria-label="User progress">
             <div>
-              <h2><a href={`https://codeforces.com/profile/${encodeURIComponent(sheet.handle)}`} target="_blank" rel="noreferrer">{sheet.handle}</a></h2>
+              <div className="user-profile-line">
+                <h2><a href={`https://codeforces.com/profile/${encodeURIComponent(sheet.handle)}`} target="_blank" rel="noreferrer">{sheet.handle}</a></h2>
+                <div className="codeforces-rating" data-rank={rankSlug(sheet.rank)} aria-label={sheet.profileAvailable ? `Codeforces rating ${sheet.rating ?? "unrated"}${sheet.rank ? `, ${sheet.rank}` : ""}` : "Codeforces rating unavailable"}>
+                  <strong>{sheet.profileAvailable ? sheet.rating ?? "Unrated" : "Unavailable"}</strong>
+                  {sheet.rank ? <span>{displayRank(sheet.rank)}</span> : null}
+                </div>
+              </div>
               <p>Accepted problems are skipped on future status checks.</p>
             </div>
             <div className="progress-count" aria-label={`${sheet.solvedCount} of ${sheet.problemCount} problems accepted`}>
@@ -141,6 +197,8 @@ export function UserSheet() {
               </span>
             ))}
           </div>
+
+          {sheet.problems.length > 0 ? <ProgressCharts problems={sheet.problems} /> : null}
 
           {sheet.problems.length === 0 ? (
             <div className="empty-sheet">No problems have been added to the probation sheet yet. Check back after the admin configures it.</div>

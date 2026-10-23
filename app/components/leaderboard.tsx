@@ -41,20 +41,15 @@ export function Leaderboard() {
 
   return (
     <>
-      <section className="page-heading">
-        <div>
-          <h1>Leaderboard</h1>
-          <p>Probation progress, ranked by the number of sheet problems accepted on Codeforces.</p>
-        </div>
-        <div className="heading-count">
-          {excludeIotLabMembers && visibleRows.length !== rows.length
-            ? `${visibleRows.length} of ${rows.length} handles`
-            : `${rows.length} ${rows.length === 1 ? "handle" : "handles"}`} · {problemCount} problems
-        </div>
-      </section>
-
       <div className="toolbar-line">
-        <span className="toolbar-label">Current standings</span>
+        <div className="toolbar-meta">
+          <span className="toolbar-label">Current standings</span>
+          <span className="toolbar-note">
+            {excludeIotLabMembers && visibleRows.length !== rows.length
+              ? `${visibleRows.length} of ${rows.length} handles`
+              : `${rows.length} ${rows.length === 1 ? "handle" : "handles"}`} · {problemCount} problems
+          </span>
+        </div>
         <div className="toolbar-controls">
           <label className="leaderboard-filter">
             <input
