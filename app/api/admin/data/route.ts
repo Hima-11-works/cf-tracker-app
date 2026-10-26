@@ -74,9 +74,9 @@ export async function PUT(request: NextRequest) {
     const marker = text.match(/^(?:[*＊]\s*)+/u)?.[0] ?? "";
     return { handle: text.slice(marker.length).trim(), isIotLabMember: marker.length > 0 };
   });
-  const invalidHandleIndex = handles.findIndex(({ handle }) => !/^[A-Za-z0-9_-]{1,64}$/.test(handle));
+  const invalidHandleIndex = handles.findIndex(({ handle }) => !/^[A-Za-z0-9._-]{1,64}$/.test(handle));
   if (invalidHandleIndex !== -1) {
-    return sendError(`Whitelist line ${invalidHandleIndex + 1} must contain a Codeforces handle using only letters, numbers, hyphens, or underscores. Prefix IoT Lab members with * (for example, *handle_name).`);
+    return sendError(`Whitelist line ${invalidHandleIndex + 1} must contain a Codeforces handle using only letters, numbers, periods, hyphens, or underscores. Prefix IoT Lab members with * (for example, *handle_name).`);
   }
   const uniqueHandles = [...new Map(handles.map((entry) => [entry.handle.toLowerCase(), entry])).values()];
 

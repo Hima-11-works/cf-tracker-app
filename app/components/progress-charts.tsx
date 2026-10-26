@@ -121,7 +121,7 @@ function RatingPie({ ratings, total }: { ratings: RatingSlice[]; total: number }
     <div className="rating-chart-layout">
       <svg className="rating-pie" viewBox="0 0 220 220" role="img" aria-labelledby="rating-pie-title rating-pie-description">
         <title id="rating-pie-title">Accepted problems by rating</title>
-        <desc id="rating-pie-description">Pie chart of {total} accepted problems grouped by exact Codeforces rating. {description || "No problems have been accepted yet."}</desc>
+        <desc id="rating-pie-description">Pie chart of {total} accepted problems with a rating, grouped by exact Codeforces rating. {description || "No accepted problems with a rating yet."}</desc>
         {total === 0 ? <circle className="rating-pie-empty" cx="110" cy="110" r="88" /> : null}
         {slices.length === 1 ? <circle cx="110" cy="110" r="88" fill={slices[0].color} /> : null}
         {slices.length > 1 ? slices.map((slice) => (
@@ -140,7 +140,7 @@ function RatingPie({ ratings, total }: { ratings: RatingSlice[]; total: number }
           ))}
         </ul>
       ) : (
-        <p className="rating-chart-empty">No accepted problems yet.</p>
+        <p className="rating-chart-empty">No accepted problems with a rating yet.</p>
       )}
     </div>
   );
@@ -164,15 +164,12 @@ export function ProgressCharts({ problems }: { problems: ChartProblem[] }) {
   const ratingCounts = new Map<string, number>();
   for (const problem of problems) {
     if (problem.status !== "accepted") continue;
-    const label = problem.rating === null || !Number.isFinite(problem.rating) ? "Unrated" : String(problem.rating);
+    if (problem.rating === null || !Number.isFinite(problem.rating)) continue;
+    const label = String(problem.rating);
     ratingCounts.set(label, (ratingCounts.get(label) ?? 0) + 1);
   }
   const ratingSlices = [...ratingCounts.entries()]
-    .sort(([left], [right]) => {
-      if (left === "Unrated") return right === "Unrated" ? 0 : 1;
-      if (right === "Unrated") return -1;
-      return Number(left) - Number(right);
-    })
+    .sort(([left], [right]) => Number(left) - Number(right))
     .map(([label, count], index) => ({ label, count, color: RATING_COLORS[index % RATING_COLORS.length] }));
   const solvedCount = ratingSlices.reduce((total, rating) => total + rating.count, 0);
 
@@ -195,7 +192,7 @@ export function ProgressCharts({ problems }: { problems: ChartProblem[] }) {
             <h3 id="rating-progress-heading">Solved by rating</h3>
             <p>Accepted problems grouped by exact rating</p>
           </div>
-          <span className="chart-meta">{solvedCount} solved</span>
+          <span className="chart-meta">{solvedCount} rated</span>
         </div>
         <RatingPie ratings={ratingSlices} total={solvedCount} />
       </section>
