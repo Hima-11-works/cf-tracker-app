@@ -5,7 +5,7 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
-const HANDLE_RE = /^[A-Za-z0-9_-]{1,64}$/;
+const HANDLE_RE = /^[A-Za-z0-9._-]{1,64}$/;
 
 function problemKey(contestId: number, index: string) {
   return `${contestId}:${index.toUpperCase()}`;
