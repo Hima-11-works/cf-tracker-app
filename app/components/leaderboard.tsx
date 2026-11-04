@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -12,40 +12,93 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetchDeduped } from "@/lib/client-fetch";
 
 type LeaderboardRow = { handle: string; solved: number; rank: number; isIotLabMember: boolean };
+type LeaderboardPayload = {
+  leaderboard: LeaderboardRow[];
+  totalCount: number;
+  problemCount: number;
+  hasMore: boolean;
+};
 
 export function Leaderboard() {
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
   const [problemCount, setProblemCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
   const [excludeIotLabMembers, setExcludeIotLabMembers] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
+  const requestVersion = useRef(0);
+  const loadingMoreRef = useRef(false);
 
-  const load = useCallback(async () => {
+  const loadFirstPage = useCallback(async () => {
+    const version = ++requestVersion.current;
     setLoading(true);
+    setLoadingMore(false);
+    loadingMoreRef.current = false;
     setError("");
+    setRows([]);
+    setPage(1);
+    setHasMore(false);
+
     try {
-      const response = await fetchDeduped("/api/leaderboard", { cache: "no-store" });
-      const payload = await response.json();
+      const params = new URLSearchParams({
+        page: "1",
+        excludeIotLabMembers: String(excludeIotLabMembers),
+      });
+      const response = await fetchDeduped("/api/leaderboard?" + params.toString(), { cache: "no-store" });
+      const payload = (await response.json()) as LeaderboardPayload & { error?: string };
       if (!response.ok) throw new Error(payload.error || "Could not load the leaderboard.");
+      if (version !== requestVersion.current) return;
       setRows(payload.leaderboard ?? []);
       setProblemCount(payload.problemCount ?? 0);
+      setTotalCount(payload.totalCount ?? 0);
+      setHasMore(Boolean(payload.hasMore));
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not load the leaderboard.");
+      if (version === requestVersion.current) {
+        setError(caught instanceof Error ? caught.message : "Could not load the leaderboard.");
+      }
     } finally {
-      setLoading(false);
+      if (version === requestVersion.current) setLoading(false);
     }
-  }, []);
+  }, [excludeIotLabMembers]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => { void loadFirstPage(); }, [loadFirstPage]);
 
-  const visibleRows = excludeIotLabMembers ? rows.filter((row) => !row.isIotLabMember) : rows;
-  let previousSolved: number | null = null;
-  let currentRank = 0;
-  const rankedVisibleRows = visibleRows.map((row, index) => {
-    if (row.solved !== previousSolved) currentRank = index + 1;
-    previousSolved = row.solved;
-    return { ...row, rank: currentRank };
-  });
+  const loadMore = useCallback(async () => {
+    if (!hasMore || loading || loadingMoreRef.current) return;
+    loadingMoreRef.current = true;
+    setLoadingMore(true);
+    setError("");
+    const version = requestVersion.current;
+    const nextPage = page + 1;
+
+    try {
+      const params = new URLSearchParams({
+        page: String(nextPage),
+        excludeIotLabMembers: String(excludeIotLabMembers),
+      });
+      const response = await fetchDeduped("/api/leaderboard?" + params.toString(), { cache: "no-store" });
+      const payload = (await response.json()) as LeaderboardPayload & { error?: string };
+      if (!response.ok) throw new Error(payload.error || "Could not load more standings.");
+      if (version !== requestVersion.current) return;
+      setRows((current) => [...current, ...(payload.leaderboard ?? [])]);
+      setPage(nextPage);
+      setTotalCount(payload.totalCount ?? 0);
+      setProblemCount(payload.problemCount ?? 0);
+      setHasMore(Boolean(payload.hasMore));
+    } catch (caught) {
+      if (version === requestVersion.current) {
+        setError(caught instanceof Error ? caught.message : "Could not load more standings.");
+      }
+    } finally {
+      if (version === requestVersion.current) {
+        loadingMoreRef.current = false;
+        setLoadingMore(false);
+      }
+    }
+  }, [excludeIotLabMembers, hasMore, loading, page]);
 
   return (
     <>
@@ -53,9 +106,10 @@ export function Leaderboard() {
         <div className="toolbar-meta">
           <h2 className="toolbar-title">Current standings</h2>
           <span className="toolbar-note">
-            {excludeIotLabMembers && visibleRows.length !== rows.length
-              ? `${visibleRows.length} of ${rows.length} handles`
-              : `${rows.length} ${rows.length === 1 ? "handle" : "handles"}`} · {problemCount} problems
+            {loading && rows.length === 0
+              ? "Loading standings..."
+              : "Showing " + rows.length + " of " + totalCount + " handles"}
+            {" · "}{problemCount} problems
           </span>
         </div>
         <div className="toolbar-controls">
@@ -67,8 +121,8 @@ export function Leaderboard() {
             />
             <span>Exclude IoT Lab members</span>
           </Label>
-          <Button variant="outline" type="button" onClick={() => void load()} disabled={loading}>
-            {loading ? "Updating…" : "Refresh standings"}
+          <Button variant="outline" type="button" onClick={() => void loadFirstPage()} disabled={loading}>
+            {loading ? "Updating..." : "Refresh standings"}
           </Button>
         </div>
       </div>
@@ -77,54 +131,57 @@ export function Leaderboard() {
         <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert>
       ) : null}
 
-      {!error && !loading && visibleRows.length === 0 ? (
+      {!error && !loading && rows.length === 0 ? (
         <Alert role="status" className="leaderboard-empty">
           <AlertDescription>
-            {rows.length === 0 ? (
-              <>
-                <strong>No handles on the board yet.</strong>
-                <span>Add Codeforces handles and problems from the <Link className="inline-link" href="/admin">admin page</Link>.</span>
-              </>
-            ) : (
-              <strong>No non-member handles match this filter.</strong>
-            )}
+            <strong>No handles on the board yet.</strong>
+            <span>Add Codeforces handles and problems from the <Link className="inline-link" href="/admin">admin page</Link>.</span>
           </AlertDescription>
         </Alert>
       ) : null}
 
-      {rankedVisibleRows.length > 0 ? (
+      {rows.length > 0 ? (
         <div className="problem-table-wrap">
           <Table className="leaderboard-table">
             <TableHeader>
               <TableRow><TableHead>Place</TableHead><TableHead>Codeforces handle</TableHead><TableHead>Problems</TableHead><TableHead>Accepted</TableHead></TableRow>
             </TableHeader>
             <TableBody>
-              {rankedVisibleRows.map((row) => {
+              {rows.map((row) => {
                 const rankClass = row.rank === 1 ? "rank-first" : row.rank === 2 ? "rank-second" : row.rank === 3 ? "rank-third" : "";
                 return (
-                  <TableRow className={rankClass ? `leaderboard-row ${rankClass}` : "leaderboard-row"} key={row.handle}>
+                  <TableRow className={rankClass ? "leaderboard-row " + rankClass : "leaderboard-row"} key={row.handle}>
                     <TableCell className="rank-cell">
-                      <Badge variant="outline" className={`rank-badge ${rankClass}`} aria-label={`Place ${row.rank}`}>{String(row.rank).padStart(2, "0")}</Badge>
+                      <Badge variant="outline" className={"rank-badge " + rankClass} aria-label={"Place " + row.rank}>{String(row.rank).padStart(2, "0")}</Badge>
                     </TableCell>
                     <TableCell className="whitespace-normal">
                       <span className="leaderboard-handle">
-                        <Link className="handle-link" href={`/user?handle=${encodeURIComponent(row.handle)}`}>{row.handle}</Link>
+                        <Link className="handle-link" href={"/user?handle=" + encodeURIComponent(row.handle)}>{row.handle}</Link>
                         {row.isIotLabMember ? <Badge variant="outline" className="iot-member-badge">IoT Lab Member</Badge> : null}
                       </span>
                     </TableCell>
-                    <TableCell className="muted">{problemCount ? `${row.solved} / ${problemCount}` : "—"}</TableCell>
+                    <TableCell className="muted">{problemCount ? row.solved + " / " + problemCount : "—"}</TableCell>
                     <TableCell className="solved-value">{row.solved}</TableCell>
                   </TableRow>
                 );
               })}
             </TableBody>
           </Table>
+          {hasMore ? (
+            <div className="leaderboard-see-more">
+              <Button variant="outline" type="button" onClick={() => void loadMore()} disabled={loadingMore}>
+                {loadingMore ? "Loading more..." : "See 10 more"}
+              </Button>
+            </div>
+          ) : rows.length > 0 ? (
+            <p className="leaderboard-end-note">You're viewing all {totalCount} handles.</p>
+          ) : null}
         </div>
       ) : null}
 
       {loading && rows.length === 0 ? (
         <div className="leaderboard-loading" role="status" aria-busy="true">
-          <span className="sr-only">Loading standings…</span>
+          <span className="sr-only">Loading standings...</span>
           <div className="leaderboard-loading-header" aria-hidden="true">
             <Skeleton className="h-3 w-10" />
             <Skeleton className="h-3 w-32" />

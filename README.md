@@ -27,7 +27,7 @@ For an existing Supabase project that still uses the legacy `service_role` key, 
 3. Copy all of [`supabase/schema.sql`](./supabase/schema.sql) into the editor and run it.
 4. Confirm the `whitelist`, `problems`, and `problem_progress` tables appear under **Table Editor**.
 
-If the app is already connected to an existing database, run [`supabase/add_iot_lab_member.sql`](./supabase/add_iot_lab_member.sql) once in the SQL Editor before deploying this update. It adds the IoT Lab membership flag to the whitelist.
+For an existing project, run [`supabase/add_iot_lab_member.sql`](./supabase/add_iot_lab_member.sql) first if it predates the IoT Lab update. Then run [`supabase/migrations/20261105_pagination.sql`](./supabase/migrations/20261105_pagination.sql) once in SQL Editor before deploying this update; it adds the function and index used by leaderboard pagination. New projects get these through `supabase/schema.sql`.
 
 The schema enables Row Level Security and creates no browser access policies. The app talks to Supabase only from its server routes, which authenticate admin edits before using the server secret key. Supabase documents secret keys as backend-only because they bypass Row Level Security; never put one in a `NEXT_PUBLIC_` variable or client code. See [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys) and [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
 
