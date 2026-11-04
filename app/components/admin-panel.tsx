@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Check, LogOut, Plus, Save, Search, Trash2 } from "lucide-react";
+import { Check, LockKeyhole, LogIn, LogOut, Plus, Save, Search, Trash2 } from "lucide-react";
 
 type Problem = { contestId: string; index: string; name: string; rating: string; section: string };
 type AdminData = { whitelist: string[]; problems: Array<{ contestId: number; index: string; name: string; rating: number | null; section: string }> };
@@ -234,9 +234,10 @@ export function AdminPanel() {
     <>
       {!isAdmin ? (
         <Card className="login-panel">
-          <CardHeader>
+          <CardHeader className="login-panel-header">
+            <span className="admin-login-icon" aria-hidden="true"><LockKeyhole /></span>
             <CardTitle><h2>Admin sign in</h2></CardTitle>
-            <CardDescription>Sign in to manage the Codeforces whitelist and probation sheet.</CardDescription>
+            <CardDescription>Manage the Codeforces whitelist and probation sheet.</CardDescription>
           </CardHeader>
           <CardContent className="login-panel-content">
             {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
@@ -245,7 +246,9 @@ export function AdminPanel() {
                 <Label htmlFor="admin-password">Admin password</Label>
                 <Input id="admin-password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required />
               </div>
-              <Button size="lg" type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</Button>
+              <Button size="lg" type="submit" disabled={busy}>
+                <LogIn data-icon="inline-start" aria-hidden="true" />{busy ? "Signing in…" : "Sign in"}
+              </Button>
             </form>
             <p className="small muted setup-note">Use the admin password configured for this deployment.</p>
           </CardContent>

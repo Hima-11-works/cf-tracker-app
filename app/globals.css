@@ -475,15 +475,19 @@ a { color: inherit; text-underline-offset: 3px; }
 .admin-add-heading p { margin: 0; color: var(--muted-foreground); font-size: 11px; }
 .admin-add-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(135px, 0.42fr) auto; align-items: end; gap: 10px; margin: 0; }
 .problem-url-field, .section-field { min-width: 0; }
-.login-panel { width: min(100%, 460px); margin: clamp(24px, 8vh, 72px) auto 0; }
+.login-panel { width: min(100%, 420px); margin: clamp(24px, 8vh, 72px) auto 0; }
 .login-panel .toolbar-controls { justify-content: flex-start; }
 .login-panel h2 { margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
 .login-panel [data-slot="card-description"] { max-width: 62ch; }
+.login-panel-header { gap: 10px; }
+.admin-login-icon { width: 40px; height: 40px; display: grid; place-items: center; border: 1px solid var(--brand-border); border-radius: 0.5rem; background: var(--brand-soft); color: var(--brand); }
+.admin-login-icon svg { width: 18px; height: 18px; }
 .login-panel-content { display: grid; gap: 14px; }
-.login-panel p.setup-note { margin: 0; color: var(--muted-foreground); font-size: 12px; }
-.login-form { display: flex; gap: 10px; }
-.login-form .field { flex: 1; }
-.password-input { flex: 1; }
+.login-panel p.setup-note { margin: 0; padding-top: 12px; border-top: 1px solid var(--border); color: var(--muted-foreground); font-size: 12px; line-height: 1.5; }
+.login-form { display: grid; gap: 14px; }
+.login-form .field { min-width: 0; }
+.login-form [data-slot="button"] { width: 100%; }
+.password-input { min-width: 0; }
 
 @media (max-width: 760px) {
   body { font-size: 16px; }
@@ -538,8 +542,6 @@ a { color: inherit; text-underline-offset: 3px; }
   .problem-subline { display: block; }
   .problem-id { display: none; }
   .date-cell { text-align: right; font-size: 10px !important; }
-  .login-form { align-items: stretch; flex-direction: column; }
-  .login-form [data-slot="button"] { width: 100%; }
   .admin-problem { grid-template-columns: minmax(0, 1fr) 32px; gap: 7px 8px; }
   .admin-problem-details { grid-column: 1; }
   .admin-section-field { grid-column: 1; }
