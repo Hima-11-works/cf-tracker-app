@@ -122,10 +122,25 @@ export function Leaderboard() {
       ) : null}
 
       {loading && rows.length === 0 ? (
-        <div className="leaderboard-loading" role="status" aria-label="Loading standings">
+        <div className="leaderboard-loading" role="status" aria-busy="true">
           <span className="sr-only">Loading standings…</span>
-          <div className="leaderboard-loading-heading"><Skeleton className="h-3 w-20" /><Skeleton className="h-3 w-16" /></div>
-          {Array.from({ length: 4 }, (_, index) => <Skeleton className="h-14 w-full" key={index} />)}
+          <div className="leaderboard-loading-header" aria-hidden="true">
+            <Skeleton className="h-3 w-10" />
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-3 w-12" />
+          </div>
+          {Array.from({ length: 5 }, (_, index) => (
+            <div className="leaderboard-loading-row" aria-hidden="true" key={index}>
+              <Skeleton className="h-8 w-8" />
+              <div className="leaderboard-loading-user">
+                <Skeleton className="h-4 w-36 max-w-full" />
+                <Skeleton className="h-3 w-24 max-w-full" />
+              </div>
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-10" />
+            </div>
+          ))}
         </div>
       ) : null}
     </>

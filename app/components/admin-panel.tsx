@@ -22,6 +22,98 @@ async function readJson(response: Response) {
   return body;
 }
 
+function AdminSessionSkeleton() {
+  return (
+    <div className="admin-session-skeleton" role="status" aria-busy="true">
+      <span className="sr-only">Checking admin session…</span>
+      <Card className="login-panel admin-session-card" aria-hidden="true">
+        <CardHeader className="login-panel-header">
+          <Skeleton className="size-10" />
+          <Skeleton className="h-6 w-36" />
+          <Skeleton className="h-4 w-64 max-w-full" />
+        </CardHeader>
+        <CardContent className="login-panel-content">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-4 w-52 max-w-full" />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function AdminDataSkeleton() {
+  return (
+    <div className="admin-data-skeleton" role="status" aria-busy="true">
+      <span className="sr-only">Loading the saved whitelist and probation sheet…</span>
+      <div className="admin-toolbar admin-loading-toolbar" aria-hidden="true">
+        <div className="admin-toolbar-copy">
+          <div className="admin-toolbar-state">
+            <Skeleton className="h-6 w-20" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+          <Skeleton className="h-3 w-64 max-w-full" />
+        </div>
+        <div className="admin-toolbar-actions">
+          <Skeleton className="h-8 w-20" />
+          <Skeleton className="h-8 w-28" />
+        </div>
+      </div>
+
+      <div className="admin-grid" aria-hidden="true">
+        <Card className="admin-section whitelist-section">
+          <CardHeader>
+            <div className="admin-card-heading">
+              <Skeleton className="h-5 w-24" />
+              <Skeleton className="h-3 w-48 max-w-full" />
+            </div>
+            <Skeleton className="h-6 w-20" />
+          </CardHeader>
+          <CardContent className="admin-card-content">
+            <Skeleton className="h-3 w-36" />
+            <Skeleton className="h-80 w-full" />
+            <Skeleton className="h-3 w-52 max-w-full" />
+          </CardContent>
+        </Card>
+
+        <Card className="admin-section probation-section">
+          <CardHeader>
+            <div className="admin-card-heading">
+              <Skeleton className="h-5 w-40" />
+              <Skeleton className="h-3 w-56 max-w-full" />
+            </div>
+            <Skeleton className="h-6 w-20" />
+          </CardHeader>
+          <CardContent className="admin-card-content">
+            <Skeleton className="h-8 w-full" />
+            <div className="admin-problems">
+              {Array.from({ length: 5 }, (_, index) => (
+                <div className="admin-problem admin-loading-problem" key={index}>
+                  <div className="admin-loading-problem-name">
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-3 w-32 max-w-full" />
+                  </div>
+                  <Skeleton className="h-8 w-full" />
+                  <Skeleton className="h-8 w-8" />
+                </div>
+              ))}
+            </div>
+            <div className="admin-add-panel">
+              <Skeleton className="h-4 w-28" />
+              <div className="admin-add-grid">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-28" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 export function AdminPanel() {
   const [checkingSession, setCheckingSession] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -203,16 +295,14 @@ export function AdminPanel() {
     ].some((value) => value.toLowerCase().includes(normalizedProblemQuery)));
 
   if (checkingSession) {
-    return (
-      <div className="admin-session-loading" role="status">
-        <span className="sr-only">Checking admin session…</span>
-        <Skeleton className="h-6 w-40" />
-        <Skeleton className="h-32 w-full" />
-      </div>
-    );
+    return <AdminSessionSkeleton />;
   }
 
-  if (isAdmin && !hasLoadedAdminData) {
+  if (isAdmin && !hasLoadedAdminData && !error) {
+    return <AdminDataSkeleton />;
+  }
+
+  if (isAdmin && !hasLoadedAdminData && error) {
     return (
       <Card className="login-panel" aria-live="polite">
         <CardHeader>

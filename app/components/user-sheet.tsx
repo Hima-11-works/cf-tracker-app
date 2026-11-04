@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type ProblemStatus = "not_attempted" | "accepted" | "tle_mle" | "wrong_answer";
@@ -76,6 +76,71 @@ function rememberHandle(value: string) {
 function formatAcceptedDate(value: string | null) {
   if (!value) return "—";
   return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
+}
+
+function UserSheetLoading() {
+  return (
+    <div className="user-sheet-loading" role="status" aria-busy="true">
+      <span className="sr-only">Checking Codeforces submissions and loading the probation sheet…</span>
+
+      <Card className="user-summary" aria-hidden="true">
+        <CardContent className="user-summary-content">
+          <div className="user-loading-profile">
+            <div className="user-loading-identity">
+              <Skeleton className="h-7 w-40" />
+              <Skeleton className="h-6 w-24" />
+            </div>
+            <Skeleton className="h-3 w-64 max-w-full" />
+          </div>
+          <Skeleton className="h-8 w-32" />
+        </CardContent>
+      </Card>
+
+      <div className="user-loading-legend" aria-hidden="true">
+        <Skeleton className="user-loading-chip w-24" />
+        <Skeleton className="user-loading-chip w-20" />
+        <Skeleton className="user-loading-chip w-24" />
+        <Skeleton className="user-loading-chip w-24" />
+      </div>
+
+      <section className="progress-charts user-loading-charts" aria-hidden="true">
+        {Array.from({ length: 2 }, (_, index) => (
+          <Card className="progress-chart-card user-loading-chart-card" key={index}>
+            <CardHeader className="progress-chart-heading">
+              <div className="user-loading-chart-heading">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-3 w-48 max-w-full" />
+              </div>
+              <Skeleton className="h-5 w-16" />
+            </CardHeader>
+            <CardContent className="progress-chart-content">
+              <Skeleton className="loading-chart-surface h-48 w-full" />
+            </CardContent>
+          </Card>
+        ))}
+      </section>
+
+      <section className="user-loading-table-section" aria-hidden="true">
+        <div className="section-heading">
+          <Skeleton className="h-5 w-36" />
+          <Skeleton className="h-3 w-24" />
+        </div>
+        <div className="user-loading-table">
+          {Array.from({ length: 5 }, (_, index) => (
+            <div className="user-loading-row" key={index}>
+              <div className="user-loading-primary">
+                <Skeleton className="h-4 w-44 max-w-full" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
 }
 
 export function UserSheet() {
@@ -174,13 +239,7 @@ export function UserSheet() {
 
       {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
       {warning ? <Alert role="status" className="form-warning"><AlertDescription>{warning}</AlertDescription></Alert> : null}
-      {loading ? (
-        <div className="user-loading" role="status">
-          <span className="sr-only">Checking stored results and Codeforces submissions…</span>
-          <Skeleton className="h-5 w-48" />
-          <Skeleton className="h-14 w-full" />
-        </div>
-      ) : null}
+      {loading ? <UserSheetLoading /> : null}
 
       {sheet ? (
         <>
