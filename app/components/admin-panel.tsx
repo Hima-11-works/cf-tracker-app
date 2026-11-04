@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Check, LogOut, Plus, Save, Search, Trash2 } from "lucide-react";
 
 type Problem = { contestId: string; index: string; name: string; rating: string; section: string };
 type AdminData = { whitelist: string[]; problems: Array<{ contestId: number; index: string; name: string; rating: number | null; section: string }> };
@@ -29,6 +30,8 @@ export function AdminPanel() {
   const [whitelistText, setWhitelistText] = useState("");
   const [problems, setProblems] = useState<Problem[]>([]);
   const [draft, setDraft] = useState<NewProblemDraft>(blankProblem);
+  const [problemQuery, setProblemQuery] = useState("");
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [busy, setBusy] = useState(false);
   const [lookingUpProblem, setLookingUpProblem] = useState(false);
   const [error, setError] = useState("");
@@ -45,6 +48,7 @@ export function AdminPanel() {
       rating: problem.rating == null ? "" : String(problem.rating),
       section: problem.section,
     })));
+    setHasUnsavedChanges(false);
     setHasLoadedAdminData(true);
   }, []);
 
@@ -92,6 +96,7 @@ export function AdminPanel() {
       await readJson(await fetch("/api/admin/session", { method: "DELETE" }));
       setIsAdmin(false);
       setHasLoadedAdminData(false);
+      setHasUnsavedChanges(false);
       setNotice("");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Could not sign out. Try again.");
@@ -114,6 +119,8 @@ export function AdminPanel() {
 
   function editProblem(position: number, value: string) {
     setProblems((current) => current.map((problem, index) => index === position ? { ...problem, section: value } : problem));
+    setHasUnsavedChanges(true);
+    setError("");
     setNotice("");
   }
 
@@ -142,7 +149,9 @@ export function AdminPanel() {
         rating: result.rating == null ? "" : String(result.rating),
         section: draft.section.trim() || "Probation Sheet",
       }]);
+      setHasUnsavedChanges(true);
       setDraft(blankProblem);
+      setProblemQuery("");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Could not look up that Codeforces problem.");
     } finally {
@@ -151,6 +160,7 @@ export function AdminPanel() {
   }
 
   async function save() {
+    if (!hasUnsavedChanges) return;
     setBusy(true);
     setError("");
     setNotice("");
@@ -180,6 +190,18 @@ export function AdminPanel() {
     }
   }
 
+  const whitelistCount = whitelistText.split(/\r?\n/).filter((entry) => entry.trim()).length;
+  const normalizedProblemQuery = problemQuery.trim().toLowerCase();
+  const visibleProblems = problems
+    .map((problem, position) => ({ problem, position }))
+    .filter(({ problem }) => !normalizedProblemQuery || [
+      problem.contestId,
+      problem.index,
+      problem.name,
+      problem.rating,
+      problem.section,
+    ].some((value) => value.toLowerCase().includes(normalizedProblemQuery)));
+
   if (checkingSession) {
     return (
       <div className="admin-session-loading" role="status">
@@ -192,21 +214,19 @@ export function AdminPanel() {
 
   if (isAdmin && !hasLoadedAdminData) {
     return (
-      <>
-        <Card className="login-panel" aria-live="polite">
-          <CardHeader>
-            <CardTitle><h2>{error ? "Tracker data didn’t load" : "Loading tracker data"}</h2></CardTitle>
-            <CardDescription>Your saved whitelist and problem sheet will appear here shortly.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
-            <div className="toolbar-controls">
-              <Button type="button" onClick={() => void retryLoadAdminData()} disabled={busy}>{busy ? "Loading…" : "Retry loading"}</Button>
-              <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy}>Sign out</Button>
-            </div>
-          </CardContent>
-        </Card>
-      </>
+      <Card className="login-panel" aria-live="polite">
+        <CardHeader>
+          <CardTitle><h2>{error ? "Tracker data didn’t load" : "Loading tracker data"}</h2></CardTitle>
+          <CardDescription>{error ? "Retry the request or sign out and try again." : "Your saved whitelist and problem sheet will appear here shortly."}</CardDescription>
+        </CardHeader>
+        <CardContent className="login-panel-content">
+          {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
+          <div className="toolbar-controls">
+            <Button type="button" onClick={() => void retryLoadAdminData()} disabled={busy}>{busy ? "Loading…" : "Retry loading"}</Button>
+            <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy}><LogOut data-icon="inline-start" aria-hidden="true" />Sign out</Button>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -216,9 +236,10 @@ export function AdminPanel() {
         <Card className="login-panel">
           <CardHeader>
             <CardTitle><h2>Admin sign in</h2></CardTitle>
-            <CardDescription>Enter the password configured in the server environment to edit tracker data.</CardDescription>
+            <CardDescription>Sign in to manage the Codeforces whitelist and probation sheet.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="login-panel-content">
+            {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
             <form className="login-form" onSubmit={signIn}>
               <div className="field password-input">
                 <Label htmlFor="admin-password">Admin password</Label>
@@ -226,84 +247,138 @@ export function AdminPanel() {
               </div>
               <Button size="lg" type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</Button>
             </form>
-            <p className="small muted setup-note">First run? Set <code>ADMIN_PASSWORD</code> and Supabase credentials in your local environment.</p>
+            <p className="small muted setup-note">Use the admin password configured for this deployment.</p>
           </CardContent>
         </Card>
       ) : (
-        <>
-          <div className="admin-topline">
-            <Badge variant="secondary" className="admin-status"><span className="admin-status-dot" aria-hidden="true" />Signed in</Badge>
-            <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy}>Sign out</Button>
+        <section className="admin-workspace" aria-label="Tracker administration">
+          <div className="admin-toolbar">
+            <div className="admin-toolbar-copy">
+              <div className="admin-toolbar-state">
+                <Badge variant="secondary" className="admin-status"><span className="admin-status-dot" aria-hidden="true" />Signed in</Badge>
+                {hasUnsavedChanges ? (
+                  <Badge variant="outline" className="admin-dirty-state">Unsaved changes</Badge>
+                ) : (
+                  <span className="admin-saved-state"><Check aria-hidden="true" />All changes saved</span>
+                )}
+              </div>
+              <p className="admin-save-note">Removing a problem also removes its saved results. Removing a handle only hides it and keeps its progress.</p>
+            </div>
+            <div className="admin-toolbar-actions">
+              <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy}>
+                <LogOut data-icon="inline-start" aria-hidden="true" />Sign out
+              </Button>
+              <Button type="button" onClick={() => void save()} disabled={busy || lookingUpProblem || !hasUnsavedChanges}>
+                <Save data-icon="inline-start" aria-hidden="true" />{busy ? "Saving…" : "Save changes"}
+              </Button>
+            </div>
           </div>
 
-          <div>
-            <div className="admin-actions">
-              <span>Saving replaces the active whitelist and sheet order. Removing sheet problems deletes their saved results.</span>
-              <Button type="button" onClick={() => void save()} disabled={busy || lookingUpProblem}>{busy ? "Saving…" : "Save changes"}</Button>
-            </div>
-            <div className="admin-grid">
-              <Card className="admin-section">
-                <CardHeader>
+          {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
+          {notice ? <Alert role="status" className="form-success"><AlertDescription>{notice}</AlertDescription></Alert> : null}
+
+          <div className="admin-grid">
+            <Card className="admin-section whitelist-section">
+              <CardHeader>
+                <div className="admin-card-heading">
                   <CardTitle><h2>Whitelist</h2></CardTitle>
-                  <CardDescription>One Codeforces handle per line. Prefix IoT Lab members with an asterisk (*). Removing a handle hides it and preserves its saved progress.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="field">
-                    <Label htmlFor="whitelist-handles">Active handles</Label>
-                    <Textarea
-                      id="whitelist-handles"
-                      className="whitelist-textarea"
-                      value={whitelistText}
-                      onChange={(event) => { setWhitelistText(event.target.value); setNotice(""); }}
-                      placeholder="handle_one&#10;*iot_lab_member"
-                      disabled={busy}
-                      spellCheck={false}
+                  <CardDescription>One handle per line. Prefix IoT Lab members with an asterisk (*).</CardDescription>
+                </div>
+                <Badge variant="secondary" className="admin-count-badge">{whitelistCount} {whitelistCount === 1 ? "handle" : "handles"}</Badge>
+              </CardHeader>
+              <CardContent className="admin-card-content">
+                <div className="field">
+                  <Label htmlFor="whitelist-handles">Codeforces handles</Label>
+                  <Textarea
+                    id="whitelist-handles"
+                    className="whitelist-textarea"
+                    aria-describedby="whitelist-help"
+                    value={whitelistText}
+                    onChange={(event) => { setWhitelistText(event.target.value); setHasUnsavedChanges(true); setError(""); setNotice(""); }}
+                    placeholder="handle_one&#10;*iot_lab_member"
+                    disabled={busy}
+                    spellCheck={false}
+                  />
+                </div>
+                <p id="whitelist-help" className="small muted admin-hint">The asterisk marks IoT Lab membership; it is not part of the Codeforces handle.</p>
+              </CardContent>
+            </Card>
+
+            <Card className="admin-section probation-section">
+              <CardHeader>
+                <div className="admin-card-heading">
+                  <CardTitle><h2>Probation sheet</h2></CardTitle>
+                  <CardDescription>Paste a Codeforces problem link to add it. Edit its section inline.</CardDescription>
+                </div>
+                <Badge variant="secondary" className="admin-count-badge">{problems.length} {problems.length === 1 ? "problem" : "problems"}</Badge>
+              </CardHeader>
+              <CardContent className="admin-card-content">
+                <div className="admin-problem-tools">
+                  <div className="admin-search-field">
+                    <Search className="admin-search-icon" aria-hidden="true" />
+                    <Input
+                      id="admin-problem-search"
+                      aria-label="Search problems by name, ID, rating, or section"
+                      value={problemQuery}
+                      onChange={(event) => setProblemQuery(event.target.value)}
+                      placeholder="Search problems…"
+                      disabled={busy || problems.length === 0}
                     />
                   </div>
-                  <p className="small muted admin-hint">The asterisk is a marker; the stored Codeforces handle stays unchanged.</p>
-                </CardContent>
-              </Card>
+                  <span className="admin-result-count" aria-live="polite">{visibleProblems.length} shown</span>
+                </div>
 
-              <Card className="admin-section">
-                <CardHeader>
-                  <CardTitle><h2>Probation sheet</h2></CardTitle>
-                  <CardDescription>Paste a Codeforces problem link to fill in its name and rating. Sections group the rows.</CardDescription>
-                </CardHeader>
-                <CardContent>
                 {problems.length === 0 ? (
-                  <Alert role="status" className="admin-empty"><AlertDescription>No problems on the sheet yet. Paste a Codeforces link below to add the first one.</AlertDescription></Alert>
+                  <Alert role="status" className="admin-empty"><AlertDescription>No problems on the sheet yet. Add the first one below.</AlertDescription></Alert>
+                ) : visibleProblems.length === 0 ? (
+                  <Alert role="status" className="admin-empty"><AlertDescription>No problems match “{problemQuery}”. Try another name, ID, rating, or section.</AlertDescription></Alert>
                 ) : (
                   <div className="admin-problems" role="list" aria-label="Problems on the sheet">
-                    {problems.map((problem, position) => (
+                    {visibleProblems.map(({ problem, position }) => (
                       <div className="admin-problem" role="listitem" key={`${position}-${problem.contestId}-${problem.index}`}>
                         <div className="admin-problem-details">
                           <a href={`https://codeforces.com/contest/${encodeURIComponent(problem.contestId)}/problem/${encodeURIComponent(problem.index)}`} target="_blank" rel="noreferrer">
-                            <span className="mono">{problem.contestId}{problem.index}</span> · {problem.name}
+                            <span className="admin-problem-id mono">{problem.contestId}{problem.index}</span>
+                            <span className="admin-problem-name">{problem.name}</span>
                           </a>
-                          <span className="small muted">{problem.rating ? `Rating ${problem.rating}` : "No rating listed"}</span>
+                          {problem.rating ? <Badge variant="outline" className="admin-problem-rating">Rating {problem.rating}</Badge> : <span className="admin-problem-unrated">No rating</span>}
                         </div>
-                        <Input className="admin-problem-input section-input" aria-label={`Problem ${position + 1} section`} value={problem.section} onChange={(event) => editProblem(position, event.target.value)} placeholder="Section" disabled={busy} />
-                        <Button variant="destructive" size="sm" className="remove-problem" type="button" aria-label={`Remove ${problem.name || `problem ${position + 1}`}`} onClick={() => { setProblems((current) => current.filter((_, index) => index !== position)); setNotice(""); }} disabled={busy}>Remove</Button>
+                        <div className="field admin-section-field">
+                          <Label className="sr-only" htmlFor={`problem-section-${position}`}>Section for {problem.contestId}{problem.index}</Label>
+                          <Input id={`problem-section-${position}`} className="admin-problem-input section-input" value={problem.section} onChange={(event) => editProblem(position, event.target.value)} placeholder="Section" disabled={busy} />
+                        </div>
+                        <Button variant="ghost" size="icon" className="remove-problem" type="button" aria-label={`Remove ${problem.name || `problem ${position + 1}`}`} title="Remove problem" onClick={() => { setProblems((current) => current.filter((_, index) => index !== position)); setHasUnsavedChanges(true); setError(""); setNotice(""); }} disabled={busy}>
+                          <Trash2 aria-hidden="true" />
+                        </Button>
                       </div>
                     ))}
                   </div>
                 )}
 
-                <form className="admin-add-grid" onSubmit={addProblem} aria-label="Add a problem">
-                  <Input className="admin-problem-input problem-url-input" aria-label="Codeforces problem link" inputMode="url" autoComplete="off" autoCapitalize="off" spellCheck={false} value={draft.url} onChange={(event) => setDraft((current) => ({ ...current, url: event.target.value }))} placeholder="https://codeforces.com/contest/1915/problem/A" disabled={busy || lookingUpProblem} />
-                  <Input className="admin-problem-input section-input" aria-label="New problem section" value={draft.section} onChange={(event) => setDraft((current) => ({ ...current, section: event.target.value }))} placeholder="Section" disabled={busy || lookingUpProblem} />
-                  <Button variant="outline" type="submit" disabled={busy || lookingUpProblem}>{lookingUpProblem ? "Looking up…" : "Add problem"}</Button>
-                </form>
-                </CardContent>
-              </Card>
-            </div>
-
-            {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
-            {notice ? <Alert role="status" className="form-success"><AlertDescription>{notice}</AlertDescription></Alert> : null}
+                <div className="admin-add-panel">
+                  <div className="admin-add-heading">
+                    <h3>Add a problem</h3>
+                    <p>Problem name and rating fill in automatically.</p>
+                  </div>
+                  <form className="admin-add-grid" onSubmit={addProblem} aria-label="Add a problem">
+                    <div className="field problem-url-field">
+                      <Label htmlFor="new-problem-url">Codeforces problem link</Label>
+                      <Input id="new-problem-url" className="admin-problem-input problem-url-input" inputMode="url" autoComplete="off" autoCapitalize="off" spellCheck={false} value={draft.url} onChange={(event) => setDraft((current) => ({ ...current, url: event.target.value }))} placeholder="https://codeforces.com/contest/1915/problem/A" disabled={busy || lookingUpProblem} required />
+                    </div>
+                    <div className="field section-field">
+                      <Label htmlFor="new-problem-section">Section</Label>
+                      <Input id="new-problem-section" className="admin-problem-input section-input" value={draft.section} onChange={(event) => setDraft((current) => ({ ...current, section: event.target.value }))} placeholder="Section" disabled={busy || lookingUpProblem} />
+                    </div>
+                    <Button type="submit" disabled={busy || lookingUpProblem}>
+                      <Plus data-icon="inline-start" aria-hidden="true" />{lookingUpProblem ? "Looking up…" : "Add problem"}
+                    </Button>
+                  </form>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </>
+        </section>
       )}
-      {!isAdmin && error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
     </>
   );
 }
