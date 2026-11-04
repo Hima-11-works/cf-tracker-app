@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Switch } from "@/components/ui/switch";
 
 type LeaderboardRow = { handle: string; solved: number; rank: number; isIotLabMember: boolean };
 
@@ -51,22 +56,22 @@ export function Leaderboard() {
           </span>
         </div>
         <div className="toolbar-controls">
-          <label className="leaderboard-filter">
-            <input
-              type="checkbox"
+          <label className="leaderboard-filter" htmlFor="exclude-iot-members">
+            <Switch
+              id="exclude-iot-members"
               checked={excludeIotLabMembers}
-              onChange={(event) => setExcludeIotLabMembers(event.target.checked)}
+              onCheckedChange={setExcludeIotLabMembers}
             />
             <span>Exclude IoT Lab members</span>
           </label>
-          <button className="button button-quiet" type="button" onClick={() => void load()} disabled={loading}>
+          <Button variant="outline" type="button" onClick={() => void load()} disabled={loading}>
             {loading ? "Updating…" : "Refresh standings"}
-          </button>
+          </Button>
         </div>
       </div>
 
       {error ? (
-        <div className="form-error" role="alert">{error}</div>
+        <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert>
       ) : null}
 
       {!error && !loading && visibleRows.length === 0 ? (
@@ -84,31 +89,31 @@ export function Leaderboard() {
 
       {rankedVisibleRows.length > 0 ? (
         <div className="problem-table-wrap">
-          <table className="leaderboard-table">
-            <thead>
-              <tr><th>Place</th><th>Codeforces handle</th><th>Problems</th><th>Accepted</th></tr>
-            </thead>
-            <tbody>
+          <Table className="leaderboard-table">
+            <TableHeader>
+              <TableRow><TableHead>Place</TableHead><TableHead>Codeforces handle</TableHead><TableHead>Problems</TableHead><TableHead>Accepted</TableHead></TableRow>
+            </TableHeader>
+            <TableBody>
               {rankedVisibleRows.map((row) => {
                 const rankClass = row.rank === 1 ? "rank-first" : row.rank === 2 ? "rank-second" : row.rank === 3 ? "rank-third" : "";
                 return (
-                  <tr className={rankClass ? `leaderboard-row ${rankClass}` : "leaderboard-row"} key={row.handle}>
-                    <td className="rank-cell">
+                  <TableRow className={rankClass ? `leaderboard-row ${rankClass}` : "leaderboard-row"} key={row.handle}>
+                    <TableCell className="rank-cell">
                       <span className={`rank-badge ${rankClass}`} aria-label={`Place ${row.rank}`}>{String(row.rank).padStart(2, "0")}</span>
-                    </td>
-                    <td>
+                    </TableCell>
+                    <TableCell className="whitespace-normal">
                       <span className="leaderboard-handle">
                         <Link className="handle-link" href={`/user?handle=${encodeURIComponent(row.handle)}`}>{row.handle}</Link>
-                        {row.isIotLabMember ? <span className="iot-member-badge">IoT Lab Member</span> : null}
+                        {row.isIotLabMember ? <Badge variant="outline" className="iot-member-badge">IoT Lab Member</Badge> : null}
                       </span>
-                    </td>
-                    <td className="muted">{problemCount ? `${row.solved} / ${problemCount}` : "—"}</td>
-                    <td className="solved-value">{row.solved}</td>
-                  </tr>
+                    </TableCell>
+                    <TableCell className="muted">{problemCount ? `${row.solved} / ${problemCount}` : "—"}</TableCell>
+                    <TableCell className="solved-value">{row.solved}</TableCell>
+                  </TableRow>
                 );
               })}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       ) : null}
 

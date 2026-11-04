@@ -1,8 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { ProgressCharts } from "./progress-charts";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 type ProblemStatus = "not_attempted" | "accepted" | "tle_mle" | "wrong_answer";
 type Problem = {
@@ -144,10 +148,9 @@ export function UserSheet() {
         </div>
         <form className="lookup-form" onSubmit={onSubmit}>
           <div className="field handle-input">
-            <label htmlFor="codeforces-handle">Codeforces ID</label>
-            <input
+            <Label htmlFor="codeforces-handle">Codeforces ID</Label>
+            <Input
               id="codeforces-handle"
-              className="text-input"
               value={handle}
               onChange={(event) => {
                 const nextHandle = event.target.value;
@@ -162,11 +165,11 @@ export function UserSheet() {
               maxLength={64}
             />
           </div>
-          <button className="button" type="submit" disabled={loading}>{loading ? "Checking…" : sheet ? "Refresh sheet" : "View sheet"}</button>
+          <Button type="submit" disabled={loading}>{loading ? "Checking…" : sheet ? "Refresh sheet" : "View sheet"}</Button>
         </form>
       </section>
 
-      {error ? <p className="form-error" role="alert">{error}</p> : null}
+      {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
       {warning ? <p className="form-warning" role="status">{warning}</p> : null}
       {loading ? <p className="loading-line" role="status">Checking stored results and Codeforces submissions…</p> : null}
 
@@ -209,31 +212,31 @@ export function UserSheet() {
                 <span>{problems.filter((problem) => problem.status === "accepted").length} / {problems.length} accepted</span>
               </div>
               <div className="problem-table-wrap">
-                <table className="problem-table">
-                  <thead><tr><th>Problem</th><th>CF ID</th><th>Status</th><th>Accepted on</th></tr></thead>
-                  <tbody>
+                <Table className="problem-table">
+                  <TableHeader><TableRow><TableHead>Problem</TableHead><TableHead>CF ID</TableHead><TableHead>Status</TableHead><TableHead>Accepted on</TableHead></TableRow></TableHeader>
+                  <TableBody>
                     {problems.map((problem) => (
-                      <tr className={`status-${problem.status}`} key={problem.id}>
-                        <td>
+                      <TableRow className={`status-${problem.status}`} key={problem.id}>
+                        <TableCell className="whitespace-normal">
                           <span className="problem-name">{problem.name}</span>
                           <span className="problem-subline">{problem.contestId}{problem.index}{problem.rating ? ` · ${problem.rating}` : ""}</span>
-                        </td>
-                        <td className="problem-id">
+                        </TableCell>
+                        <TableCell className="problem-id">
                           <a href={`https://codeforces.com/problemset/problem/${problem.contestId}/${encodeURIComponent(problem.index)}`} target="_blank" rel="noreferrer">
                             {problem.contestId}{problem.index}
                           </a>
-                        </td>
-                        <td>
+                        </TableCell>
+                        <TableCell>
                           <span className={`status-label ${problem.status}`}>
                             <span className="status-dot" aria-hidden="true" />
                             {statusLabels[problem.status]}
                           </span>
-                        </td>
-                        <td className="date-cell">{problem.status === "accepted" ? formatAcceptedDate(problem.acceptedAt) : "—"}</td>
-                      </tr>
+                        </TableCell>
+                        <TableCell className="date-cell">{problem.status === "accepted" ? formatAcceptedDate(problem.acceptedAt) : "—"}</TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
             </section>
           ))}

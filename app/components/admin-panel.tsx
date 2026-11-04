@@ -1,6 +1,11 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 type Problem = { contestId: string; index: string; name: string; rating: string; section: string };
 type AdminData = { whitelist: string[]; problems: Array<{ contestId: number; index: string; name: string; rating: number | null; section: string }> };
@@ -181,8 +186,8 @@ export function AdminPanel() {
           <h2>{error ? "Tracker data didn’t load" : "Loading tracker data"}</h2>
           <p>{error || "Your saved whitelist and problem sheet will appear here shortly."}</p>
           <div className="toolbar-controls">
-            <button className="button" type="button" onClick={() => void retryLoadAdminData()} disabled={busy}>{busy ? "Loading…" : "Retry loading"}</button>
-            <button className="button button-quiet" type="button" onClick={() => void signOut()} disabled={busy}>Sign out</button>
+            <Button type="button" onClick={() => void retryLoadAdminData()} disabled={busy}>{busy ? "Loading…" : "Retry loading"}</Button>
+            <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy}>Sign out</Button>
           </div>
         </section>
       </>
@@ -197,10 +202,10 @@ export function AdminPanel() {
           <p>Enter the password configured in the server environment to edit tracker data.</p>
           <form className="login-form" onSubmit={signIn}>
             <div className="field password-input">
-              <label htmlFor="admin-password">Admin password</label>
-              <input id="admin-password" className="text-input" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+              <Label htmlFor="admin-password">Admin password</Label>
+              <Input id="admin-password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required />
             </div>
-            <button className="button" type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
+            <Button size="lg" type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</Button>
           </form>
           <p className="small muted">First run? Set <code>ADMIN_PASSWORD</code> and Supabase credentials in your local environment.</p>
         </section>
@@ -208,30 +213,30 @@ export function AdminPanel() {
         <>
           <div className="admin-topline">
             <div className="admin-status">Signed in</div>
-            <button className="button button-quiet" type="button" onClick={() => void signOut()} disabled={busy}>Sign out</button>
+            <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy}>Sign out</Button>
           </div>
 
           <div>
             <div className="admin-actions">
               <span>Saving replaces the active whitelist and sheet order. Removing sheet problems deletes their saved results.</span>
-              <button className="button" type="button" onClick={() => void save()} disabled={busy || lookingUpProblem}>{busy ? "Saving…" : "Save changes"}</button>
+              <Button type="button" onClick={() => void save()} disabled={busy || lookingUpProblem}>{busy ? "Saving…" : "Save changes"}</Button>
             </div>
             <div className="admin-grid">
               <section className="admin-section">
                 <h2>Whitelist</h2>
                 <p>One Codeforces handle per line. Prefix IoT Lab members with an asterisk (*). Removing a handle hides it and preserves its saved progress.</p>
-                <label className="field" htmlFor="whitelist-handles">
-                  <span className="small muted">Active handles</span>
-                  <textarea
+                <div className="field">
+                  <Label htmlFor="whitelist-handles">Active handles</Label>
+                  <Textarea
                     id="whitelist-handles"
-                    className="text-area"
+                    className="whitelist-textarea"
                     value={whitelistText}
                     onChange={(event) => { setWhitelistText(event.target.value); setNotice(""); }}
                     placeholder="handle_one&#10;*iot_lab_member"
                     disabled={busy}
                     spellCheck={false}
                   />
-                </label>
+                </div>
                 <p className="small muted">The asterisk is a marker; the stored Codeforces handle stays unchanged.</p>
               </section>
 
@@ -250,27 +255,27 @@ export function AdminPanel() {
                           </a>
                           <span className="small muted">{problem.rating ? `Rating ${problem.rating}` : "No rating listed"}</span>
                         </div>
-                        <input className="problem-input section-input" aria-label={`Problem ${position + 1} section`} value={problem.section} onChange={(event) => editProblem(position, event.target.value)} placeholder="Section" disabled={busy} />
-                        <button className="button button-quiet remove-problem" type="button" aria-label={`Remove ${problem.name || `problem ${position + 1}`}`} onClick={() => { setProblems((current) => current.filter((_, index) => index !== position)); setNotice(""); }} disabled={busy}>Remove</button>
+                        <Input className="admin-problem-input section-input" aria-label={`Problem ${position + 1} section`} value={problem.section} onChange={(event) => editProblem(position, event.target.value)} placeholder="Section" disabled={busy} />
+                        <Button variant="destructive" size="sm" className="remove-problem" type="button" aria-label={`Remove ${problem.name || `problem ${position + 1}`}`} onClick={() => { setProblems((current) => current.filter((_, index) => index !== position)); setNotice(""); }} disabled={busy}>Remove</Button>
                       </div>
                     ))}
                   </div>
                 )}
 
                 <form className="admin-add-grid" onSubmit={addProblem} aria-label="Add a problem">
-                  <input className="problem-input problem-url-input" aria-label="Codeforces problem link" inputMode="url" autoComplete="off" autoCapitalize="off" spellCheck={false} value={draft.url} onChange={(event) => setDraft((current) => ({ ...current, url: event.target.value }))} placeholder="https://codeforces.com/contest/1915/problem/A" disabled={busy || lookingUpProblem} />
-                  <input className="problem-input section-input" aria-label="New problem section" value={draft.section} onChange={(event) => setDraft((current) => ({ ...current, section: event.target.value }))} placeholder="Section" disabled={busy || lookingUpProblem} />
-                  <button className="button button-secondary" type="submit" disabled={busy || lookingUpProblem}>{lookingUpProblem ? "Looking up…" : "Add problem"}</button>
+                  <Input className="admin-problem-input problem-url-input" aria-label="Codeforces problem link" inputMode="url" autoComplete="off" autoCapitalize="off" spellCheck={false} value={draft.url} onChange={(event) => setDraft((current) => ({ ...current, url: event.target.value }))} placeholder="https://codeforces.com/contest/1915/problem/A" disabled={busy || lookingUpProblem} />
+                  <Input className="admin-problem-input section-input" aria-label="New problem section" value={draft.section} onChange={(event) => setDraft((current) => ({ ...current, section: event.target.value }))} placeholder="Section" disabled={busy || lookingUpProblem} />
+                  <Button variant="outline" type="submit" disabled={busy || lookingUpProblem}>{lookingUpProblem ? "Looking up…" : "Add problem"}</Button>
                 </form>
               </section>
             </div>
 
-            {error ? <p className="form-error" role="alert">{error}</p> : null}
-            {notice ? <p className="form-success" role="status">{notice}</p> : null}
+            {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
+            {notice ? <Alert role="status" className="form-success"><AlertDescription>{notice}</AlertDescription></Alert> : null}
           </div>
         </>
       )}
-      {!isAdmin && error ? <p className="form-error" role="alert">{error}</p> : null}
+      {!isAdmin && error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
     </>
   );
 }

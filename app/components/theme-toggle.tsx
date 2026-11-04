@@ -1,5 +1,8 @@
 "use client";
 
+import { Moon, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
 const THEME_STORAGE_KEY = "cf-probation-theme";
 
 export function ThemeToggle() {
@@ -7,6 +10,7 @@ export function ThemeToggle() {
     const root = document.documentElement;
     const nextTheme = root.dataset.theme === "dark" ? "light" : "dark";
     root.dataset.theme = nextTheme;
+    root.classList.toggle("dark", nextTheme === "dark");
 
     try {
       window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
@@ -16,18 +20,17 @@ export function ThemeToggle() {
   }
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="icon"
       className="theme-toggle"
       type="button"
       onClick={toggleTheme}
-      aria-label="Switch between light and dark theme"
-      title="Switch between light and dark theme"
+      aria-label="Switch theme"
+      title="Switch theme"
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <circle className="theme-icon-sun" cx="12" cy="12" r="3.5" />
-        <path className="theme-icon-sun" d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" />
-        <path className="theme-icon-moon" d="M20.2 15.3A8.5 8.5 0 0 1 8.7 3.8 8.5 8.5 0 1 0 20.2 15.3Z" />
-      </svg>
-    </button>
+      <Sun className="theme-icon-sun" aria-hidden="true" />
+      <Moon className="theme-icon-moon" aria-hidden="true" />
+    </Button>
   );
 }
