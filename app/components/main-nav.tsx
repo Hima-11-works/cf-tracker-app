@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "./theme-toggle";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/leaderboard", label: "Leaderboard" },
@@ -15,7 +17,15 @@ export function MainNav() {
   return (
     <nav className="main-nav" aria-label="Main navigation">
       {links.map((link) => (
-        <Link key={link.href} href={link.href} aria-current={pathname === link.href ? "page" : undefined}>
+        <Link
+          key={link.href}
+          href={link.href}
+          className={cn(
+            buttonVariants({ variant: pathname === link.href ? "default" : "ghost" }),
+            "nav-link"
+          )}
+          aria-current={pathname === link.href ? "page" : undefined}
+        >
           {link.label}
         </Link>
       ))}

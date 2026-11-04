@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ProblemStatus = "not_attempted" | "accepted" | "tle_mle" | "wrong_answer";
 type Problem = {
@@ -170,41 +173,49 @@ export function UserSheet() {
       </section>
 
       {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
-      {warning ? <p className="form-warning" role="status">{warning}</p> : null}
-      {loading ? <p className="loading-line" role="status">Checking stored results and Codeforces submissions…</p> : null}
+      {warning ? <Alert role="status" className="form-warning"><AlertDescription>{warning}</AlertDescription></Alert> : null}
+      {loading ? (
+        <div className="user-loading" role="status">
+          <span className="sr-only">Checking stored results and Codeforces submissions…</span>
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-14 w-full" />
+        </div>
+      ) : null}
 
       {sheet ? (
         <>
-          <section className="user-summary" aria-label="User progress">
-            <div>
-              <div className="user-profile-line">
-                <h2><a href={`https://codeforces.com/profile/${encodeURIComponent(sheet.handle)}`} target="_blank" rel="noreferrer">{sheet.handle}</a></h2>
-                <div className="codeforces-rating" data-rank={rankSlug(sheet.rank)} aria-label={sheet.profileAvailable ? `Codeforces rating ${sheet.rating ?? "unrated"}${sheet.rank ? `, ${sheet.rank}` : ""}` : "Codeforces rating unavailable"}>
-                  <strong>{sheet.profileAvailable ? sheet.rating ?? "Unrated" : "Unavailable"}</strong>
-                  {sheet.rank ? <span>{displayRank(sheet.rank)}</span> : null}
+          <Card className="user-summary" aria-label="User progress">
+            <CardContent className="user-summary-content">
+              <div>
+                <div className="user-profile-line">
+                  <h2><a href={`https://codeforces.com/profile/${encodeURIComponent(sheet.handle)}`} target="_blank" rel="noreferrer">{sheet.handle}</a></h2>
+                  <Badge variant="outline" className="codeforces-rating" data-rank={rankSlug(sheet.rank)} aria-label={sheet.profileAvailable ? `Codeforces rating ${sheet.rating ?? "unrated"}${sheet.rank ? `, ${sheet.rank}` : ""}` : "Codeforces rating unavailable"}>
+                    <strong>{sheet.profileAvailable ? sheet.rating ?? "Unrated" : "Unavailable"}</strong>
+                    {sheet.rank ? <span>{displayRank(sheet.rank)}</span> : null}
+                  </Badge>
                 </div>
+                <p>Accepted problems are skipped on future status checks.</p>
               </div>
-              <p>Accepted problems are skipped on future status checks.</p>
-            </div>
-            <div className="progress-count" aria-label={`${sheet.solvedCount} of ${sheet.problemCount} problems accepted`}>
-              <strong>{String(sheet.solvedCount).padStart(2, "0")}</strong>
-              <span>/ {sheet.problemCount} accepted</span>
-            </div>
-          </section>
+              <div className="progress-count" aria-label={`${sheet.solvedCount} of ${sheet.problemCount} problems accepted`}>
+                <strong>{String(sheet.solvedCount).padStart(2, "0")}</strong>
+                <span>/ {sheet.problemCount} accepted</span>
+              </div>
+            </CardContent>
+          </Card>
 
           <div className="legend" aria-label="Problem status legend">
             {(Object.keys(statusLabels) as ProblemStatus[]).map((status) => (
-              <span className="legend-item" key={status}>
-                <span className={`legend-swatch ${status === "accepted" ? "accepted" : status === "tle_mle" ? "tle" : status === "wrong_answer" ? "wrong" : ""}`} aria-hidden="true" />
+              <Badge variant="outline" className={`legend-item status-chip ${status}`} key={status}>
+                <span className="status-dot" aria-hidden="true" />
                 {statusLabels[status]}
-              </span>
+              </Badge>
             ))}
           </div>
 
           {sheet.problems.length > 0 ? <ProgressCharts problems={sheet.problems} /> : null}
 
           {sheet.problems.length === 0 ? (
-            <div className="empty-sheet">No problems have been added to the probation sheet yet. Check back after the admin configures it.</div>
+            <Alert role="status" className="empty-sheet"><AlertDescription>No problems have been added to the probation sheet yet. Check back after the admin configures it.</AlertDescription></Alert>
           ) : groups.map(([section, problems]) => (
             <section key={section} aria-label={section}>
               <div className="section-heading">
@@ -227,10 +238,10 @@ export function UserSheet() {
                           </a>
                         </TableCell>
                         <TableCell>
-                          <span className={`status-label ${problem.status}`}>
+                          <Badge variant="outline" className={`status-label status-chip ${problem.status}`}>
                             <span className="status-dot" aria-hidden="true" />
                             {statusLabels[problem.status]}
-                          </span>
+                          </Badge>
                         </TableCell>
                         <TableCell className="date-cell">{problem.status === "accepted" ? formatAcceptedDate(problem.acceptedAt) : "—"}</TableCell>
                       </TableRow>

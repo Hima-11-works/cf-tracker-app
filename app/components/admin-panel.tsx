@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Problem = { contestId: string; index: string; name: string; rating: string; section: string };
 type AdminData = { whitelist: string[]; problems: Array<{ contestId: number; index: string; name: string; rating: number | null; section: string }> };
@@ -177,19 +180,32 @@ export function AdminPanel() {
     }
   }
 
-  if (checkingSession) return <p className="loading-line" role="status">Checking admin session…</p>;
+  if (checkingSession) {
+    return (
+      <div className="admin-session-loading" role="status">
+        <span className="sr-only">Checking admin session…</span>
+        <Skeleton className="h-6 w-40" />
+        <Skeleton className="h-32 w-full" />
+      </div>
+    );
+  }
 
   if (isAdmin && !hasLoadedAdminData) {
     return (
       <>
-        <section className="login-panel" aria-live="polite">
-          <h2>{error ? "Tracker data didn’t load" : "Loading tracker data"}</h2>
-          <p>{error || "Your saved whitelist and problem sheet will appear here shortly."}</p>
-          <div className="toolbar-controls">
-            <Button type="button" onClick={() => void retryLoadAdminData()} disabled={busy}>{busy ? "Loading…" : "Retry loading"}</Button>
-            <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy}>Sign out</Button>
-          </div>
-        </section>
+        <Card className="login-panel" aria-live="polite">
+          <CardHeader>
+            <CardTitle><h2>{error ? "Tracker data didn’t load" : "Loading tracker data"}</h2></CardTitle>
+            <CardDescription>Your saved whitelist and problem sheet will appear here shortly.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
+            <div className="toolbar-controls">
+              <Button type="button" onClick={() => void retryLoadAdminData()} disabled={busy}>{busy ? "Loading…" : "Retry loading"}</Button>
+              <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy}>Sign out</Button>
+            </div>
+          </CardContent>
+        </Card>
       </>
     );
   }
@@ -197,22 +213,26 @@ export function AdminPanel() {
   return (
     <>
       {!isAdmin ? (
-        <section className="login-panel">
-          <h2>Admin sign in</h2>
-          <p>Enter the password configured in the server environment to edit tracker data.</p>
-          <form className="login-form" onSubmit={signIn}>
-            <div className="field password-input">
-              <Label htmlFor="admin-password">Admin password</Label>
-              <Input id="admin-password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required />
-            </div>
-            <Button size="lg" type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</Button>
-          </form>
-          <p className="small muted">First run? Set <code>ADMIN_PASSWORD</code> and Supabase credentials in your local environment.</p>
-        </section>
+        <Card className="login-panel">
+          <CardHeader>
+            <CardTitle><h2>Admin sign in</h2></CardTitle>
+            <CardDescription>Enter the password configured in the server environment to edit tracker data.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form className="login-form" onSubmit={signIn}>
+              <div className="field password-input">
+                <Label htmlFor="admin-password">Admin password</Label>
+                <Input id="admin-password" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+              </div>
+              <Button size="lg" type="submit" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</Button>
+            </form>
+            <p className="small muted setup-note">First run? Set <code>ADMIN_PASSWORD</code> and Supabase credentials in your local environment.</p>
+          </CardContent>
+        </Card>
       ) : (
         <>
           <div className="admin-topline">
-            <div className="admin-status">Signed in</div>
+            <Badge variant="secondary" className="admin-status"><span className="admin-status-dot" aria-hidden="true" />Signed in</Badge>
             <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy}>Sign out</Button>
           </div>
 
@@ -222,29 +242,36 @@ export function AdminPanel() {
               <Button type="button" onClick={() => void save()} disabled={busy || lookingUpProblem}>{busy ? "Saving…" : "Save changes"}</Button>
             </div>
             <div className="admin-grid">
-              <section className="admin-section">
-                <h2>Whitelist</h2>
-                <p>One Codeforces handle per line. Prefix IoT Lab members with an asterisk (*). Removing a handle hides it and preserves its saved progress.</p>
-                <div className="field">
-                  <Label htmlFor="whitelist-handles">Active handles</Label>
-                  <Textarea
-                    id="whitelist-handles"
-                    className="whitelist-textarea"
-                    value={whitelistText}
-                    onChange={(event) => { setWhitelistText(event.target.value); setNotice(""); }}
-                    placeholder="handle_one&#10;*iot_lab_member"
-                    disabled={busy}
-                    spellCheck={false}
-                  />
-                </div>
-                <p className="small muted">The asterisk is a marker; the stored Codeforces handle stays unchanged.</p>
-              </section>
+              <Card className="admin-section">
+                <CardHeader>
+                  <CardTitle><h2>Whitelist</h2></CardTitle>
+                  <CardDescription>One Codeforces handle per line. Prefix IoT Lab members with an asterisk (*). Removing a handle hides it and preserves its saved progress.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="field">
+                    <Label htmlFor="whitelist-handles">Active handles</Label>
+                    <Textarea
+                      id="whitelist-handles"
+                      className="whitelist-textarea"
+                      value={whitelistText}
+                      onChange={(event) => { setWhitelistText(event.target.value); setNotice(""); }}
+                      placeholder="handle_one&#10;*iot_lab_member"
+                      disabled={busy}
+                      spellCheck={false}
+                    />
+                  </div>
+                  <p className="small muted admin-hint">The asterisk is a marker; the stored Codeforces handle stays unchanged.</p>
+                </CardContent>
+              </Card>
 
-              <section className="admin-section">
-                <h2>Probation sheet</h2>
-                <p>Paste a Codeforces problem link to fill in its name and rating. Sections group the rows.</p>
+              <Card className="admin-section">
+                <CardHeader>
+                  <CardTitle><h2>Probation sheet</h2></CardTitle>
+                  <CardDescription>Paste a Codeforces problem link to fill in its name and rating. Sections group the rows.</CardDescription>
+                </CardHeader>
+                <CardContent>
                 {problems.length === 0 ? (
-                  <p className="admin-empty">No problems on the sheet yet. Paste a Codeforces link below to add the first one.</p>
+                  <Alert role="status" className="admin-empty"><AlertDescription>No problems on the sheet yet. Paste a Codeforces link below to add the first one.</AlertDescription></Alert>
                 ) : (
                   <div className="admin-problems" role="list" aria-label="Problems on the sheet">
                     {problems.map((problem, position) => (
@@ -267,7 +294,8 @@ export function AdminPanel() {
                   <Input className="admin-problem-input section-input" aria-label="New problem section" value={draft.section} onChange={(event) => setDraft((current) => ({ ...current, section: event.target.value }))} placeholder="Section" disabled={busy || lookingUpProblem} />
                   <Button variant="outline" type="submit" disabled={busy || lookingUpProblem}>{lookingUpProblem ? "Looking up…" : "Add problem"}</Button>
                 </form>
-              </section>
+                </CardContent>
+              </Card>
             </div>
 
             {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}

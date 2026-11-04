@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type LeaderboardRow = { handle: string; solved: number; rank: number; isIotLabMember: boolean };
 
@@ -48,7 +50,7 @@ export function Leaderboard() {
     <>
       <div className="toolbar-line">
         <div className="toolbar-meta">
-          <span className="toolbar-label">Current standings</span>
+          <h2 className="toolbar-title">Current standings</h2>
           <span className="toolbar-note">
             {excludeIotLabMembers && visibleRows.length !== rows.length
               ? `${visibleRows.length} of ${rows.length} handles`
@@ -56,14 +58,14 @@ export function Leaderboard() {
           </span>
         </div>
         <div className="toolbar-controls">
-          <label className="leaderboard-filter" htmlFor="exclude-iot-members">
+          <Label className="leaderboard-filter" htmlFor="exclude-iot-members">
             <Switch
               id="exclude-iot-members"
               checked={excludeIotLabMembers}
               onCheckedChange={setExcludeIotLabMembers}
             />
             <span>Exclude IoT Lab members</span>
-          </label>
+          </Label>
           <Button variant="outline" type="button" onClick={() => void load()} disabled={loading}>
             {loading ? "Updating…" : "Refresh standings"}
           </Button>
@@ -75,16 +77,18 @@ export function Leaderboard() {
       ) : null}
 
       {!error && !loading && visibleRows.length === 0 ? (
-        <div className="leaderboard-empty">
-          {rows.length === 0 ? (
-            <>
-              <strong>No handles on the board yet.</strong>
-              Add Codeforces handles and problems from the <Link className="inline-link" href="/admin">admin page</Link>.
-            </>
-          ) : (
-            <strong>No non-member handles match this filter.</strong>
-          )}
-        </div>
+        <Alert role="status" className="leaderboard-empty">
+          <AlertDescription>
+            {rows.length === 0 ? (
+              <>
+                <strong>No handles on the board yet.</strong>
+                <span>Add Codeforces handles and problems from the <Link className="inline-link" href="/admin">admin page</Link>.</span>
+              </>
+            ) : (
+              <strong>No non-member handles match this filter.</strong>
+            )}
+          </AlertDescription>
+        </Alert>
       ) : null}
 
       {rankedVisibleRows.length > 0 ? (
@@ -99,7 +103,7 @@ export function Leaderboard() {
                 return (
                   <TableRow className={rankClass ? `leaderboard-row ${rankClass}` : "leaderboard-row"} key={row.handle}>
                     <TableCell className="rank-cell">
-                      <span className={`rank-badge ${rankClass}`} aria-label={`Place ${row.rank}`}>{String(row.rank).padStart(2, "0")}</span>
+                      <Badge variant="outline" className={`rank-badge ${rankClass}`} aria-label={`Place ${row.rank}`}>{String(row.rank).padStart(2, "0")}</Badge>
                     </TableCell>
                     <TableCell className="whitespace-normal">
                       <span className="leaderboard-handle">
@@ -117,7 +121,13 @@ export function Leaderboard() {
         </div>
       ) : null}
 
-      {loading && rows.length === 0 ? <p className="loading-line" role="status">Loading standings…</p> : null}
+      {loading && rows.length === 0 ? (
+        <div className="leaderboard-loading" role="status" aria-label="Loading standings">
+          <span className="sr-only">Loading standings…</span>
+          <div className="leaderboard-loading-heading"><Skeleton className="h-3 w-20" /><Skeleton className="h-3 w-16" /></div>
+          {Array.from({ length: 4 }, (_, index) => <Skeleton className="h-14 w-full" key={index} />)}
+        </div>
+      ) : null}
     </>
   );
 }
