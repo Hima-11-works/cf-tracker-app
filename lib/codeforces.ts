@@ -27,8 +27,23 @@ interface CodeforcesUserInfoResponse {
 const CODEFORCES_API_INTERVAL_MS = 2_000;
 const USER_PROFILE_CACHE_MS = 10 * 60 * 1_000;
 const userProfileCache = new Map<string, { profile: CodeforcesUserProfile; expiresAt: number }>();
+const inFlightProfileRequests = new Map<string, Promise<CodeforcesUserProfile>>();
+const inFlightSubmissionRequests = new Map<string, Promise<CodeforcesSubmission[]>>();
 let nextCodeforcesRequestAt = 0;
 let codeforcesRequestQueue = Promise.resolve();
+
+function singleFlight<T>(requests: Map<string, Promise<T>>, key: string, request: () => Promise<T>) {
+  const existing = requests.get(key);
+  if (existing) return existing;
+
+  const pending = request();
+  requests.set(key, pending);
+  void pending.then(
+    () => { if (requests.get(key) === pending) requests.delete(key); },
+    () => { if (requests.get(key) === pending) requests.delete(key); },
+  );
+  return pending;
+}
 
 async function waitForCodeforcesRequestSlot() {
   let release: () => void = () => {};
@@ -62,16 +77,18 @@ async function fetchCodeforcesJson<T>(url: URL, timeoutMs = 15_000): Promise<T> 
 }
 
 export async function getRecentSubmissions(handle: string) {
-  const url = new URL("https://codeforces.com/api/user.status");
-  url.searchParams.set("handle", handle);
-  url.searchParams.set("from", "1");
-  url.searchParams.set("count", "10000");
+  return singleFlight(inFlightSubmissionRequests, handle.toLowerCase(), async () => {
+    const url = new URL("https://codeforces.com/api/user.status");
+    url.searchParams.set("handle", handle);
+    url.searchParams.set("from", "1");
+    url.searchParams.set("count", "10000");
 
-  const payload = await fetchCodeforcesJson<CodeforcesResponse>(url);
-  if (payload.status !== "OK" || !Array.isArray(payload.result)) {
-    throw new Error(payload.comment || "Codeforces could not return this user's submissions.");
-  }
-  return payload.result;
+    const payload = await fetchCodeforcesJson<CodeforcesResponse>(url);
+    if (payload.status !== "OK" || !Array.isArray(payload.result)) {
+      throw new Error(payload.comment || "Codeforces could not return this user's submissions.");
+    }
+    return payload.result;
+  });
 }
 
 export async function getUserInfo(handle: string): Promise<CodeforcesUserProfile> {
@@ -79,21 +96,23 @@ export async function getUserInfo(handle: string): Promise<CodeforcesUserProfile
   const cached = userProfileCache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) return cached.profile;
 
-  const url = new URL("https://codeforces.com/api/user.info");
-  url.searchParams.set("handles", handle);
-  url.searchParams.set("lang", "en");
-  const payload = await fetchCodeforcesJson<CodeforcesUserInfoResponse>(url, 10_000);
-  if (payload.status !== "OK" || !Array.isArray(payload.result) || !payload.result[0]) {
-    throw new Error(payload.comment || "Codeforces could not return this user's profile.");
-  }
+  return singleFlight(inFlightProfileRequests, cacheKey, async () => {
+    const url = new URL("https://codeforces.com/api/user.info");
+    url.searchParams.set("handles", handle);
+    url.searchParams.set("lang", "en");
+    const payload = await fetchCodeforcesJson<CodeforcesUserInfoResponse>(url, 10_000);
+    if (payload.status !== "OK" || !Array.isArray(payload.result) || !payload.result[0]) {
+      throw new Error(payload.comment || "Codeforces could not return this user's profile.");
+    }
 
-  const user = payload.result[0];
-  const profile = {
-    rating: typeof user.rating === "number" && Number.isInteger(user.rating) ? user.rating : null,
-    rank: typeof user.rank === "string" ? user.rank : null,
-  };
-  userProfileCache.set(cacheKey, { profile, expiresAt: Date.now() + USER_PROFILE_CACHE_MS });
-  return profile;
+    const user = payload.result[0];
+    const profile = {
+      rating: typeof user.rating === "number" && Number.isInteger(user.rating) ? user.rating : null,
+      rank: typeof user.rank === "string" ? user.rank : null,
+    };
+    userProfileCache.set(cacheKey, { profile, expiresAt: Date.now() + USER_PROFILE_CACHE_MS });
+    return profile;
+  });
 }
 
 export function statusFromVerdict(verdict: string | undefined): CodeforcesVerdict | null {

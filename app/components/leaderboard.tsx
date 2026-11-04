@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetchDeduped } from "@/lib/client-fetch";
 
 type LeaderboardRow = { handle: string; solved: number; rank: number; isIotLabMember: boolean };
 
@@ -23,7 +24,7 @@ export function Leaderboard() {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("/api/leaderboard", { cache: "no-store" });
+      const response = await fetchDeduped("/api/leaderboard", { cache: "no-store" });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Could not load the leaderboard.");
       setRows(payload.leaderboard ?? []);

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Check, LockKeyhole, LogIn, LogOut, Plus, Save, Search, Trash2 } from "lucide-react";
+import { fetchDeduped } from "@/lib/client-fetch";
 
 type Problem = { contestId: string; index: string; name: string; rating: string; section: string };
 type AdminData = { whitelist: string[]; problems: Array<{ contestId: number; index: string; name: string; rating: number | null; section: string }> };
@@ -128,9 +129,11 @@ export function AdminPanel() {
   const [lookingUpProblem, setLookingUpProblem] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const actionInFlight = useRef(false);
+  const problemLookupInFlight = useRef(false);
 
   const loadAdminData = useCallback(async () => {
-    const response = await fetch("/api/admin/data", { cache: "no-store" });
+    const response = await fetchDeduped("/api/admin/data", { cache: "no-store" });
     const data = (await readJson(response)) as AdminData;
     setWhitelistText(data.whitelist.join("\n"));
     setProblems(data.problems.map((problem) => ({
@@ -146,7 +149,7 @@ export function AdminPanel() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/admin/session", { cache: "no-store" })
+    fetchDeduped("/api/admin/session", { cache: "no-store" })
       .then(readJson)
       .then(async (result) => {
         if (!active) return;
@@ -162,6 +165,8 @@ export function AdminPanel() {
 
   async function signIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (actionInFlight.current) return;
+    actionInFlight.current = true;
     setBusy(true);
     setError("");
     setNotice("");
@@ -177,11 +182,14 @@ export function AdminPanel() {
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Could not sign in.");
     } finally {
+      actionInFlight.current = false;
       setBusy(false);
     }
   }
 
   async function signOut() {
+    if (actionInFlight.current || problemLookupInFlight.current) return;
+    actionInFlight.current = true;
     setBusy(true);
     setError("");
     try {
@@ -193,11 +201,14 @@ export function AdminPanel() {
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Could not sign out. Try again.");
     } finally {
+      actionInFlight.current = false;
       setBusy(false);
     }
   }
 
   async function retryLoadAdminData() {
+    if (actionInFlight.current) return;
+    actionInFlight.current = true;
     setBusy(true);
     setError("");
     try {
@@ -205,6 +216,7 @@ export function AdminPanel() {
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Could not load tracker data.");
     } finally {
+      actionInFlight.current = false;
       setBusy(false);
     }
   }
@@ -218,10 +230,12 @@ export function AdminPanel() {
 
   async function addProblem(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (problemLookupInFlight.current || actionInFlight.current) return;
     if (!draft.url.trim()) {
       setError("Paste a Codeforces problem link first.");
       return;
     }
+    problemLookupInFlight.current = true;
     setError("");
     setNotice("");
     setLookingUpProblem(true);
@@ -247,12 +261,14 @@ export function AdminPanel() {
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Could not look up that Codeforces problem.");
     } finally {
+      problemLookupInFlight.current = false;
       setLookingUpProblem(false);
     }
   }
 
   async function save() {
-    if (!hasUnsavedChanges) return;
+    if (!hasUnsavedChanges || actionInFlight.current || problemLookupInFlight.current) return;
+    actionInFlight.current = true;
     setBusy(true);
     setError("");
     setNotice("");
@@ -278,6 +294,7 @@ export function AdminPanel() {
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Could not save tracker data.");
     } finally {
+      actionInFlight.current = false;
       setBusy(false);
     }
   }
@@ -358,7 +375,7 @@ export function AdminPanel() {
               <p className="admin-save-note">Removing a problem also removes its saved results. Removing a handle only hides it and keeps its progress.</p>
             </div>
             <div className="admin-toolbar-actions">
-              <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy}>
+              <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy || lookingUpProblem}>
                 <LogOut data-icon="inline-start" aria-hidden="true" />Sign out
               </Button>
               <Button type="button" onClick={() => void save()} disabled={busy || lookingUpProblem || !hasUnsavedChanges}>

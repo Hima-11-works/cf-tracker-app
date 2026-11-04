@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ProgressCharts } from "./progress-charts";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { fetchDeduped } from "@/lib/client-fetch";
 
 type ProblemStatus = "not_attempted" | "accepted" | "tle_mle" | "wrong_answer";
 type Problem = {
@@ -149,15 +150,19 @@ export function UserSheet() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [warning, setWarning] = useState("");
+  const lookupSequence = useRef(0);
 
   const lookup = useCallback(async (nextHandle: string) => {
     const clean = nextHandle.trim();
     if (!clean) {
+      lookupSequence.current += 1;
       setError("Enter a Codeforces handle to look up a sheet.");
       setWarning("");
       setSheet(null);
+      setLoading(false);
       return;
     }
+    const sequence = ++lookupSequence.current;
     setHandle(clean);
     rememberHandle(clean);
     setLoading(true);
@@ -165,15 +170,18 @@ export function UserSheet() {
     setWarning("");
     setSheet(null);
     try {
-      const response = await fetch(`/api/user?handle=${encodeURIComponent(clean)}`, { cache: "no-store" });
+      const response = await fetchDeduped(`/api/user?handle=${encodeURIComponent(clean)}`, { cache: "no-store" });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || "Could not load this user's sheet.");
+      if (sequence !== lookupSequence.current) return;
       setSheet(payload as Sheet);
       setWarning(typeof payload.warning === "string" ? payload.warning : "");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not load this user's sheet.");
+      if (sequence === lookupSequence.current) {
+        setError(caught instanceof Error ? caught.message : "Could not load this user's sheet.");
+      }
     } finally {
-      setLoading(false);
+      if (sequence === lookupSequence.current) setLoading(false);
     }
   }, []);
 
