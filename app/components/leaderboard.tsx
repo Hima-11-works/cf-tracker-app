@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchDeduped } from "@/lib/client-fetch";
+import { readStaleRecord, writeStaleCache } from "@/lib/stale-cache";
 
 type LeaderboardRow = { handle: string; solved: number; rank: number; isIotLabMember: boolean };
 type LeaderboardPayload = {
@@ -32,15 +33,28 @@ export function Leaderboard() {
   const requestVersion = useRef(0);
   const loadingMoreRef = useRef(false);
 
-  const loadFirstPage = useCallback(async () => {
+  const loadFirstPage = useCallback(async (forceRefresh = false) => {
     const version = ++requestVersion.current;
-    setLoading(true);
+    const cacheKey = "leaderboard:exclude-iot:" + String(excludeIotLabMembers);
+    const cached = readStaleRecord<LeaderboardPayload>(cacheKey);
+    const freshForPrefetch = Boolean(!forceRefresh && cached && Date.now() - cached.savedAt < 15_000);
+    setLoading(!freshForPrefetch);
     setLoadingMore(false);
     loadingMoreRef.current = false;
     setError("");
-    setRows([]);
     setPage(1);
     setHasMore(false);
+
+    if (cached) {
+      setRows(cached.data.leaderboard ?? []);
+      setProblemCount(cached.data.problemCount ?? 0);
+      setTotalCount(cached.data.totalCount ?? 0);
+      setHasMore(Boolean(cached.data.hasMore));
+    } else {
+      setRows([]);
+    }
+
+    if (freshForPrefetch && cached) return;
 
     try {
       const params = new URLSearchParams({
@@ -51,6 +65,7 @@ export function Leaderboard() {
       const payload = (await response.json()) as LeaderboardPayload & { error?: string };
       if (!response.ok) throw new Error(payload.error || "Could not load the leaderboard.");
       if (version !== requestVersion.current) return;
+      writeStaleCache(cacheKey, payload);
       setRows(payload.leaderboard ?? []);
       setProblemCount(payload.problemCount ?? 0);
       setTotalCount(payload.totalCount ?? 0);
@@ -108,7 +123,9 @@ export function Leaderboard() {
           <span className="toolbar-note">
             {loading && rows.length === 0
               ? "Loading standings..."
-              : "Showing " + rows.length + " of " + totalCount + " handles"}
+              : loading
+                ? "Showing saved standings while refreshing…"
+                : "Showing " + rows.length + " of " + totalCount + " handles"}
             {" · "}{problemCount} problems
           </span>
         </div>
@@ -121,7 +138,7 @@ export function Leaderboard() {
             />
             <span>Exclude IoT Lab members</span>
           </Label>
-          <Button variant="outline" type="button" onClick={() => void loadFirstPage()} disabled={loading}>
+          <Button variant="outline" type="button" onClick={() => void loadFirstPage(true)} disabled={loading}>
             {loading ? "Updating..." : "Refresh standings"}
           </Button>
         </div>
@@ -175,6 +192,18 @@ export function Leaderboard() {
             </div>
           ) : rows.length > 0 ? (
             <p className="leaderboard-end-note">You're viewing all {totalCount} handles.</p>
+          ) : null}
+          {loadingMore ? (
+            <div className="leaderboard-more-skeleton" role="status" aria-label="Loading more standings" aria-busy="true">
+              {Array.from({ length: 3 }, (_, index) => (
+                <div className="leaderboard-loading-row" aria-hidden="true" key={index}>
+                  <Skeleton className="h-8 w-8" />
+                  <div className="leaderboard-loading-user"><Skeleton className="h-4 w-36 max-w-full" /></div>
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-10" />
+                </div>
+              ))}
+            </div>
           ) : null}
         </div>
       ) : null}

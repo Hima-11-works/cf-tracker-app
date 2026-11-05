@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminSessionValid } from "@/lib/admin-auth";
 import { getSupabaseAdmin } from "@/lib/supabase";
@@ -164,8 +165,52 @@ export async function PATCH(request: NextRequest) {
     return sendError("A problem cannot be changed and removed in the same save.");
   }
 
+  const idempotencyKey = request.headers.get("Idempotency-Key")?.trim() ?? "";
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idempotencyKey)) {
+    return sendError("A valid idempotency key is required to save changes.");
+  }
+  const requestHash = createHash("sha256").update(JSON.stringify(payload)).digest("hex");
+
   try {
     const supabase = getSupabaseAdmin();
+    const { error: cleanupError } = await supabase
+      .from("admin_idempotency_keys")
+      .delete()
+      .lt("created_at", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+    if (cleanupError) throw cleanupError;
+
+    let { error: reservationError } = await supabase
+      .from("admin_idempotency_keys")
+      .insert({ idempotency_key: idempotencyKey, request_hash: requestHash });
+    if (reservationError?.code === "23505") {
+      const { data: existingRequest, error: existingError } = await supabase
+        .from("admin_idempotency_keys")
+        .select("request_hash, response, created_at")
+        .eq("idempotency_key", idempotencyKey)
+        .maybeSingle();
+      if (existingError) throw existingError;
+      if (existingRequest && existingRequest.request_hash !== requestHash) {
+        return sendError("This save key was already used for different changes. Retry the save to create a new key.", 409);
+      }
+      if (existingRequest?.response) {
+        return NextResponse.json(existingRequest.response, { headers: { "Idempotency-Replayed": "true" } });
+      }
+      if (existingRequest && Date.now() - Date.parse(existingRequest.created_at) < 10 * 60 * 1000) {
+        return sendError("This save is already processing. Wait briefly, then retry.", 409);
+      }
+      if (existingRequest) {
+        const { error: staleDeleteError } = await supabase
+          .from("admin_idempotency_keys")
+          .delete()
+          .eq("idempotency_key", idempotencyKey);
+        if (staleDeleteError) throw staleDeleteError;
+        const retry = await supabase.from("admin_idempotency_keys")
+          .insert({ idempotency_key: idempotencyKey, request_hash: requestHash });
+        reservationError = retry.error;
+      }
+    }
+    if (reservationError) throw reservationError;
+
     for (const problem of newProblems) {
       const { data, error } = await supabase
         .from("problems")
@@ -174,7 +219,10 @@ export async function PATCH(request: NextRequest) {
         .eq("problem_index", problem.index)
         .maybeSingle();
       if (error) throw error;
-      if (data) return sendError("Problem " + problem.contestId + problem.index + " is already on the sheet.");
+      if (data) {
+        await supabase.from("admin_idempotency_keys").delete().eq("idempotency_key", idempotencyKey);
+        return sendError("Problem " + problem.contestId + problem.index + " is already on the sheet.");
+      }
     }
 
     const existingHandles = await readAllHandles(supabase);
@@ -251,12 +299,19 @@ export async function PATCH(request: NextRequest) {
     ]);
     if (countError) throw countError;
 
-    return NextResponse.json({
+    const result = {
       saved: true,
       whitelistCount: uniqueHandles.length,
       problemCount: problemCount ?? 0,
-    });
+    };
+    const { error: completeError } = await supabase
+      .from("admin_idempotency_keys")
+      .update({ response: result })
+      .eq("idempotency_key", idempotencyKey);
+    if (completeError) throw completeError;
+    return NextResponse.json(result);
   } catch (error) {
+    await getSupabaseAdmin().from("admin_idempotency_keys").delete().eq("idempotency_key", idempotencyKey);
     console.error("Admin data save failed:", error);
     return sendError(error instanceof Error ? error.message : "Could not save tracker data.", 503);
   }

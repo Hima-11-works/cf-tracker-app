@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { MainNav } from "./components/main-nav";
+import { PageTransition } from "./components/page-transition";
 import "./globals.css";
 import { DM_Mono, Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,8 @@ const themeBootstrap = `try {
   document.documentElement.dataset.theme = theme;
   document.documentElement.classList.toggle("dark", theme === "dark");
 }`;
+
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export const metadata: Metadata = {
   applicationName: "Codeforces Probation Tracker",
@@ -48,7 +51,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </Link>
             <MainNav />
           </header>
-          <main className="main-content" id="main-content" tabIndex={-1}>{children}</main>
+          <main className="main-content" id="main-content" tabIndex={-1}><PageTransition>{children}</PageTransition></main>
           <footer className="site-footer">
             <span>CODEFORCES · PROBATION SHEET</span>
             <span>Accepted results stay cached in Supabase.</span>

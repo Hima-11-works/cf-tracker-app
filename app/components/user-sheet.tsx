@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchDeduped } from "@/lib/client-fetch";
+import { clearStaleCache, readStaleCache, writeStaleCache } from "@/lib/stale-cache";
 
 type ProblemStatus = "not_attempted" | "accepted" | "tle_mle" | "wrong_answer";
 type Problem = {
@@ -163,22 +164,41 @@ export function UserSheet() {
       return;
     }
     const sequence = ++lookupSequence.current;
+    const cacheKey = "user-sheet:" + clean.toLowerCase();
+    const cached = readStaleCache<Sheet>(cacheKey);
     setHandle(clean);
     rememberHandle(clean);
+    setSheet(cached);
     setLoading(true);
     setError("");
-    setWarning("");
-    setSheet(null);
+    setWarning(cached ? "Showing saved results while refreshing Codeforces status…" : "");
     try {
       const response = await fetchDeduped(`/api/user?handle=${encodeURIComponent(clean)}`, { cache: "no-store" });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "Could not load this user's sheet.");
+      if (!response.ok) {
+        if (sequence !== lookupSequence.current) return;
+        if (response.status === 404 || response.status < 500) {
+          clearStaleCache(cacheKey);
+          setSheet(null);
+        }
+        throw Object.assign(new Error(payload.error || "Could not load this user's sheet."), { status: response.status });
+      }
       if (sequence !== lookupSequence.current) return;
-      setSheet(payload as Sheet);
+      const freshSheet = payload as Sheet;
+      writeStaleCache(cacheKey, freshSheet);
+      setSheet(freshSheet);
       setWarning(typeof payload.warning === "string" ? payload.warning : "");
     } catch (caught) {
       if (sequence === lookupSequence.current) {
-        setError(caught instanceof Error ? caught.message : "Could not load this user's sheet.");
+        const status = (caught as Error & { status?: number }).status;
+        const message = caught instanceof Error ? caught.message : "Could not load this user's sheet.";
+        if (cached && (!status || status >= 500)) {
+          setSheet(cached);
+          setWarning("Refresh failed. Showing the last saved results.");
+        } else {
+          setError(message);
+          setWarning("");
+        }
       }
     } finally {
       if (sequence === lookupSequence.current) setLoading(false);
@@ -186,7 +206,9 @@ export function UserSheet() {
   }, []);
 
   useEffect(() => {
-    const initialHandle = new URLSearchParams(window.location.search).get("handle")?.trim();
+    const params = new URLSearchParams(window.location.search);
+    const initialHandle = params.get("handle")?.trim();
+    if (params.get("focus") === "handle") window.setTimeout(() => document.getElementById("codeforces-handle")?.focus(), 0);
     if (initialHandle) {
       void lookup(initialHandle);
       return;
@@ -241,13 +263,14 @@ export function UserSheet() {
               maxLength={64}
             />
           </div>
-          <Button type="submit" disabled={loading}>{loading ? "Checking…" : sheet ? "Refresh sheet" : "View sheet"}</Button>
+          <Button type="submit" disabled={loading}>{loading ? sheet ? "Refreshing…" : "Checking…" : sheet ? "Refresh sheet" : "View sheet"}</Button>
         </form>
       </section>
 
       {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
       {warning ? <Alert role="status" className="form-warning"><AlertDescription>{warning}</AlertDescription></Alert> : null}
-      {loading ? <UserSheetLoading /> : null}
+      {loading && sheet ? <p className="lookup-refreshing" role="status">Refreshing saved results in the background…</p> : null}
+      {loading && !sheet ? <UserSheetLoading /> : null}
 
       {sheet ? (
         <>

@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Check, LockKeyhole, LogIn, LogOut, Plus, Save, Search, Trash2 } from "lucide-react";
+import { Check, LockKeyhole, LogIn, LogOut, Plus, Save, Search, Trash2, X } from "lucide-react";
 import { fetchDeduped } from "@/lib/client-fetch";
 
 type Problem = { contestId: string; index: string; name: string; rating: string; section: string; orderIndex: number | null };
@@ -140,6 +140,10 @@ export function AdminPanel() {
   const [lookingUpProblem, setLookingUpProblem] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [undoToast, setUndoToast] = useState<{ message: string; undo: () => void } | null>(null);
+  const undoToastTimer = useRef<number | null>(null);
+  const saveIdempotencyKey = useRef<string | null>(null);
+  const savePayloadSignature = useRef<string | null>(null);
   const actionInFlight = useRef(false);
   const problemLookupInFlight = useRef(false);
   const problemPageRequest = useRef(0);
@@ -212,6 +216,7 @@ export function AdminPanel() {
     setNewProblems([]);
     setRemovedProblems([]);
     setHasUnsavedChanges(false);
+    dismissUndoToast();
     setHasLoadedAdminData(true);
   }, []);
 
@@ -302,6 +307,36 @@ export function AdminPanel() {
     return problem.contestId + ":" + problem.index.toUpperCase();
   }
 
+  function showUndoToast(message: string, undo: () => void) {
+    if (undoToastTimer.current !== null) window.clearTimeout(undoToastTimer.current);
+    setUndoToast({ message, undo });
+    undoToastTimer.current = window.setTimeout(() => {
+      setUndoToast(null);
+      undoToastTimer.current = null;
+    }, 7000);
+  }
+
+  function dismissUndoToast() {
+    if (undoToastTimer.current !== null) window.clearTimeout(undoToastTimer.current);
+    undoToastTimer.current = null;
+    setUndoToast(null);
+  }
+
+  function removePendingProblem(problem: Problem) {
+    const key = problemKey(problem);
+    const index = newProblems.findIndex((entry) => problemKey(entry) === key);
+    setNewProblems((current) => current.filter((entry) => problemKey(entry) !== key));
+    setHasUnsavedChanges(true);
+    showUndoToast("Pending addition removed.", () => {
+      setNewProblems((current) => {
+        const next = [...current];
+        next.splice(Math.min(index, next.length), 0, problem);
+        return next;
+      });
+      setHasUnsavedChanges(true);
+    });
+  }
+
   function editProblem(problem: Problem, value: string) {
     const key = problemKey(problem);
     setProblemEdits((current) => ({
@@ -315,6 +350,7 @@ export function AdminPanel() {
 
   function removeProblem(problem: Problem) {
     const key = problemKey(problem);
+    const previousEdit = problemEdits[key];
     setProblems((current) => current.filter((entry) => problemKey(entry) !== key));
     setProblemEdits((current) => {
       const next = { ...current };
@@ -327,6 +363,16 @@ export function AdminPanel() {
     setHasUnsavedChanges(true);
     setError("");
     setNotice("");
+    showUndoToast("Problem removal staged.", () => {
+      setProblems((current) => [...current, problem].sort((a, b) => (a.orderIndex ?? 0) - (b.orderIndex ?? 0)));
+      setProblemEdits((current) => {
+        const next = { ...current };
+        if (previousEdit) next[key] = previousEdit;
+        return next;
+      });
+      setRemovedProblems((current) => current.filter((entry) => problemKey(entry) !== key));
+      setHasUnsavedChanges(true);
+    });
   }
 
   async function addProblem(event: FormEvent<HTMLFormElement>) {
@@ -397,20 +443,56 @@ export function AdminPanel() {
     };
 
     try {
+      setNotice("Saving changes…");
+      const payloadSignature = JSON.stringify(payload);
+      if (!saveIdempotencyKey.current || savePayloadSignature.current !== payloadSignature) {
+        saveIdempotencyKey.current = crypto.randomUUID();
+        savePayloadSignature.current = payloadSignature;
+      }
+      const idempotencyKey = saveIdempotencyKey.current;
       const result = await readJson(await fetch("/api/admin/data", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Idempotency-Key": idempotencyKey },
         body: JSON.stringify(payload),
       }));
+      setNotice("Saved. Refreshing the editor…");
       await loadAdminData();
+      saveIdempotencyKey.current = null;
+      savePayloadSignature.current = null;
       setNotice("Saved " + result.whitelistCount + " handles and " + result.problemCount + " problems.");
     } catch (caught) {
+      setHasUnsavedChanges(true);
+      setNotice("");
       setError(caught instanceof Error ? caught.message : "Could not save tracker data.");
     } finally {
       actionInFlight.current = false;
       setBusy(false);
     }
   }
+
+  useEffect(() => () => {
+    if (undoToastTimer.current !== null) window.clearTimeout(undoToastTimer.current);
+  }, []);
+
+  useEffect(() => {
+    function onSaveShortcut(event: globalThis.KeyboardEvent) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s" && isAdmin && hasUnsavedChanges) {
+        event.preventDefault();
+        if (!busy && !lookingUpProblem) void save();
+      }
+    }
+    window.addEventListener("keydown", onSaveShortcut);
+    return () => window.removeEventListener("keydown", onSaveShortcut);
+  }, [isAdmin, hasUnsavedChanges, busy, lookingUpProblem]);
+
+  useEffect(() => {
+    if (!isAdmin || !hasLoadedAdminData) return;
+    const focus = new URLSearchParams(window.location.search).get("focus");
+    const targetId = focus === "problems" ? "admin-problem-search" : focus === "whitelist" ? "whitelist-handles" : null;
+    if (!targetId) return;
+    const timer = window.setTimeout(() => document.getElementById(targetId)?.focus(), 0);
+    return () => window.clearTimeout(timer);
+  }, [isAdmin, hasLoadedAdminData]);
 
   const whitelistCount = whitelistText.split(/\r?\n/).filter((entry) => entry.trim()).length;
   const visibleProblems = problems
@@ -485,8 +567,8 @@ export function AdminPanel() {
               <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy || lookingUpProblem}>
                 <LogOut data-icon="inline-start" aria-hidden="true" />Sign out
               </Button>
-              <Button type="button" onClick={() => void save()} disabled={busy || lookingUpProblem || !hasUnsavedChanges}>
-                <Save data-icon="inline-start" aria-hidden="true" />{busy ? "Saving..." : "Save changes"}
+              <Button id="admin-save-button" type="button" onClick={() => void save()} disabled={busy || lookingUpProblem || !hasUnsavedChanges} title="Save changes (Ctrl/⌘ S)">
+                <Save data-icon="inline-start" aria-hidden="true" />{busy ? "Saving..." : "Save changes"}<kbd className="shortcut-hint">Ctrl/⌘ S</kbd>
               </Button>
             </div>
           </div>
@@ -595,6 +677,13 @@ export function AdminPanel() {
                         </Button>
                       </div>
                     ))}
+                    {loadingProblems ? Array.from({ length: 3 }, (_, index) => (
+                      <div className="admin-problem admin-loading-problem-row" aria-hidden="true" key={"loading-" + index}>
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-8 w-full" />
+                        <Skeleton className="size-8" />
+                      </div>
+                    )) : null}
                   </div>
                 ) : null}
 
@@ -614,7 +703,7 @@ export function AdminPanel() {
                           {problem.rating ? <Badge variant="outline" className="admin-problem-rating">Rating {problem.rating}</Badge> : <span className="admin-problem-unrated">No rating</span>}
                         </div>
                         <span className="admin-pending-section">{problem.section}</span>
-                        <Button variant="ghost" size="icon" className="remove-problem" type="button" aria-label={"Remove pending " + problem.name} title="Remove pending addition" onClick={() => { setNewProblems((current) => current.filter((entry) => problemKey(entry) !== problemKey(problem))); setHasUnsavedChanges(true); }} disabled={busy}>
+                        <Button variant="ghost" size="icon" className="remove-problem" type="button" aria-label={"Remove pending " + problem.name} title="Remove pending addition" onClick={() => removePendingProblem(problem)} disabled={busy}>
                           <Trash2 aria-hidden="true" />
                         </Button>
                       </div>
@@ -632,6 +721,13 @@ export function AdminPanel() {
               </CardContent>
             </Card>
           </div>
+          {undoToast ? (
+            <div className="admin-undo-toast" role="status" aria-live="polite">
+              <span>{undoToast.message}</span>
+              <Button variant="outline" size="sm" type="button" onClick={() => { undoToast.undo(); dismissUndoToast(); }} disabled={busy}>Undo</Button>
+              <Button variant="ghost" size="icon-sm" type="button" onClick={dismissUndoToast} disabled={busy} aria-label="Dismiss undo message"><X aria-hidden="true" /></Button>
+            </div>
+          ) : null}
         </section>
       )}
     </>
