@@ -135,6 +135,7 @@ function UserSheetLoading() {
                 <Skeleton className="h-3 w-24" />
               </div>
               <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-5 w-14" />
               <Skeleton className="h-6 w-24" />
               <Skeleton className="h-4 w-20" />
             </div>
@@ -229,6 +230,13 @@ export function UserSheet() {
       list.push(problem);
       grouped.set(problem.section, list);
     }
+    for (const problems of grouped.values()) {
+      problems.sort((a, b) => {
+        const ratingA = a.rating ?? Number.POSITIVE_INFINITY;
+        const ratingB = b.rating ?? Number.POSITIVE_INFINITY;
+        return ratingA - ratingB || a.contestId - b.contestId || a.index.localeCompare(b.index);
+      });
+    }
     return [...grouped.entries()];
   }, [sheet]);
 
@@ -314,7 +322,7 @@ export function UserSheet() {
               </div>
               <div className="problem-table-wrap">
                 <Table className="problem-table">
-                  <TableHeader><TableRow><TableHead>Problem</TableHead><TableHead>CF ID</TableHead><TableHead>Status</TableHead><TableHead>Accepted on</TableHead></TableRow></TableHeader>
+                  <TableHeader><TableRow><TableHead>Problem</TableHead><TableHead>CF ID</TableHead><TableHead>Rating</TableHead><TableHead>Status</TableHead><TableHead>Accepted on</TableHead></TableRow></TableHeader>
                   <TableBody>
                     {problems.map((problem) => (
                       <TableRow className={`status-${problem.status}`} key={problem.id}>
@@ -326,6 +334,11 @@ export function UserSheet() {
                           <a href={`https://codeforces.com/problemset/problem/${problem.contestId}/${encodeURIComponent(problem.index)}`} target="_blank" rel="noreferrer">
                             {problem.contestId}{problem.index}
                           </a>
+                        </TableCell>
+                        <TableCell className="problem-rating-cell">
+                          <Badge variant="outline" className="problem-rating-badge" aria-label={`Difficulty rating ${problem.rating ?? "unrated"}`}>
+                            {problem.rating ?? "Unrated"}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className={`status-label status-chip ${problem.status}`}>
