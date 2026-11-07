@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminSessionValid } from "@/lib/admin-auth";
+import { getSupabaseAdmin } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -61,6 +62,19 @@ export async function POST(request: NextRequest) {
   if (!target) {
     return sendError("Use a public Codeforces link in the format /contest/1915/problem/A or /problemset/problem/1915/A. Gym links are not supported.");
   }
+
+  const supabase = getSupabaseAdmin();
+  const { data: existingProblem, error: existingProblemError } = await supabase
+    .from("problems")
+    .select("contest_id")
+    .eq("contest_id", target.contestId)
+    .eq("problem_index", target.index)
+    .maybeSingle();
+  if (existingProblemError) {
+    console.error("Problem duplicate check failed:", existingProblemError);
+    return sendError("Could not check whether this problem is already on the sheet.", 503);
+  }
+  if (existingProblem) return sendError("That problem is already on the sheet.", 409);
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15_000);

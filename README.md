@@ -27,7 +27,7 @@ For an existing Supabase project that still uses the legacy `service_role` key, 
 3. Copy all of [`supabase/schema.sql`](./supabase/schema.sql) into the editor and run it.
 4. Confirm the `whitelist`, `problems`, and `problem_progress` tables appear under **Table Editor**.
 
-If the app is already connected to an existing database, run [`supabase/add_iot_lab_member.sql`](./supabase/add_iot_lab_member.sql) once in the SQL Editor before deploying this update. It adds the IoT Lab membership flag to the whitelist.
+For an existing project, run [`supabase/add_iot_lab_member.sql`](./supabase/add_iot_lab_member.sql) first if it predates the IoT Lab update. Then run [`supabase/migrations/20261105_pagination.sql`](./supabase/migrations/20261105_pagination.sql) and [`supabase/migrations/20261105_admin_idempotency.sql`](./supabase/migrations/20261106_admin_idempotency.sql) once in SQL Editor before deploying this update. These add the leaderboard function/index and the protected request-key table used to make admin saves safe to retry. New projects get these through `supabase/schema.sql`.
 
 The schema enables Row Level Security and creates no browser access policies. The app talks to Supabase only from its server routes, which authenticate admin edits before using the server secret key. Supabase documents secret keys as backend-only because they bypass Row Level Security; never put one in a `NEXT_PUBLIC_` variable or client code. See [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys) and [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).
 
@@ -54,7 +54,7 @@ The app also accepts the legacy `service_role` JWT through `SUPABASE_SERVICE_ROL
 3. Paste each public Codeforces contest or problemset URL, such as `https://codeforces.com/contest/1915/problem/A`. The app looks up the problem name and rating; choose a section to group it on the sheet.
 4. Choose **Save changes**. The sheet page groups problems by section, and the leaderboard includes active whitelist handles.
 
-On `/leaderboard`, use **Exclude IoT Lab members** to hide marked handles from the standings.
+On `/leaderboard`, use **Exclude IoT Lab members** to hide marked handles from the standings. Press **Ctrl/⌘ K** to open the page and theme command menu; while signed into `/admin`, press **Ctrl/⌘ S** to save the current draft.
 
 Removing a handle from the active whitelist hides it from both public pages but preserves progress in the database. Removing a problem from the sheet deletes its progress rows for all handles, because the progress row belongs to that sheet problem.
 

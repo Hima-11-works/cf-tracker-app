@@ -1,3 +1,6 @@
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
 type ChartProblem = {
   section: string;
   rating: number | null;
@@ -175,27 +178,27 @@ export function ProgressCharts({ problems }: { problems: ChartProblem[] }) {
 
   return (
     <section className="progress-charts" aria-label="Probation sheet progress charts">
-      <section className="progress-chart-card" aria-labelledby="topic-progress-heading">
-        <div className="progress-chart-heading">
+      <Card className="progress-chart-card" aria-labelledby="topic-progress-heading">
+        <CardHeader className="progress-chart-heading">
           <div>
-            <h3 id="topic-progress-heading">Topic progress</h3>
-            <p>Accepted share of problems in each section</p>
+            <CardTitle className="chart-card-title"><h3 id="topic-progress-heading">Topic progress</h3></CardTitle>
+            <CardDescription>Accepted share of problems in each section</CardDescription>
           </div>
-          <span className="chart-meta">0–100%</span>
-        </div>
-        <TopicRadar topics={topics} />
-      </section>
+          <Badge variant="secondary" className="chart-meta">0–100%</Badge>
+        </CardHeader>
+        <CardContent className="progress-chart-content"><TopicRadar topics={topics} /></CardContent>
+      </Card>
 
-      <section className="progress-chart-card" aria-labelledby="rating-progress-heading">
-        <div className="progress-chart-heading">
+      <Card className="progress-chart-card" aria-labelledby="rating-progress-heading">
+        <CardHeader className="progress-chart-heading">
           <div>
-            <h3 id="rating-progress-heading">Solved by rating</h3>
-            <p>Accepted problems grouped by exact rating</p>
+            <CardTitle className="chart-card-title"><h3 id="rating-progress-heading">Solved by rating</h3></CardTitle>
+            <CardDescription>Accepted problems grouped by exact rating</CardDescription>
           </div>
-          <span className="chart-meta">{solvedCount} rated</span>
-        </div>
-        <RatingPie ratings={ratingSlices} total={solvedCount} />
-      </section>
+          <Badge variant="secondary" className="chart-meta">{solvedCount} rated</Badge>
+        </CardHeader>
+        <CardContent className="progress-chart-content"><RatingPie ratings={ratingSlices} total={solvedCount} /></CardContent>
+      </Card>
     </section>
   );
 }

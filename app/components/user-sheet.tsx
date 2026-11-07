@@ -1,8 +1,17 @@
 "use client";
 
-import Link from "next/link";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ProgressCharts } from "./progress-charts";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { fetchDeduped } from "@/lib/client-fetch";
+import { clearStaleCache, readStaleCache, writeStaleCache } from "@/lib/stale-cache";
 
 type ProblemStatus = "not_attempted" | "accepted" | "tle_mle" | "wrong_answer";
 type Problem = {
@@ -71,42 +80,136 @@ function formatAcceptedDate(value: string | null) {
   return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
+function UserSheetLoading() {
+  return (
+    <div className="user-sheet-loading" role="status" aria-busy="true">
+      <span className="sr-only">Checking Codeforces submissions and loading the probation sheet…</span>
+
+      <Card className="user-summary" aria-hidden="true">
+        <CardContent className="user-summary-content">
+          <div className="user-loading-profile">
+            <div className="user-loading-identity">
+              <Skeleton className="h-7 w-40" />
+              <Skeleton className="h-6 w-24" />
+            </div>
+            <Skeleton className="h-3 w-64 max-w-full" />
+          </div>
+          <Skeleton className="h-8 w-32" />
+        </CardContent>
+      </Card>
+
+      <div className="user-loading-legend" aria-hidden="true">
+        <Skeleton className="user-loading-chip w-24" />
+        <Skeleton className="user-loading-chip w-20" />
+        <Skeleton className="user-loading-chip w-24" />
+        <Skeleton className="user-loading-chip w-24" />
+      </div>
+
+      <section className="progress-charts user-loading-charts" aria-hidden="true">
+        {Array.from({ length: 2 }, (_, index) => (
+          <Card className="progress-chart-card user-loading-chart-card" key={index}>
+            <CardHeader className="progress-chart-heading">
+              <div className="user-loading-chart-heading">
+                <Skeleton className="h-5 w-32" />
+                <Skeleton className="h-3 w-48 max-w-full" />
+              </div>
+              <Skeleton className="h-5 w-16" />
+            </CardHeader>
+            <CardContent className="progress-chart-content">
+              <Skeleton className="loading-chart-surface h-48 w-full" />
+            </CardContent>
+          </Card>
+        ))}
+      </section>
+
+      <section className="user-loading-table-section" aria-hidden="true">
+        <div className="section-heading">
+          <Skeleton className="h-5 w-36" />
+          <Skeleton className="h-3 w-24" />
+        </div>
+        <div className="user-loading-table">
+          {Array.from({ length: 5 }, (_, index) => (
+            <div className="user-loading-row" key={index}>
+              <div className="user-loading-primary">
+                <Skeleton className="h-4 w-44 max-w-full" />
+                <Skeleton className="h-3 w-24" />
+              </div>
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-5 w-14" />
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export function UserSheet() {
   const [handle, setHandle] = useState("");
   const [sheet, setSheet] = useState<Sheet | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [warning, setWarning] = useState("");
+  const lookupSequence = useRef(0);
 
   const lookup = useCallback(async (nextHandle: string) => {
     const clean = nextHandle.trim();
     if (!clean) {
+      lookupSequence.current += 1;
       setError("Enter a Codeforces handle to look up a sheet.");
       setWarning("");
       setSheet(null);
+      setLoading(false);
       return;
     }
+    const sequence = ++lookupSequence.current;
+    const cacheKey = "user-sheet:" + clean.toLowerCase();
+    const cached = readStaleCache<Sheet>(cacheKey);
     setHandle(clean);
     rememberHandle(clean);
+    setSheet(cached);
     setLoading(true);
     setError("");
-    setWarning("");
-    setSheet(null);
+    setWarning(cached ? "Showing saved results while refreshing Codeforces status…" : "");
     try {
-      const response = await fetch(`/api/user?handle=${encodeURIComponent(clean)}`, { cache: "no-store" });
+      const response = await fetchDeduped(`/api/user?handle=${encodeURIComponent(clean)}`, { cache: "no-store" });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "Could not load this user's sheet.");
-      setSheet(payload as Sheet);
+      if (!response.ok) {
+        if (sequence !== lookupSequence.current) return;
+        if (response.status === 404 || response.status < 500) {
+          clearStaleCache(cacheKey);
+          setSheet(null);
+        }
+        throw Object.assign(new Error(payload.error || "Could not load this user's sheet."), { status: response.status });
+      }
+      if (sequence !== lookupSequence.current) return;
+      const freshSheet = payload as Sheet;
+      writeStaleCache(cacheKey, freshSheet);
+      setSheet(freshSheet);
       setWarning(typeof payload.warning === "string" ? payload.warning : "");
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not load this user's sheet.");
+      if (sequence === lookupSequence.current) {
+        const status = (caught as Error & { status?: number }).status;
+        const message = caught instanceof Error ? caught.message : "Could not load this user's sheet.";
+        if (cached && (!status || status >= 500)) {
+          setSheet(cached);
+          setWarning("Refresh failed. Showing the last saved results.");
+        } else {
+          setError(message);
+          setWarning("");
+        }
+      }
     } finally {
-      setLoading(false);
+      if (sequence === lookupSequence.current) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    const initialHandle = new URLSearchParams(window.location.search).get("handle")?.trim();
+    const params = new URLSearchParams(window.location.search);
+    const initialHandle = params.get("handle")?.trim();
+    if (params.get("focus") === "handle") window.setTimeout(() => document.getElementById("codeforces-handle")?.focus(), 0);
     if (initialHandle) {
       void lookup(initialHandle);
       return;
@@ -127,6 +230,13 @@ export function UserSheet() {
       list.push(problem);
       grouped.set(problem.section, list);
     }
+    for (const problems of grouped.values()) {
+      problems.sort((a, b) => {
+        const ratingA = a.rating ?? Number.POSITIVE_INFINITY;
+        const ratingB = b.rating ?? Number.POSITIVE_INFINITY;
+        return ratingA - ratingB || a.contestId - b.contestId || a.index.localeCompare(b.index);
+      });
+    }
     return [...grouped.entries()];
   }, [sheet]);
 
@@ -144,10 +254,9 @@ export function UserSheet() {
         </div>
         <form className="lookup-form" onSubmit={onSubmit}>
           <div className="field handle-input">
-            <label htmlFor="codeforces-handle">Codeforces ID</label>
-            <input
+            <Label htmlFor="codeforces-handle">Codeforces ID</Label>
+            <Input
               id="codeforces-handle"
-              className="text-input"
               value={handle}
               onChange={(event) => {
                 const nextHandle = event.target.value;
@@ -162,46 +271,49 @@ export function UserSheet() {
               maxLength={64}
             />
           </div>
-          <button className="button" type="submit" disabled={loading}>{loading ? "Checking…" : sheet ? "Refresh sheet" : "View sheet"}</button>
+          <Button type="submit" disabled={loading}>{loading ? sheet ? "Refreshing…" : "Checking…" : sheet ? "Refresh sheet" : "View sheet"}</Button>
         </form>
       </section>
 
-      {error ? <p className="form-error" role="alert">{error}</p> : null}
-      {warning ? <p className="form-warning" role="status">{warning}</p> : null}
-      {loading ? <p className="loading-line" role="status">Checking stored results and Codeforces submissions…</p> : null}
+      {error ? <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert> : null}
+      {warning ? <Alert role="status" className="form-warning"><AlertDescription>{warning}</AlertDescription></Alert> : null}
+      {loading && sheet ? <p className="lookup-refreshing" role="status">Refreshing saved results in the background…</p> : null}
+      {loading && !sheet ? <UserSheetLoading /> : null}
 
       {sheet ? (
         <>
-          <section className="user-summary" aria-label="User progress">
-            <div>
-              <div className="user-profile-line">
-                <h2><a href={`https://codeforces.com/profile/${encodeURIComponent(sheet.handle)}`} target="_blank" rel="noreferrer">{sheet.handle}</a></h2>
-                <div className="codeforces-rating" data-rank={rankSlug(sheet.rank)} aria-label={sheet.profileAvailable ? `Codeforces rating ${sheet.rating ?? "unrated"}${sheet.rank ? `, ${sheet.rank}` : ""}` : "Codeforces rating unavailable"}>
-                  <strong>{sheet.profileAvailable ? sheet.rating ?? "Unrated" : "Unavailable"}</strong>
-                  {sheet.rank ? <span>{displayRank(sheet.rank)}</span> : null}
+          <Card className="user-summary" aria-label="User progress">
+            <CardContent className="user-summary-content">
+              <div>
+                <div className="user-profile-line">
+                  <h2><a href={`https://codeforces.com/profile/${encodeURIComponent(sheet.handle)}`} target="_blank" rel="noreferrer">{sheet.handle}</a></h2>
+                  <Badge variant="outline" className="codeforces-rating" data-rank={rankSlug(sheet.rank)} aria-label={sheet.profileAvailable ? `Codeforces rating ${sheet.rating ?? "unrated"}${sheet.rank ? `, ${sheet.rank}` : ""}` : "Codeforces rating unavailable"}>
+                    <strong>{sheet.profileAvailable ? sheet.rating ?? "Unrated" : "Unavailable"}</strong>
+                    {sheet.rank ? <span>{displayRank(sheet.rank)}</span> : null}
+                  </Badge>
                 </div>
+                <p>Accepted problems are skipped on future status checks.</p>
               </div>
-              <p>Accepted problems are skipped on future status checks.</p>
-            </div>
-            <div className="progress-count" aria-label={`${sheet.solvedCount} of ${sheet.problemCount} problems accepted`}>
-              <strong>{String(sheet.solvedCount).padStart(2, "0")}</strong>
-              <span>/ {sheet.problemCount} accepted</span>
-            </div>
-          </section>
+              <div className="progress-count" aria-label={`${sheet.solvedCount} of ${sheet.problemCount} problems accepted`}>
+                <strong>{String(sheet.solvedCount).padStart(2, "0")}</strong>
+                <span>/ {sheet.problemCount} accepted</span>
+              </div>
+            </CardContent>
+          </Card>
 
           <div className="legend" aria-label="Problem status legend">
             {(Object.keys(statusLabels) as ProblemStatus[]).map((status) => (
-              <span className="legend-item" key={status}>
-                <span className={`legend-swatch ${status === "accepted" ? "accepted" : status === "tle_mle" ? "tle" : status === "wrong_answer" ? "wrong" : ""}`} aria-hidden="true" />
+              <Badge variant="outline" className={`legend-item status-chip ${status}`} key={status}>
+                <span className="status-dot" aria-hidden="true" />
                 {statusLabels[status]}
-              </span>
+              </Badge>
             ))}
           </div>
 
           {sheet.problems.length > 0 ? <ProgressCharts problems={sheet.problems} /> : null}
 
           {sheet.problems.length === 0 ? (
-            <div className="empty-sheet">No problems have been added to the probation sheet yet. Check back after the admin configures it.</div>
+            <Alert role="status" className="empty-sheet"><AlertDescription>No problems have been added to the probation sheet yet. Check back after the admin configures it.</AlertDescription></Alert>
           ) : groups.map(([section, problems]) => (
             <section key={section} aria-label={section}>
               <div className="section-heading">
@@ -209,31 +321,36 @@ export function UserSheet() {
                 <span>{problems.filter((problem) => problem.status === "accepted").length} / {problems.length} accepted</span>
               </div>
               <div className="problem-table-wrap">
-                <table className="problem-table">
-                  <thead><tr><th>Problem</th><th>CF ID</th><th>Status</th><th>Accepted on</th></tr></thead>
-                  <tbody>
+                <Table className="problem-table">
+                  <TableHeader><TableRow><TableHead>Problem</TableHead><TableHead>CF ID</TableHead><TableHead>Rating</TableHead><TableHead>Status</TableHead><TableHead>Accepted on</TableHead></TableRow></TableHeader>
+                  <TableBody>
                     {problems.map((problem) => (
-                      <tr className={`status-${problem.status}`} key={problem.id}>
-                        <td>
+                      <TableRow className={`status-${problem.status}`} key={problem.id}>
+                        <TableCell className="whitespace-normal">
                           <span className="problem-name">{problem.name}</span>
                           <span className="problem-subline">{problem.contestId}{problem.index}{problem.rating ? ` · ${problem.rating}` : ""}</span>
-                        </td>
-                        <td className="problem-id">
+                        </TableCell>
+                        <TableCell className="problem-id">
                           <a href={`https://codeforces.com/problemset/problem/${problem.contestId}/${encodeURIComponent(problem.index)}`} target="_blank" rel="noreferrer">
                             {problem.contestId}{problem.index}
                           </a>
-                        </td>
-                        <td>
-                          <span className={`status-label ${problem.status}`}>
+                        </TableCell>
+                        <TableCell className="problem-rating-cell">
+                          <Badge variant="outline" className="problem-rating-badge" aria-label={`Difficulty rating ${problem.rating ?? "unrated"}`}>
+                            {problem.rating ?? "Unrated"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={`status-label status-chip ${problem.status}`}>
                             <span className="status-dot" aria-hidden="true" />
                             {statusLabels[problem.status]}
-                          </span>
-                        </td>
-                        <td className="date-cell">{problem.status === "accepted" ? formatAcceptedDate(problem.acceptedAt) : "—"}</td>
-                      </tr>
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="date-cell">{problem.status === "accepted" ? formatAcceptedDate(problem.acceptedAt) : "—"}</TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
             </section>
           ))}

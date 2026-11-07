@@ -1,15 +1,27 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { MainNav } from "./components/main-nav";
+import { PageTransition } from "./components/page-transition";
 import "./globals.css";
+import { DM_Mono, Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
+const dmMono = DM_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-dm-mono" });
 
 const themeBootstrap = `try {
   const savedTheme = localStorage.getItem("cf-probation-theme");
   const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  document.documentElement.dataset.theme = savedTheme === "dark" || savedTheme === "light" ? savedTheme : systemTheme;
+  const theme = savedTheme === "dark" || savedTheme === "light" ? savedTheme : systemTheme;
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.classList.toggle("dark", theme === "dark");
 } catch {
-  document.documentElement.dataset.theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  const theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.classList.toggle("dark", theme === "dark");
 }`;
+
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export const metadata: Metadata = {
   applicationName: "Codeforces Probation Tracker",
@@ -25,7 +37,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={cn("font-sans", geist.variable, dmMono.variable)}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
       </head>
@@ -39,7 +51,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             </Link>
             <MainNav />
           </header>
-          <main className="main-content" id="main-content" tabIndex={-1}>{children}</main>
+          <main className="main-content" id="main-content" tabIndex={-1}><PageTransition>{children}</PageTransition></main>
           <footer className="site-footer">
             <span>CODEFORCES · PROBATION SHEET</span>
             <span>Accepted results stay cached in Supabase.</span>
