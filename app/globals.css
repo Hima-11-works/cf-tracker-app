@@ -239,15 +239,10 @@ a { color: inherit; text-underline-offset: 3px; }
 .brand-mark {
   width: 36px;
   height: 36px;
-  display: grid;
-  place-items: center;
+  flex: none;
+  display: block;
   border-radius: 0.5rem;
   background: var(--brand-strong);
-  color: #ffffff;
-  font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: -0.03em;
 }
 .brand-name { font-size: 14px; font-weight: 700; letter-spacing: -0.02em; }
 .main-nav { height: 60px; display: flex; align-items: center; gap: 4px; }
