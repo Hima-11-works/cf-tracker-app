@@ -215,12 +215,13 @@ export function UserSheet() {
       return;
     }
 
+    let savedHandle: string | undefined;
     try {
-      const savedHandle = window.localStorage.getItem(LAST_HANDLE_STORAGE_KEY)?.trim();
-      if (savedHandle) setHandle(savedHandle);
+      savedHandle = window.localStorage.getItem(LAST_HANDLE_STORAGE_KEY)?.trim();
     } catch {
       // Keep the form usable when browser storage is unavailable.
     }
+    if (savedHandle) void lookup(savedHandle);
   }, [lookup]);
 
   const groups = useMemo(() => {
