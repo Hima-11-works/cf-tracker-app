@@ -45,9 +45,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <div className="site-frame">
           <a className="skip-link" href="#main-content">Skip to content</a>
           <header className="site-header">
-            <Link href="/leaderboard" className="brand" aria-label="Codeforces Probation Tracker home">
+            <Link href="/leaderboard" className="brand" aria-label="IoT Lab Probation home">
               <img className="brand-mark" src="/logo.svg" alt="" width={36} height={36} />
-              <span className="brand-name">Probation tracker</span>
+              <span className="brand-name">IoT Lab Probation</span>
             </Link>
             <MainNav />
           </header>
