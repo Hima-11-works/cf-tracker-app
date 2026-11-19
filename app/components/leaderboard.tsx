@@ -129,7 +129,7 @@ export function Leaderboard() {
             {" · "}{problemCount} problems
           </span>
         </div>
-        <div className="toolbar-controls">
+        <div className="toolbar-controls leaderboard-controls">
           <Label className="leaderboard-filter" htmlFor="exclude-iot-members">
             <Switch
               id="exclude-iot-members"
@@ -145,7 +145,7 @@ export function Leaderboard() {
       </div>
 
       {error ? (
-        <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert>
+        <Alert variant="destructive" className="leaderboard-error"><AlertDescription>{error}</AlertDescription></Alert>
       ) : null}
 
       {!error && !loading && rows.length === 0 ? (
@@ -158,7 +158,7 @@ export function Leaderboard() {
       ) : null}
 
       {rows.length > 0 ? (
-        <div className="problem-table-wrap">
+        <div className="leaderboard-surface">
           <Table className="leaderboard-table">
             <TableHeader>
               <TableRow><TableHead>Place</TableHead><TableHead>Codeforces handle</TableHead><TableHead>Problems</TableHead><TableHead>Accepted</TableHead></TableRow>
@@ -169,7 +169,10 @@ export function Leaderboard() {
                 return (
                   <TableRow className={rankClass ? "leaderboard-row " + rankClass : "leaderboard-row"} key={row.handle}>
                     <TableCell className="rank-cell">
-                      <Badge variant="outline" className={"rank-badge " + rankClass} aria-label={"Place " + row.rank}>{String(row.rank).padStart(2, "0")}</Badge>
+                      <span className={"rank-badge " + rankClass}>
+                        <span aria-hidden="true">{String(row.rank).padStart(2, "0")}</span>
+                        <span className="sr-only">Place {row.rank}</span>
+                      </span>
                     </TableCell>
                     <TableCell className="whitespace-normal">
                       <span className="leaderboard-handle">
@@ -177,13 +180,25 @@ export function Leaderboard() {
                         {row.isIotLabMember ? <Badge variant="outline" className="iot-member-badge">IoT Lab Member</Badge> : null}
                       </span>
                     </TableCell>
-                    <TableCell className="muted">{problemCount ? row.solved + " / " + problemCount : "—"}</TableCell>
+                    <TableCell className="leaderboard-problems">{problemCount ? row.solved + " / " + problemCount : "—"}</TableCell>
                     <TableCell className="solved-value">{row.solved}</TableCell>
                   </TableRow>
                 );
               })}
             </TableBody>
           </Table>
+          {loadingMore ? (
+            <div className="leaderboard-more-skeleton" role="status" aria-label="Loading more standings" aria-busy="true">
+              {Array.from({ length: 10 }, (_, index) => (
+                <div className="leaderboard-loading-row" aria-hidden="true" key={index}>
+                  <Skeleton className="h-3 w-6" />
+                  <div className="leaderboard-loading-user"><Skeleton className="h-4 w-36 max-w-full" /></div>
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-10" />
+                </div>
+              ))}
+            </div>
+          ) : null}
           {hasMore ? (
             <div className="leaderboard-see-more">
               <Button variant="outline" type="button" onClick={() => void loadMore()} disabled={loadingMore}>
@@ -192,18 +207,6 @@ export function Leaderboard() {
             </div>
           ) : rows.length > 0 ? (
             <p className="leaderboard-end-note">You're viewing all {totalCount} handles.</p>
-          ) : null}
-          {loadingMore ? (
-            <div className="leaderboard-more-skeleton" role="status" aria-label="Loading more standings" aria-busy="true">
-              {Array.from({ length: 3 }, (_, index) => (
-                <div className="leaderboard-loading-row" aria-hidden="true" key={index}>
-                  <Skeleton className="h-8 w-8" />
-                  <div className="leaderboard-loading-user"><Skeleton className="h-4 w-36 max-w-full" /></div>
-                  <Skeleton className="h-4 w-16" />
-                  <Skeleton className="h-4 w-10" />
-                </div>
-              ))}
-            </div>
           ) : null}
         </div>
       ) : null}
@@ -217,17 +220,17 @@ export function Leaderboard() {
             <Skeleton className="h-3 w-16" />
             <Skeleton className="h-3 w-12" />
           </div>
-          {Array.from({ length: 5 }, (_, index) => (
+          {Array.from({ length: 10 }, (_, index) => (
             <div className="leaderboard-loading-row" aria-hidden="true" key={index}>
-              <Skeleton className="h-8 w-8" />
+              <Skeleton className="h-3 w-6" />
               <div className="leaderboard-loading-user">
                 <Skeleton className="h-4 w-36 max-w-full" />
-                <Skeleton className="h-3 w-24 max-w-full" />
               </div>
               <Skeleton className="h-4 w-16" />
               <Skeleton className="h-4 w-10" />
             </div>
           ))}
+          <div className="leaderboard-loading-footer" aria-hidden="true" />
         </div>
       ) : null}
     </>
