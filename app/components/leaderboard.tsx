@@ -118,17 +118,7 @@ export function Leaderboard() {
   return (
     <>
       <div className="toolbar-line">
-        <div className="toolbar-meta">
-          <h2 className="toolbar-title">Current standings</h2>
-          <span className="toolbar-note">
-            {loading && rows.length === 0
-              ? "Loading standings..."
-              : loading
-                ? "Showing saved standings while refreshing…"
-                : "Showing " + rows.length + " of " + totalCount + " handles"}
-            {" · "}{problemCount} problems
-          </span>
-        </div>
+        <h2 className="sr-only">Current standings</h2>
         <div className="toolbar-controls leaderboard-controls">
           <Label className="leaderboard-filter" htmlFor="exclude-iot-members">
             <Switch

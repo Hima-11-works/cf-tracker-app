@@ -249,10 +249,6 @@ export function UserSheet() {
   return (
     <>
       <section className="lookup-row" aria-label="Find a user">
-        <div className="lookup-intro">
-          <strong>Find a probation sheet</strong>
-          <span>Only handles on the admin whitelist can view a sheet.</span>
-        </div>
         <form className="lookup-form" onSubmit={onSubmit}>
           <div className="field handle-input">
             <Label htmlFor="codeforces-handle">Codeforces ID</Label>
