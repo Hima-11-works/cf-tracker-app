@@ -94,7 +94,7 @@ as $$
       codeforces_handle,
       is_iot_lab_member,
       solved,
-      rank() over (order by solved desc) as leaderboard_rank
+      dense_rank() over (order by solved desc) as leaderboard_rank
     from scores
   )
   select jsonb_build_object(

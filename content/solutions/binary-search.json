@@ -1,0 +1,410 @@
+{
+  "section": "Binary Search",
+  "problems": [
+    {
+      "contestId": 2197,
+      "index": "A",
+      "name": "Friendly Numbers",
+      "rating": 800,
+      "idea": "If y is friendly to x, then y is only a small distance above x: that distance is the digit sum of y. Since x is at most 10^9, any such y has at most ten digits, so checking the next 90 integers covers every possibility.",
+      "approach": [
+        "Read t test cases, each containing one integer x, and print the number of positive integers y satisfying y - digitSum(y) = x. A valid y must be greater than x because a positive integer has a positive digit sum.",
+        "For x <= 10^9, a valid y cannot have eleven digits: then y - x would be billions, but its digit sum is at most 99. Thus y has at most ten digits and digitSum(y) <= 90, which confines y to [x + 1, x + 90].",
+        "For every candidate in that interval, compute its digit sum by repeatedly taking the last decimal digit and dividing by 10. Count it exactly when y - digitSum(y) equals x; the fixed 90-candidate search is constant work per test."
+      ],
+      "complexity": {
+        "time": "O(90 * 10) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Include x + 90 in the candidate range.",
+        "Use a wide integer type for candidate arithmetic.",
+        "Do not mistake the number of valid y values for a fixed answer; check the equation for each candidate."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        long long x;\n        cin >> x;\n        int answer = 0;\n        for (long long y = x + 1; y <= x + 90; ++y) {\n            long long value = y;\n            int digitSum = 0;\n            while (value > 0) {\n                digitSum += static_cast<int>(value % 10);\n                value /= 10;\n            }\n            if (y - digitSum == x) ++answer;\n        }\n        cout << answer << '\\n';\n    }\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int t = nextInt();\n        while (t-- > 0) {\n            long x = nextLong();\n            int answer = 0;\n            for (long y = x + 1; y <= x + 90; y++) {\n                long value = y;\n                int digitSum = 0;\n                while (value > 0) {\n                    digitSum += (int) (value % 10);\n                    value /= 10;\n                }\n                if (y - digitSum == x) answer++;\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    t = int(next(it))\n    answers = []\n    for _ in range(t):\n        x = int(next(it))\n        answer = 0\n        for y in range(x + 1, x + 91):\n            digit_sum = sum(int(digit) for digit in str(y))\n            if y - digit_sum == x:\n                answer += 1\n        answers.append(str(answer))\n    sys.stdout.write(\"\\n\".join(answers))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2114,
+      "index": "A",
+      "name": "Square Year",
+      "rating": 800,
+      "idea": "The four-character year is just a value from 0 through 9999, with leading zeroes allowed. It can be written as (a + b)^2 exactly when the parsed value is a perfect square; choosing a = 0 and b equal to its root always supplies a valid pair.",
+      "approach": [
+        "Read t four-character year strings and interpret each as a decimal integer. For each one, print two non-negative integers whose sum squares to the year, or print -1 if no such pair exists.",
+        "Any valid pair has a sum r with r squared equal to the year. Since the year is at most 9999, it is enough to check integer roots from 0 through 99.",
+        "When a square root is found, output 0 and that root; otherwise output -1. Keeping the string for input handles leading zeroes naturally, while numeric conversion is safe for this small range."
+      ],
+      "complexity": {
+        "time": "O(100) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Treat the four digits as a number even when the string starts with zeroes.",
+        "The pair may contain zero; the problem allows non-negative a and b.",
+        "Check the square exactly rather than relying on a rounded floating-point root."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        string s;\n        cin >> s;\n        int year = stoi(s);\n        int root = -1;\n        for (int r = 0; r <= 99; ++r) {\n            if (r * r == year) {\n                root = r;\n                break;\n            }\n        }\n        if (root == -1) cout << -1 << '\\n';\n        else cout << 0 << ' ' << root << '\\n';\n    }\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int t = nextInt();\n        while (t-- > 0) {\n            String s = next();\n            int year = Integer.parseInt(s);\n            int root = -1;\n            for (int r = 0; r <= 99; r++) {\n                if (r * r == year) {\n                    root = r;\n                    break;\n                }\n            }\n            if (root == -1) out.append(-1).append('\\n');\n            else out.append(0).append(' ').append(root).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    t = int(next(it))\n    answers = []\n    for _ in range(t):\n        year = int(next(it))\n        root = next((r for r in range(100) if r * r == year), None)\n        if root is None:\n            answers.append(\"-1\")\n        else:\n            answers.append(f\"0 {root}\")\n    sys.stdout.write(\"\\n\".join(answers))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2051,
+      "index": "B",
+      "name": "Journey",
+      "rating": 800,
+      "idea": "The daily distances repeat in cycles of a, b, c, so complete cycles can be counted without simulation. Only the remainder after those cycles needs at most three checks to find the finishing day.",
+      "approach": [
+        "Each test case gives the target distance n and the three distances walked on consecutive days. Print the first day number on which the cumulative distance reaches at least n.",
+        "One full three-day cycle covers a + b + c kilometers. Divide n by this sum to get complete cycles and multiply that count by three to obtain the days already accounted for.",
+        "The remaining distance is smaller than one cycle. Check a, then a + b, then a + b + c, adding one, two, or three more days at the first threshold that reaches the remainder; if the remainder is zero, no extra day is needed."
+      ],
+      "complexity": {
+        "time": "O(1) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Use 64-bit arithmetic for the day count and cycle multiplication.",
+        "A zero remainder means the journey ends at the end of the counted full cycle.",
+        "The target is reached on the first day cumulative distance is at least n, including equality."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        long long n, a, b, c;\n        cin >> n >> a >> b >> c;\n        long long cycle = a + b + c;\n        long long days = (n / cycle) * 3;\n        long long remaining = n % cycle;\n        if (remaining > 0) {\n            if (remaining <= a) days += 1;\n            else if (remaining <= a + b) days += 2;\n            else days += 3;\n        }\n        cout << days << '\\n';\n    }\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int t = nextInt();\n        while (t-- > 0) {\n            long n = nextLong();\n            long a = nextLong();\n            long b = nextLong();\n            long c = nextLong();\n            long cycle = a + b + c;\n            long days = (n / cycle) * 3;\n            long remaining = n % cycle;\n            if (remaining > 0) {\n                if (remaining <= a) days++;\n                else if (remaining <= a + b) days += 2;\n                else days += 3;\n            }\n            out.append(days).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    t = int(next(it))\n    answers = []\n    for _ in range(t):\n        n = int(next(it))\n        a = int(next(it))\n        b = int(next(it))\n        c = int(next(it))\n        cycle = a + b + c\n        days = (n // cycle) * 3\n        remaining = n % cycle\n        if remaining:\n            if remaining <= a:\n                days += 1\n            elif remaining <= a + b:\n                days += 2\n            else:\n                days += 3\n        answers.append(str(days))\n    sys.stdout.write(\"\\n\".join(answers))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2008,
+      "index": "C",
+      "name": "Longest Good Array",
+      "rating": 800,
+      "idea": "A good array needs positive, strictly increasing integer differences. For any fixed length, the smallest possible total span uses differences 1, 2, 3, ..., so the answer is one plus the largest triangular number that fits inside r - l.",
+      "approach": [
+        "For each test case, read the inclusive value bounds l and r and print the maximum length of a good increasing array contained in them. Its adjacent differences must themselves increase strictly.",
+        "All values are integers, so the smallest legal sequence of differences is 1, then 2, then 3, and so on. With m differences, the array spans at least 1 + 2 + ... + m = m(m + 1)/2; any larger starting point or difference only consumes more of the available range.",
+        "Set the available span to r - l and add differences in increasing order while the next one still fits. The number of accepted differences plus one is the maximum array length, and this construction can start at l to attain it."
+      ],
+      "complexity": {
+        "time": "O(sqrt(r - l)) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The length is one more than the number of differences.",
+        "Use the span r - l, not r - l + 1, because the first value contributes no difference.",
+        "Use 64-bit arithmetic for the triangular sum."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        long long l, r;\n        cin >> l >> r;\n        long long span = r - l;\n        long long used = 0;\n        long long step = 1;\n        while (used + step <= span) {\n            used += step;\n            ++step;\n        }\n        cout << step << '\\n';\n    }\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int t = nextInt();\n        while (t-- > 0) {\n            long l = nextLong();\n            long r = nextLong();\n            long span = r - l;\n            long used = 0;\n            long step = 1;\n            while (used + step <= span) {\n                used += step;\n                step++;\n            }\n            out.append(step).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    t = int(next(it))\n    answers = []\n    for _ in range(t):\n        l = int(next(it))\n        r = int(next(it))\n        span = r - l\n        used = 0\n        step = 1\n        while used + step <= span:\n            used += step\n            step += 1\n        answers.append(str(step))\n    sys.stdout.write(\"\\n\".join(answers))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1996,
+      "index": "A",
+      "name": "Legs",
+      "rating": 800,
+      "idea": "To minimize the number of animals, use as many four-legged cows as possible. Any remaining two legs require one chicken, so the answer is the ceiling of n / 4, which for even n is (n + 2) / 4.",
+      "approach": [
+        "Each test case contains an even total number n of legs, and every animal is either a two-legged chicken or a four-legged cow. Print the smallest number of animals that can account for exactly those legs.",
+        "Replacing two chickens with one cow preserves the number of legs while reducing the animal count. Thus an optimal arrangement contains floor(n / 4) cows and, when n is not divisible by four, one chicken for the remaining two legs.",
+        "This gives ceil(n / 4), equivalently integer division of n + 2 by 4 for even n. No search is needed because the remainder has only the two possible values 0 and 2."
+      ],
+      "complexity": {
+        "time": "O(1) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The input n is always even, so a remainder of two is the only nonzero case.",
+        "Use ceiling division; plain n / 4 is wrong when n is 2 modulo 4.",
+        "The output is the number of animals, not the number of cows."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        cout << (n + 2) / 4 << '\\n';\n    }\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int t = nextInt();\n        while (t-- > 0) {\n            int n = nextInt();\n            out.append((n + 2) / 4).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    t = int(next(it))\n    answers = []\n    for _ in range(t):\n        n = int(next(it))\n        answers.append(str((n + 2) // 4))\n    sys.stdout.write(\"\\n\".join(answers))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1956,
+      "index": "A",
+      "name": "Nene's Game",
+      "rating": 800,
+      "idea": "In a round with p players remaining, exactly the listed positions a_i <= p are removed; positions beyond p are skipped. Since a is sorted, an upper-bound search gives the number removed, and repeating this update reaches the final survivor count.",
+      "approach": [
+        "For each test case, read the increasing removal positions and then q independent initial player counts. For each query, print how many players remain after the game reaches a round that removes nobody.",
+        "When p players are present, every a_i at most p names a distinct existing player, while every larger a_i is skipped. Therefore the number removed simultaneously is upper_bound(a, p), the count of entries no greater than p.",
+        "Subtract that count from p and repeat the same round rule until the count is zero. Because the sequence is strictly increasing and positive, the removal count never exceeds p; when it is zero the current p is exactly the number of winners."
+      ],
+      "complexity": {
+        "time": "O(n log k) per query in the worst case",
+        "space": "O(k)"
+      },
+      "pitfalls": [
+        "Each query starts a fresh game with its own initial player count.",
+        "Removal positions are evaluated against the row at the start of that round, not updated one at a time.",
+        "Stop when no listed position is at most the current player count."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int k, q;\n        cin >> k >> q;\n        vector<int> a(k);\n        for (int &x : a) cin >> x;\n        for (int query = 0; query < q; ++query) {\n            int players;\n            cin >> players;\n            while (true) {\n                int removed = upper_bound(a.begin(), a.end(), players) - a.begin();\n                if (removed == 0) break;\n                players -= removed;\n            }\n            if (query) cout << ' ';\n            cout << players;\n        }\n        cout << '\\n';\n    }\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int t = nextInt();\n        while (t-- > 0) {\n            int k = nextInt();\n            int q = nextInt();\n            int[] a = new int[k];\n            for (int i = 0; i < k; i++) a[i] = nextInt();\n            for (int query = 0; query < q; query++) {\n                int players = nextInt();\n                while (true) {\n                    int lo = 0;\n                    int hi = k;\n                    while (lo < hi) {\n                        int mid = lo + (hi - lo) / 2;\n                        if (a[mid] <= players) lo = mid + 1;\n                        else hi = mid;\n                    }\n                    int removed = lo;\n                    if (removed == 0) break;\n                    players -= removed;\n                }\n                if (query > 0) out.append(' ');\n                out.append(players);\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    from bisect import bisect_right\n\n    t = int(next(it))\n    answers = []\n    for _ in range(t):\n        k = int(next(it))\n        q = int(next(it))\n        a = [int(next(it)) for _ in range(k)]\n        results = []\n        for _ in range(q):\n            players = int(next(it))\n            while True:\n                removed = bisect_right(a, players)\n                if removed == 0:\n                    break\n                players -= removed\n            results.append(str(players))\n        answers.append(\" \".join(results))\n    sys.stdout.write(\"\\n\".join(answers))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 750,
+      "index": "A",
+      "name": "New Year and Hurry",
+      "rating": 800,
+      "idea": "The easiest i-th problem takes 5i minutes, so solving the first m problems costs 5m(m + 1) / 2. Because every next problem takes longer, count this feasible prefix until the contest time left after travel is exceeded.",
+      "approach": [
+        "Read the number n of ordered problems and travel time k, then print the largest number of easiest problems Limak can solve and still arrive by midnight. The contest provides 240 minutes total.",
+        "Solving the first m problems takes 5 + 10 + ... + 5m minutes, and the trip takes k more. These costs increase as m grows, so feasibility is a prefix condition.",
+        "Start with zero used minutes and test problems in order, adding 5i for problem i. Accept each while used time plus k is at most 240; stop at the first failure and print the accepted count."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The full contest time is 240 minutes, not 240 minus the trip time after the loop.",
+        "Only the easiest prefix can be chosen because problem times increase with i.",
+        "Equality with 240 minutes is feasible."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int n, k;\n    cin >> n >> k;\n    int used = 0;\n    int solved = 0;\n    for (int i = 1; i <= n; ++i) {\n        int nextTime = used + 5 * i;\n        if (nextTime + k > 240) break;\n        used = nextTime;\n        ++solved;\n    }\n    cout << solved << '\\n';\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int n = nextInt();\n        int k = nextInt();\n        int used = 0;\n        int solved = 0;\n        for (int i = 1; i <= n; i++) {\n            int nextTime = used + 5 * i;\n            if (nextTime + k > 240) break;\n            used = nextTime;\n            solved++;\n        }\n        out.append(solved).append('\\n');\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    n = int(next(it))\n    k = int(next(it))\n    used = 0\n    solved = 0\n    for i in range(1, n + 1):\n        next_time = used + 5 * i\n        if next_time + k > 240:\n            break\n        used = next_time\n        solved += 1\n    sys.stdout.write(str(solved))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1566,
+      "index": "A",
+      "name": "Median Maximization",
+      "rating": 800,
+      "idea": "In sorted order, the n / 2 elements before the median can be zero, leaving floor(n / 2) + 1 elements that must be at least the median. Sharing the sum as evenly as possible among those elements makes the median as large as possible.",
+      "approach": [
+        "Each test case gives the length n and required sum s of an array of non-negative integers. Print the largest median under the problem's definition, the element at one-based position ceil(n / 2) after sorting.",
+        "Set all elements before that position to zero; doing so spends no sum and cannot lower the median. There are m = floor(n / 2) + 1 elements from the median through the end, and all of them must be at least the median value.",
+        "If the median were v, those m elements would require at least m * v sum, so v cannot exceed floor(s / m). This bound is attainable by assigning v to all m elements and putting any leftover on the final element."
+      ],
+      "complexity": {
+        "time": "O(1) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The number of elements at or above the median is n / 2 + 1 using integer division.",
+        "The array elements may be zero and need not be distinct.",
+        "Use floor division because the sum may not divide evenly among the remaining elements."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        long long n, s;\n        cin >> n >> s;\n        long long count = n / 2 + 1;\n        cout << s / count << '\\n';\n    }\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int t = nextInt();\n        while (t-- > 0) {\n            long n = nextLong();\n            long s = nextLong();\n            long count = n / 2 + 1;\n            out.append(s / count).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    t = int(next(it))\n    answers = []\n    for _ in range(t):\n        n = int(next(it))\n        s = int(next(it))\n        count = n // 2 + 1\n        answers.append(str(s // count))\n    sys.stdout.write(\"\\n\".join(answers))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1915,
+      "index": "C",
+      "name": "Can I Square?",
+      "rating": 800,
+      "idea": "The individual buckets do not matter after every unit square is gathered: the total area is the sum of all a_i. A square can be built using every piece exactly when this total is a perfect square.",
+      "approach": [
+        "For each test case, read n bucket counts and print YES if all their unit squares can form one square, otherwise print NO. The count of physical pieces is the total area available.",
+        "Sum the counts into a 64-bit integer because n can be large and each bucket can contain up to 10^9 pieces. If the side length is r, the area must be exactly r squared, so no other property of the distribution across buckets matters.",
+        "Compute the integer square root of the sum and verify its square equals the sum. Use an adjusted integer root or an integer square-root routine so floating-point rounding cannot change the decision."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The sum can be around 2 * 10^14, so 32-bit arithmetic overflows.",
+        "A rounded square root must still be checked by squaring it.",
+        "All pieces must be used, so divisibility by a square is not enough; the total itself must be square."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        long long total = 0;\n        for (int i = 0; i < n; ++i) {\n            long long x;\n            cin >> x;\n            total += x;\n        }\n        long long root = static_cast<long long>(sqrtl(static_cast<long double>(total)));\n        while ((root + 1) * (root + 1) <= total) ++root;\n        while (root * root > total) --root;\n        cout << (root * root == total ? \"YES\" : \"NO\") << '\\n';\n    }\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int t = nextInt();\n        while (t-- > 0) {\n            int n = nextInt();\n            long total = 0;\n            for (int i = 0; i < n; i++) total += nextLong();\n            long root = (long) Math.sqrt(total);\n            while ((root + 1) * (root + 1) <= total) root++;\n            while (root * root > total) root--;\n            out.append(root * root == total ? \"YES\" : \"NO\").append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    from math import isqrt\n\n    t = int(next(it))\n    answers = []\n    for _ in range(t):\n        n = int(next(it))\n        total = sum(int(next(it)) for _ in range(n))\n        root = isqrt(total)\n        answers.append(\"YES\" if root * root == total else \"NO\")\n    sys.stdout.write(\"\\n\".join(answers))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1978,
+      "index": "B",
+      "name": "New Bakery",
+      "rating": 800,
+      "idea": "Changing one more bun from the usual price a to the next promotion price is beneficial only while that promotion price exceeds a. The promotion prices descend by one, so take up to b - a discounted buns, capped by n; all later promotion choices add no profit.",
+      "approach": [
+        "Each test case gives n buns, their usual price a, and the first promotion price b. Choose k from 0 through min(n, b), sell the first k at b, b - 1, ..., b - k + 1, and print the maximum total revenue.",
+        "Compared with leaving a bun at price a, promoting the k-th bun changes revenue by b - k + 1 - a. These marginal gains decrease by one each time, so positive gains occur for at most the first b - a buns; if b <= a, no promotion is needed.",
+        "Set k to min(n, max(0, b - a)). Sum the arithmetic progression of those k prices as k * (2b - k + 1) / 2, then add a for each of the remaining n - k buns. Use 64-bit integers for the products."
+      ],
+      "complexity": {
+        "time": "O(1) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Promotion k cannot exceed n or b.",
+        "The k-th promotion price is b - k + 1, not b - k.",
+        "Use 64-bit arithmetic; total revenue may reach 10^18."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        long long n, a, b;\n        cin >> n >> a >> b;\n        long long k = max(0LL, min(n, b - a));\n        long long promotion = k * (2 * b - k + 1) / 2;\n        long long answer = promotion + (n - k) * a;\n        cout << answer << '\\n';\n    }\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int t = nextInt();\n        while (t-- > 0) {\n            long n = nextLong();\n            long a = nextLong();\n            long b = nextLong();\n            long k = Math.max(0L, Math.min(n, b - a));\n            long promotion = k * (2 * b - k + 1) / 2;\n            long answer = promotion + (n - k) * a;\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    t = int(next(it))\n    answers = []\n    for _ in range(t):\n        n = int(next(it))\n        a = int(next(it))\n        b = int(next(it))\n        k = min(n, max(0, b - a))\n        promotion = k * (2 * b - k + 1) // 2\n        answer = promotion + (n - k) * a\n        answers.append(str(answer))\n    sys.stdout.write(\"\\n\".join(answers))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1611,
+      "index": "B",
+      "name": "Team Composition: Programmers and Mathematicians",
+      "rating": 800,
+      "idea": "Every team uses four students and must include at least one from each group. Thus the number of teams is bounded by min(a, b) and floor((a + b) / 4), and those two necessary limits are also sufficient.",
+      "approach": [
+        "For each test case, read the available programmers a and mathematicians b, then print the maximum number of disjoint four-person teams. Each team needs both kinds of student.",
+        "If there are x teams, each group must contribute at least x people, so x <= min(a, b). The total capacity also gives 4x <= a + b, hence x <= floor((a + b) / 4).",
+        "Take the smaller bound. It is achievable: reserve one person of each type per team, then fill the remaining two seats per team from the available students; the combined-total bound guarantees enough people and the per-group bound guarantees neither side runs out."
+      ],
+      "complexity": {
+        "time": "O(1) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "A team of four from only one group is forbidden.",
+        "Both the minority-group limit and total-student limit are needed.",
+        "Use 64-bit arithmetic when adding a and b."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        long long a, b;\n        cin >> a >> b;\n        cout << min(min(a, b), (a + b) / 4) << '\\n';\n    }\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int t = nextInt();\n        while (t-- > 0) {\n            long a = nextLong();\n            long b = nextLong();\n            out.append(Math.min(Math.min(a, b), (a + b) / 4)).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    t = int(next(it))\n    answers = []\n    for _ in range(t):\n        a = int(next(it))\n        b = int(next(it))\n        answers.append(str(min(a, b, (a + b) // 4)))\n    sys.stdout.write(\"\\n\".join(answers))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1592,
+      "index": "A",
+      "name": "Gamer Hemose",
+      "rating": 800,
+      "idea": "The strongest weapon and the strongest different weapon form the best alternating pair, with damage D = max1 + max2 every two moves. Divide the health by D, then finish the remainder with one strongest hit or two alternating hits.",
+      "approach": [
+        "Each test case gives n weapon damages and enemy health H. The same weapon cannot be chosen on consecutive moves, and the output is the minimum number of moves needed to reduce health to zero or below.",
+        "Keep the two largest damage values, counting two separate weapons even if their values are equal. No other weapon can improve any alternating pair, so repeating max1, max2 yields maximum damage over each two-move block.",
+        "Use H / (max1 + max2) complete blocks, contributing twice that many moves. For the remainder, zero needs no moves, a remainder at most max1 needs one move, and a larger remainder needs both weapons."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The top two values must come from distinct weapons, even if they are equal.",
+        "The enemy dies at health less than or equal to zero, so reaching the target exactly is enough.",
+        "When the remainder is greater than max1, count two moves, not one."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        long long health;\n        cin >> n >> health;\n        long long best1 = 0, best2 = 0;\n        for (int i = 0; i < n; ++i) {\n            long long damage;\n            cin >> damage;\n            if (damage >= best1) {\n                best2 = best1;\n                best1 = damage;\n            } else if (damage > best2) {\n                best2 = damage;\n            }\n        }\n        long long pairDamage = best1 + best2;\n        long long remainder = health % pairDamage;\n        long long moves = 2 * (health / pairDamage);\n        if (remainder > 0) moves += (remainder <= best1 ? 1 : 2);\n        cout << moves << '\\n';\n    }\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int t = nextInt();\n        while (t-- > 0) {\n            int n = nextInt();\n            long health = nextLong();\n            long best1 = 0;\n            long best2 = 0;\n            for (int i = 0; i < n; i++) {\n                long damage = nextLong();\n                if (damage >= best1) {\n                    best2 = best1;\n                    best1 = damage;\n                } else if (damage > best2) {\n                    best2 = damage;\n                }\n            }\n            long pairDamage = best1 + best2;\n            long remainder = health % pairDamage;\n            long moves = 2 * (health / pairDamage);\n            if (remainder > 0) moves += remainder <= best1 ? 1 : 2;\n            out.append(moves).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    t = int(next(it))\n    answers = []\n    for _ in range(t):\n        n = int(next(it))\n        health = int(next(it))\n        best1 = 0\n        best2 = 0\n        for _ in range(n):\n            damage = int(next(it))\n            if damage >= best1:\n                best2 = best1\n                best1 = damage\n            elif damage > best2:\n                best2 = damage\n        pair_damage = best1 + best2\n        remainder = health % pair_damage\n        moves = 2 * (health // pair_damage)\n        if remainder > 0:\n            moves += 1 if remainder <= best1 else 2\n        answers.append(str(moves))\n    sys.stdout.write(\"\\n\".join(answers))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 202,
+      "index": "A",
+      "name": "LLPS",
+      "rating": 800,
+      "idea": "A palindrome made only of the largest letter in the string is always a subsequence. Using every occurrence of that letter gives the lexicographically largest result, since any competing subsequence must eventually use a smaller letter or stop earlier.",
+      "approach": [
+        "Read one non-empty lowercase string and print its lexicographically largest palindromic subsequence. A subsequence preserves character order but may omit any positions.",
+        "Find the greatest character present in the string and count its occurrences. Those positions can all be selected, and the resulting repeated-character string is a palindrome.",
+        "No answer can begin with a larger character. After matching the maximum character as long as possible, any candidate that uses a smaller character becomes lexicographically smaller, while stopping sooner gives a shorter prefix; hence all copies are optimal."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1) extra"
+      },
+      "pitfalls": [
+        "The required output is a subsequence, not a substring.",
+        "Use all occurrences of the maximum character.",
+        "The input contains one string and no test-case count."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    string s;\n    cin >> s;\n    char largest = *max_element(s.begin(), s.end());\n    int count = 0;\n    for (char ch : s) {\n        if (ch == largest) ++count;\n    }\n    cout << string(count, largest) << '\\n';\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        String s = next();\n        char largest = 'a';\n        for (int i = 0; i < s.length(); i++) {\n            if (s.charAt(i) > largest) largest = s.charAt(i);\n        }\n        int count = 0;\n        for (int i = 0; i < s.length(); i++) {\n            if (s.charAt(i) == largest) count++;\n        }\n        for (int i = 0; i < count; i++) out.append(largest);\n        out.append('\\n');\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    s = next(it).decode()\n    largest = max(s)\n    sys.stdout.write(largest * s.count(largest))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1138,
+      "index": "A",
+      "name": "Sushi for Two",
+      "rating": 900,
+      "idea": "A valid segment consists of two neighboring runs of different sushi types, with both halves having equal length. For each adjacent pair of run lengths, the best segment uses the shorter run twice.",
+      "approach": [
+        "Read the row of sushi types, each either 1 or 2, and print the longest contiguous segment whose two equal halves each contain only one type. The two halves must therefore meet exactly at a boundary between different runs.",
+        "Compress the row conceptually into lengths of maximal equal-value runs. A valid segment can use only a suffix of one run and a prefix of its adjacent run, because including another type would contaminate one of its halves.",
+        "For adjacent run lengths L and R, choose min(L, R) pieces from each, giving length 2 * min(L, R). Take the maximum of this value over all neighboring runs."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Only adjacent runs can form the two halves.",
+        "The two runs may have different lengths; use twice the shorter length.",
+        "The input guarantees both types occur, so at least one valid segment exists."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int n;\n    cin >> n;\n    vector<int> runs;\n    int previous = -1;\n    int length = 0;\n    for (int i = 0; i < n; ++i) {\n        int type;\n        cin >> type;\n        if (type == previous) {\n            ++length;\n        } else {\n            if (length > 0) runs.push_back(length);\n            previous = type;\n            length = 1;\n        }\n    }\n    runs.push_back(length);\n    int answer = 0;\n    for (int i = 1; i < static_cast<int>(runs.size()); ++i) {\n        answer = max(answer, 2 * min(runs[i - 1], runs[i]));\n    }\n    cout << answer << '\\n';\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int n = nextInt();\n        ArrayList<Integer> runs = new ArrayList<>();\n        int previous = -1;\n        int length = 0;\n        for (int i = 0; i < n; i++) {\n            int type = nextInt();\n            if (type == previous) {\n                length++;\n            } else {\n                if (length > 0) runs.add(length);\n                previous = type;\n                length = 1;\n            }\n        }\n        runs.add(length);\n        int answer = 0;\n        for (int i = 1; i < runs.size(); i++) {\n            answer = Math.max(answer, 2 * Math.min(runs.get(i - 1), runs.get(i)));\n        }\n        out.append(answer).append('\\n');\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    n = int(next(it))\n    runs = []\n    previous = None\n    length = 0\n    for _ in range(n):\n        sushi_type = int(next(it))\n        if sushi_type == previous:\n            length += 1\n        else:\n            if length:\n                runs.append(length)\n            previous = sushi_type\n            length = 1\n    runs.append(length)\n    answer = max(2 * min(runs[i - 1], runs[i]) for i in range(1, len(runs)))\n    sys.stdout.write(str(answer))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2237,
+      "index": "C",
+      "name": "Duck Surplus",
+      "rating": 1000,
+      "idea": "Scan the piles from left to right while tracking the value that is still forced to move right by an inversion. If that value exceeds the next pile, resolving the inversion merges their counts; otherwise the next pile can start a fresh carry.",
+      "approach": [
+        "For each test case, read the initial pile sizes and print the minimum possible largest pile after the process reaches nondecreasing order. An allowed move changes an inverted adjacent pair (x, y), where x > y, into (y, x + y).",
+        "Maintain a carry for the pile currently being pushed right by inversions. When carry > x, resolving that descent puts x before it and increases the moving pile to carry + x; when carry <= x, the pair is already in nondecreasing order, so the carry can settle and x becomes the new carry.",
+        "Applying this left-to-right choice keeps each settled prefix as small as possible and only adds a pile when an inversion requires it. The final carry is the smallest achievable maximum; use 64-bit values because repeated merges can grow beyond 32-bit limits."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(1) extra"
+      },
+      "pitfalls": [
+        "Merge only on a strict inversion; equal adjacent piles do not move.",
+        "The merged value is carry + x and can exceed 32-bit range.",
+        "The input has multiple test cases and the sum of n is bounded across them."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        long long carry = 0;\n        for (int i = 0; i < n; ++i) {\n            long long x;\n            cin >> x;\n            if (carry > x) carry += x;\n            else carry = x;\n        }\n        cout << carry << '\\n';\n    }\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws IOException {\n        return Integer.parseInt(next());\n    }\n\n    static long nextLong() throws IOException {\n        return Long.parseLong(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        StringBuilder out = new StringBuilder();\n        int t = nextInt();\n        while (t-- > 0) {\n            int n = nextInt();\n            long carry = 0;\n            for (int i = 0; i < n; i++) {\n                long x = nextLong();\n                if (carry > x) carry += x;\n                else carry = x;\n            }\n            out.append(carry).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    t = int(next(it))\n    answers = []\n    for _ in range(t):\n        n = int(next(it))\n        carry = 0\n        for _ in range(n):\n            x = int(next(it))\n            if carry > x:\n                carry += x\n            else:\n                carry = x\n        answers.append(str(carry))\n    sys.stdout.write(\"\\n\".join(answers))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    }
+  ]
+}

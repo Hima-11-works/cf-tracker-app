@@ -1,0 +1,396 @@
+{
+  "section": "Constructive Algorithm",
+  "problems": [
+    {
+      "contestId": 2218,
+      "index": "D",
+      "name": "The 67th OEIS Problem",
+      "rating": 1100,
+      "idea": "Build each term as the product of two consecutive markers. If the markers are odd numbers increasing by two, the gcd of adjacent products is exactly the shared marker, because the two non-shared markers differ by four and are coprime.",
+      "approach": [
+        "For each test case, read n and output n positive integers. We want adjacent gcds that are easy to predict, so introduce markers b_i and set a_i = b_i * b_(i+1).",
+        "Choose b_i = 2i + 1 for i starting at zero. Then gcd(a_i, a_(i+1)) = b_(i+1) * gcd(b_i, b_(i+2)); the latter gcd is gcd(2i+1, 2i+5) = gcd(2i+1, 4) = 1 because the first number is odd.",
+        "Thus the adjacent gcds are 3, 5, 7, ... and are all distinct. Even at n = 10000, the largest product is about 4 * 10^8, safely below 10^18."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(1) auxiliary space"
+      },
+      "pitfalls": [
+        "Use 64-bit integers for the products.",
+        "The markers must be odd; arbitrary consecutive integers would not give the same gcd identity."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        for (int i = 0; i < n; ++i) {\n            long long value = 1LL * (2 * i + 1) * (2 * i + 3);\n            cout << value << (i + 1 == n ? '\\n' : ' ');\n        }\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int t = fs.nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            for (int i = 0; i < n; ++i) {\n                long value = (2L * i + 1) * (2L * i + 3);\n                if (i > 0) out.append(' ');\n                out.append(value);\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        out.append(\" \".join(str((2 * i + 1) * (2 * i + 3)) for i in range(n)))\n    sys.stdout.write(\"\\n\".join(out) + \"\\n\")\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2040,
+      "index": "B",
+      "name": "Paint a Strip",
+      "rating": 1000,
+      "idea": "A filled contiguous block can be extended after adding one new seed: an interval with the old block and the seed has enough ones to fill at most twice its current span plus two. This gives the maximum coverable length recurrence L -> 2L + 2, starting from one seed.",
+      "approach": [
+        "Each test case gives a strip length n, and only operations that turn one chosen zero into one are counted. Start with a single seed, whose covered interval has length L = 1.",
+        "With a filled interval of length L, place the next seed L + 2 positions beyond one end and choose the interval from the opposite end to that seed. It has length 2L + 2 and contains L + 1 ones, exactly enough to satisfy the half-full condition, so one spread operation fills it.",
+        "The same condition also bounds growth: an interval that uses the existing block and one new seed can span at most twice the current length plus two. Multiple seeds before a spread cannot beat applying this bound one seed at a time, so iterate L = 2L + 2 until L >= n; the number of seeds used is minimal."
+      ],
+      "complexity": {
+        "time": "O(log n) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "n = 1 needs one seed, not zero.",
+        "The spreading operation requires both interval endpoints to already be one."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        long long n;\n        cin >> n;\n        long long covered = 1;\n        int seeds = 1;\n        while (covered < n) {\n            covered = 2 * covered + 2;\n            ++seeds;\n        }\n        cout << seeds << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int t = fs.nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            long n = fs.nextLong();\n            long covered = 1;\n            int seeds = 1;\n            while (covered < n) {\n                covered = 2 * covered + 2;\n                ++seeds;\n            }\n            out.append(seeds).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    out = []\n    for n in data[1:1 + t]:\n        covered = 1\n        seeds = 1\n        while covered < n:\n            covered = 2 * covered + 2\n            seeds += 1\n        out.append(str(seeds))\n    sys.stdout.write(\"\\n\".join(out) + \"\\n\")\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2055,
+      "index": "B",
+      "name": "Crafting",
+      "rating": 1000,
+      "idea": "Repeatedly crafting one material raises its count while lowering every other count by the same amount. Mixing craft targets cannot help: combining operations on two targets leaves both target counts unchanged overall and only drains the remaining materials, so at most one material may be deficient.",
+      "approach": [
+        "Read the initial inventory a and the required inventory b for each test case. If every a_i is already at least b_i, crafting zero times succeeds.",
+        "If two or more indices have a_i < b_i, success is impossible because any sequence of operations can effectively target at most one material. For a unique deficient index i, let need = b_i - a_i.",
+        "Crafting i exactly x times requires x >= need, while every other material j loses x units and therefore imposes x <= a_j - b_j. The answer is YES precisely when need does not exceed the minimum surplus among all other materials."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Count deficient materials before applying the one-deficit formula.",
+        "The limit is the smallest surplus among all other types, not the total surplus."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        vector<long long> a(n), b(n);\n        for (auto &x : a) cin >> x;\n        for (auto &x : b) cin >> x;\n        int deficient = 0;\n        long long need = 0, minSurplus = LLONG_MAX;\n        for (int i = 0; i < n; ++i) {\n            if (a[i] < b[i]) {\n                ++deficient;\n                need = b[i] - a[i];\n            } else {\n                minSurplus = min(minSurplus, a[i] - b[i]);\n            }\n        }\n        bool possible = deficient == 0 || (deficient == 1 && need <= minSurplus);\n        cout << (possible ? \"YES\" : \"NO\") << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int t = fs.nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            long[] a = new long[n], b = new long[n];\n            for (int i = 0; i < n; ++i) a[i] = fs.nextLong();\n            for (int i = 0; i < n; ++i) b[i] = fs.nextLong();\n            int deficient = 0;\n            long need = 0, minSurplus = Long.MAX_VALUE;\n            for (int i = 0; i < n; ++i) {\n                if (a[i] < b[i]) {\n                    ++deficient;\n                    need = b[i] - a[i];\n                } else {\n                    minSurplus = Math.min(minSurplus, a[i] - b[i]);\n                }\n            }\n            boolean possible = deficient == 0 || (deficient == 1 && need <= minSurplus);\n            out.append(possible ? \"YES\" : \"NO\").append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        a = data[pos:pos + n]\n        pos += n\n        b = data[pos:pos + n]\n        pos += n\n        deficient = [i for i in range(n) if a[i] < b[i]]\n        if not deficient:\n            out.append(\"YES\")\n        elif len(deficient) > 1:\n            out.append(\"NO\")\n        else:\n            i = deficient[0]\n            need = b[i] - a[i]\n            min_surplus = min(a[j] - b[j] for j in range(n) if j != i)\n            out.append(\"YES\" if need <= min_surplus else \"NO\")\n    sys.stdout.write(\"\\n\".join(out) + \"\\n\")\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2051,
+      "index": "C",
+      "name": "Preparing for the Exam",
+      "rating": 1000,
+      "idea": "A list omits exactly one question, so passing it requires Monocarp to know every question except possibly that omitted one. If he knows n questions every list passes; if he knows n-1, only the list omitting his sole unknown question passes.",
+      "approach": [
+        "For each test case, read the m omitted-question values and the k questions Monocarp knows. Store the known questions in a boolean array indexed from 1 through n.",
+        "If k = n, every list contains only known questions, so emit m ones. If k < n - 1, every list contains at least one question he does not know, because each list has n - 1 questions.",
+        "When k = n - 1, each list passes exactly when its omitted question is the one question not marked as known. Check that condition independently for each of the m list descriptors and print the resulting bit string."
+      ],
+      "complexity": {
+        "time": "O(n + m + k) per test case",
+        "space": "O(n + m)"
+      },
+      "pitfalls": [
+        "The omitted values are given before the known-question list.",
+        "For k = n - 1, compare against the missing known question; do not compare counts of list values."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, m, k;\n        cin >> n >> m >> k;\n        vector<int> omitted(m);\n        for (int &x : omitted) cin >> x;\n        vector<char> known(n + 1, false);\n        for (int i = 0, x; i < k; ++i) {\n            cin >> x;\n            known[x] = true;\n        }\n        for (int x : omitted) {\n            char answer = (k == n || (k == n - 1 && !known[x])) ? '1' : '0';\n            cout << answer;\n        }\n        cout << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int t = fs.nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = fs.nextInt(), m = fs.nextInt(), k = fs.nextInt();\n            int[] omitted = new int[m];\n            for (int i = 0; i < m; ++i) omitted[i] = fs.nextInt();\n            boolean[] known = new boolean[n + 1];\n            for (int i = 0; i < k; ++i) known[fs.nextInt()] = true;\n            for (int x : omitted) {\n                out.append(k == n || (k == n - 1 && !known[x]) ? '1' : '0');\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n, m, k = data[pos:pos + 3]\n        pos += 3\n        omitted = data[pos:pos + m]\n        pos += m\n        known = [False] * (n + 1)\n        for x in data[pos:pos + k]:\n            known[x] = True\n        pos += k\n        out.append(\"\".join(\"1\" if k == n or (k == n - 1 and not known[x]) else \"0\" for x in omitted))\n    sys.stdout.write(\"\\n\".join(out) + \"\\n\")\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2211,
+      "index": "B",
+      "name": "Mickey Mouse Constructive",
+      "rating": 1100,
+      "idea": "For any arrangement with nonzero total sum S, every equal-sum partition into m parts requires m to divide |S|. Ordering all copies of the majority sign before the minority sign attains exactly one partition for each divisor, while a zero total is minimized by a one-part partition.",
+      "approach": [
+        "The total sum is S = x - y. In a partition into m equal-sum subarrays, each part sums to S/m, so when S is nonzero, m must be a positive divisor of |S|.",
+        "Every arrangement has at least one valid partition for every divisor m: the prefix sum changes by one at each step and therefore visits the intermediate multiples of S/m in order. These visits give cut positions for m equal-sum parts, so the divisor count is a lower bound for f(a).",
+        "Output all copies of the majority sign first, then all copies of the other sign. Its prefix sums move monotonically up to the majority count and then down to S, so every internal cut level for a divisor lies on the first monotone run exactly once; no extra partition is possible. If S = 0, this arrangement returns to prefix sum zero only at the end, so f(a) = 1."
+      ],
+      "complexity": {
+        "time": "O(sqrt(|x - y|) + x + y) per test case",
+        "space": "O(x + y)"
+      },
+      "pitfalls": [
+        "Use one part as the minimum when x = y; do not count divisors of zero.",
+        "The requested modulo is applied after minimizing the actual divisor count."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    const long long MOD = 676767677;\n    int t;\n    cin >> t;\n    while (t--) {\n        int x, y;\n        cin >> x >> y;\n        int diff = abs(x - y);\n        long long ways = 1;\n        if (diff != 0) {\n            ways = 0;\n            for (int d = 1; 1LL * d * d <= diff; ++d) {\n                if (diff % d == 0) {\n                    ++ways;\n                    if (d * d != diff) ++ways;\n                }\n            }\n        }\n        cout << ways % MOD << '\\n';\n        bool plusFirst = x >= y;\n        int firstCount = plusFirst ? x : y;\n        int secondCount = plusFirst ? y : x;\n        int firstValue = plusFirst ? 1 : -1;\n        int secondValue = -firstValue;\n        bool needSpace = false;\n        for (int i = 0; i < firstCount; ++i) {\n            if (needSpace) cout << ' ';\n            cout << firstValue;\n            needSpace = true;\n        }\n        for (int i = 0; i < secondCount; ++i) {\n            if (needSpace) cout << ' ';\n            cout << secondValue;\n            needSpace = true;\n        }\n        cout << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        final long MOD = 676767677L;\n        int t = fs.nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int x = fs.nextInt(), y = fs.nextInt();\n            int diff = Math.abs(x - y);\n            long ways = 1;\n            if (diff != 0) {\n                ways = 0;\n                for (int d = 1; (long) d * d <= diff; ++d) {\n                    if (diff % d == 0) {\n                        ++ways;\n                        if (d * d != diff) ++ways;\n                    }\n                }\n            }\n            out.append(ways % MOD).append('\\n');\n            boolean plusFirst = x >= y;\n            int firstCount = plusFirst ? x : y;\n            int secondCount = plusFirst ? y : x;\n            int firstValue = plusFirst ? 1 : -1;\n            int secondValue = -firstValue;\n            boolean needSpace = false;\n            for (int i = 0; i < firstCount; ++i) {\n                if (needSpace) out.append(' ');\n                out.append(firstValue);\n                needSpace = true;\n            }\n            for (int i = 0; i < secondCount; ++i) {\n                if (needSpace) out.append(' ');\n                out.append(secondValue);\n                needSpace = true;\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\nMOD = 676767677\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        x, y = data[pos], data[pos + 1]\n        pos += 2\n        diff = abs(x - y)\n        ways = 1 if diff == 0 else 0\n        d = 1\n        while d * d <= diff:\n            if diff % d == 0:\n                ways += 1\n                if d * d != diff:\n                    ways += 1\n            d += 1\n        out.append(str(ways % MOD))\n        if x >= y:\n            values = [\"1\"] * x + [\"-1\"] * y\n        else:\n            values = [\"-1\"] * y + [\"1\"] * x\n        out.append(\" \".join(values))\n    sys.stdout.write(\"\\n\".join(out) + \"\\n\")\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2059,
+      "index": "B",
+      "name": "Cost of the Array",
+      "rating": 1300,
+      "idea": "Only the first mismatch between b_i and i matters. When k = n, the even-positioned elements form a fixed b; when k < n, the first element of b can be chosen from a range of starting positions, so either a mismatch gives cost 1 or all starts force cost at least 2.",
+      "approach": [
+        "Read n, even k, and the array. The k even-indexed subarrays contribute exactly k/2 times as many elements to b as the number of even subarrays, followed by an extra zero, so the cost is the first 1-based index where b differs from that index.",
+        "If k = n, all subarrays must be singletons. Then b is a_2, a_4, ... , a_k, 0; compare these entries in order with 1, 2, ... and return the first mismatch, or k/2 + 1 if all match.",
+        "If k < n, the first element of b can be chosen from a[1] through a[n-k+1] in zero-based indexing. If any candidate differs from 1, arrange it as b_1 and the answer is 1; otherwise choose the first even segment to include the next 1, making b start [1,1] and the answer 2."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "The special branch is when the original k equals n.",
+        "Indices in the searchable start range are zero-based positions 1 through n-k+1."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, k;\n        cin >> n >> k;\n        vector<int> a(n);\n        for (int &x : a) cin >> x;\n        if (k == n) {\n            int answer = k / 2 + 1;\n            for (int pos = 1, expected = 1; pos < n; pos += 2, ++expected) {\n                if (a[pos] != expected) {\n                    answer = expected;\n                    break;\n                }\n            }\n            cout << answer << '\\n';\n        } else {\n            bool canMakeCostOne = false;\n            for (int pos = 1; pos <= n - k + 1; ++pos) {\n                if (a[pos] != 1) canMakeCostOne = true;\n            }\n            cout << (canMakeCostOne ? 1 : 2) << '\\n';\n        }\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int t = fs.nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = fs.nextInt(), k = fs.nextInt();\n            int[] a = new int[n];\n            for (int i = 0; i < n; ++i) a[i] = fs.nextInt();\n            if (k == n) {\n                int answer = k / 2 + 1;\n                for (int pos = 1, expected = 1; pos < n; pos += 2, ++expected) {\n                    if (a[pos] != expected) {\n                        answer = expected;\n                        break;\n                    }\n                }\n                out.append(answer).append('\\n');\n            } else {\n                boolean canMakeCostOne = false;\n                for (int pos = 1; pos <= n - k + 1; ++pos) {\n                    if (a[pos] != 1) canMakeCostOne = true;\n                }\n                out.append(canMakeCostOne ? 1 : 2).append('\\n');\n            }\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n, k = data[pos], data[pos + 1]\n        pos += 2\n        a = data[pos:pos + n]\n        pos += n\n        if k == n:\n            answer = k // 2 + 1\n            for expected, index in enumerate(range(1, n, 2), start=1):\n                if a[index] != expected:\n                    answer = expected\n                    break\n            out.append(str(answer))\n        else:\n            can_make_cost_one = any(a[index] != 1 for index in range(1, n - k + 2))\n            out.append(\"1\" if can_make_cost_one else \"2\")\n    sys.stdout.write(\"\\n\".join(out) + \"\\n\")\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2273,
+      "index": "A",
+      "name": "Lavencia Oranges",
+      "rating": 1300,
+      "idea": "If the maximum confiscation cost is C, then load size s can occur in at most floor(C/s) bags, giving total capacity M(C) = sum(s * floor(C/s)) over s <= C. The smallest C with M(C) >= n is feasible, and bounded bag loads can represent every total from zero through M(C).",
+      "approach": [
+        "The array assigns each of n oranges to a bag, so a bag load s occurs c_s times and the cost is max(s * c_s). Under a candidate cost C, at most floor(C/s) bags may have load s; sizes greater than C cannot appear.",
+        "Therefore no arrangement under cost C can hold more than M(C) = sum from s = 1 to C of s * floor(C/s) oranges. Conversely, the available copies of sizes 1 through C form a bounded coin system with no gaps in its reachable sums: smaller sizes already cover at least s - 1, so adding size s connects consecutive reachable ranges.",
+        "Binary search for the smallest C with M(C) >= n. Compute M(C) by grouping consecutive s values with the same quotient floor(C/s), then greedily take as many bags as possible from size C down to 1; the remaining total reaches zero. Give each selected bag a fresh ID and repeat that ID by its load in the output array; unused bag IDs stay empty."
+      ],
+      "complexity": {
+        "time": "O(sqrt(C) log n + n) per test case",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "The zero-load bags contribute zero cost and can be left unused.",
+        "The value c_s counts bags with load s, not oranges with that load.",
+        "Use 64-bit arithmetic for the capacity sum."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nlong long capacity(int c) {\n    long long total = 0;\n    for (long long left = 1, right; left <= c; left = right + 1) {\n        long long q = c / left;\n        right = c / q;\n        total += q * (left + right) * (right - left + 1) / 2;\n    }\n    return total;\n}\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        int low = 1, high = n;\n        while (low < high) {\n            int mid = low + (high - low) / 2;\n            if (capacity(mid) >= n) high = mid;\n            else low = mid + 1;\n        }\n        int cost = low;\n        vector<int> counts(cost + 1, 0);\n        int remaining = n;\n        for (int size = cost; size >= 1; --size) {\n            counts[size] = min(cost / size, remaining / size);\n            remaining -= counts[size] * size;\n        }\n        vector<int> assignment;\n        assignment.reserve(n);\n        int bag = 1;\n        for (int size = 1; size <= cost; ++size) {\n            for (int copy = 0; copy < counts[size]; ++copy) {\n                for (int j = 0; j < size; ++j) assignment.push_back(bag);\n                ++bag;\n            }\n        }\n        cout << cost << '\\n';\n        for (int i = 0; i < n; ++i) cout << assignment[i] << (i + 1 == n ? '\\n' : ' ');\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n    }\n    static long capacity(int c) {\n        long total = 0;\n        for (long left = 1, right; left <= c; left = right + 1) {\n            long q = c / left;\n            right = c / q;\n            total += q * (left + right) * (right - left + 1) / 2;\n        }\n        return total;\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int t = fs.nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            int low = 1, high = n;\n            while (low < high) {\n                int mid = low + (high - low) / 2;\n                if (capacity(mid) >= n) high = mid;\n                else low = mid + 1;\n            }\n            int cost = low;\n            int[] counts = new int[cost + 1];\n            int remaining = n;\n            for (int size = cost; size >= 1; --size) {\n                counts[size] = Math.min(cost / size, remaining / size);\n                remaining -= counts[size] * size;\n            }\n            int[] assignment = new int[n];\n            int at = 0, bag = 1;\n            for (int size = 1; size <= cost; ++size) {\n                for (int copy = 0; copy < counts[size]; ++copy) {\n                    for (int j = 0; j < size; ++j) assignment[at++] = bag;\n                    ++bag;\n                }\n            }\n            out.append(cost).append('\\n');\n            for (int i = 0; i < n; ++i) {\n                if (i > 0) out.append(' ');\n                out.append(assignment[i]);\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef capacity(c):\n    total = 0\n    left = 1\n    while left <= c:\n        quotient = c // left\n        right = c // quotient\n        total += quotient * (left + right) * (right - left + 1) // 2\n        left = right + 1\n    return total\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    out = []\n    for n in data[1:1 + t]:\n        low, high = 1, n\n        while low < high:\n            mid = (low + high) // 2\n            if capacity(mid) >= n:\n                high = mid\n            else:\n                low = mid + 1\n        cost = low\n        counts = [0] * (cost + 1)\n        remaining = n\n        for size in range(cost, 0, -1):\n            counts[size] = min(cost // size, remaining // size)\n            remaining -= counts[size] * size\n        assignment = []\n        bag = 1\n        for size in range(1, cost + 1):\n            for _ in range(counts[size]):\n                assignment.extend([bag] * size)\n                bag += 1\n        out.append(str(cost))\n        out.append(\" \".join(map(str, assignment)))\n    sys.stdout.write(\"\\n\".join(out) + \"\\n\")\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 361,
+      "index": "A",
+      "name": "Levko and Table",
+      "rating": 800,
+      "idea": "A diagonal matrix with k on every diagonal entry gives every row and every column exactly one nonzero value, equal to k. No interaction between rows or columns is needed.",
+      "approach": [
+        "Read the single pair n and k, where n is the side length of the table. The output only needs to satisfy the sum condition for each row and column.",
+        "Set cell (i,j) to k when i = j and to zero otherwise. Every row contains one diagonal k, and every column also contains exactly one diagonal k.",
+        "All values are between zero and k, and k is at most 1000, so this direct construction respects the element bound."
+      ],
+      "complexity": {
+        "time": "O(n^2)",
+        "space": "O(1) auxiliary space"
+      },
+      "pitfalls": [
+        "This problem has one input case and no leading test count.",
+        "Print n entries on each of n rows."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int n, k;\n    cin >> n >> k;\n    for (int i = 0; i < n; ++i) {\n        for (int j = 0; j < n; ++j) {\n            if (j) cout << ' ';\n            cout << (i == j ? k : 0);\n        }\n        cout << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st = new StringTokenizer(br.readLine());\n        int n = Integer.parseInt(st.nextToken());\n        int k = Integer.parseInt(st.nextToken());\n        StringBuilder out = new StringBuilder();\n        for (int i = 0; i < n; ++i) {\n            for (int j = 0; j < n; ++j) {\n                if (j > 0) out.append(' ');\n                out.append(i == j ? k : 0);\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    n, k = map(int, sys.stdin.buffer.readline().split())\n    for i in range(n):\n        row = [str(k if i == j else 0) for j in range(n)]\n        print(\" \".join(row))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 595,
+      "index": "A",
+      "name": "Vitaly and Night",
+      "rating": 800,
+      "idea": "Each flat has two windows, and Vitaly considers its residents awake if either window is lit. Count a flat once per floor whenever its pair contains at least one 1.",
+      "approach": [
+        "Read n floors and m flats per floor, then inspect the 2m window indicators on each floor. The pair at positions 2j and 2j+1 belongs to flat j in zero-based indexing.",
+        "For each pair, add one to the answer if either character is 1. The rule is an OR, so two lit windows in the same flat still count only once.",
+        "Print the accumulated number after all floors have been processed. The input may show bits separated by whitespace or together; reading individual characters handles either representation."
+      ],
+      "complexity": {
+        "time": "O(nm)",
+        "space": "O(1) auxiliary space"
+      },
+      "pitfalls": [
+        "Count flats, not windows.",
+        "A flat with both windows lit contributes one, not two."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int n, m;\n    cin >> n >> m;\n    int awake = 0;\n    for (int i = 0; i < n; ++i) {\n        for (int j = 0; j < m; ++j) {\n            char left, right;\n            cin >> left >> right;\n            if (left == '1' || right == '1') ++awake;\n        }\n    }\n    cout << awake << '\\n';\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int n = fs.nextInt(), m = fs.nextInt();\n        int awake = 0;\n        for (int floor = 0; floor < n; ++floor) {\n            StringBuilder bits = new StringBuilder();\n            while (bits.length() < 2 * m) bits.append(fs.next());\n            for (int flat = 0; flat < m; ++flat) {\n                if (bits.charAt(2 * flat) == '1' || bits.charAt(2 * flat + 1) == '1') ++awake;\n            }\n        }\n        System.out.println(awake);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    tokens = sys.stdin.buffer.read().split()\n    n, m = map(int, tokens[:2])\n    bits = b\"\".join(tokens[2:])\n    awake = 0\n    for flat in range(n * m):\n        if bits[2 * flat] == ord('1') or bits[2 * flat + 1] == ord('1'):\n            awake += 1\n    print(awake)\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1088,
+      "index": "A",
+      "name": "Ehab and another construction problem",
+      "rating": 800,
+      "idea": "For every x greater than one, choose a = b = x. Then b divides a, their product is x squared and exceeds x, while their quotient is one and is strictly less than x.",
+      "approach": [
+        "Read the single integer x. Both output values must lie from 1 through x, so using x for both values immediately satisfies those bounds.",
+        "If x > 1, then a/b = 1 < x and a*b = x^2 > x; also b divides a because the two values are equal. Thus x x is a valid pair.",
+        "For x = 1, the only possible values are a = b = 1, whose product is not greater than x, so no pair exists and the answer is -1."
+      ],
+      "complexity": {
+        "time": "O(1)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The input is one integer, not a number of test cases.",
+        "The product inequality is strict, so x = 1 must return -1."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int x;\n    cin >> x;\n    if (x == 1) cout << -1 << '\\n';\n    else cout << x << ' ' << x << '\\n';\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int x = fs.nextInt();\n        if (x == 1) System.out.println(-1);\n        else System.out.println(x + \" \" + x);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    x = int(sys.stdin.buffer.read())\n    if x == 1:\n        print(-1)\n    else:\n        print(x, x)\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2247,
+      "index": "A",
+      "name": "Zero Sum",
+      "rating": 800,
+      "idea": "Each operation flips two signs, so the parity of the number of negative elements never changes. The adjacent-pair flips generate every even-sized set of sign changes, making that parity condition sufficient once n is even.",
+      "approach": [
+        "A sum of n values from {-1, 1} can be zero only when n is even and exactly n/2 entries are negative. Count the negative entries in each test case.",
+        "Flipping an adjacent pair changes the number of negative entries by -2, 0, or 2, so its parity is invariant. Therefore the target is impossible unless the current negative count and n/2 have the same parity.",
+        "For sufficiency, represent each sign change as a bit. Adjacent-pair flips generate all bit vectors with even parity on a line, so any target arrangement with n/2 negative signs is reachable exactly when the symmetric difference from the current signs has even size; this is the same parity test."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Odd n is always impossible because a sum of an odd number of +/-1 values cannot be zero.",
+        "Compare parity of the negative count with n/2, not just whether the current sum is close to zero."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, negatives = 0;\n        cin >> n;\n        for (int i = 0, x; i < n; ++i) {\n            cin >> x;\n            if (x == -1) ++negatives;\n        }\n        bool possible = (n % 2 == 0 && negatives % 2 == (n / 2) % 2);\n        cout << (possible ? \"YES\" : \"NO\") << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int t = fs.nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = fs.nextInt(), negatives = 0;\n            for (int i = 0; i < n; ++i) if (fs.nextInt() == -1) ++negatives;\n            boolean possible = n % 2 == 0 && negatives % 2 == (n / 2) % 2;\n            out.append(possible ? \"YES\" : \"NO\").append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        values = data[pos:pos + n]\n        pos += n\n        negatives = sum(x == -1 for x in values)\n        possible = n % 2 == 0 and negatives % 2 == (n // 2) % 2\n        out.append(\"YES\" if possible else \"NO\")\n    sys.stdout.write(\"\\n\".join(out) + \"\\n\")\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2246,
+      "index": "A",
+      "name": "farmpiggie and Subset Sum",
+      "rating": 800,
+      "idea": "Make every weight i * p_i even, so every signed sum is even and can never equal one. Since n is even, pair odd positions with even permutation values and even positions with odd values.",
+      "approach": [
+        "Each position i contributes either -i*p_i, zero, or i*p_i, and the task asks for a permutation that makes the final sum 1 impossible. It is enough to make every individual weight even.",
+        "For even n there are exactly n/2 odd positions and n/2 even positions. Assign the even values 2, 4, ... to odd positions, and the odd values 1, 3, ... to even positions; each position-value product then has an even factor.",
+        "Any sum or difference of even weights is even, including the choice that contributes zero at some positions. Therefore no sequence of permitted choices can produce the odd value 1."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(1) auxiliary space"
+      },
+      "pitfalls": [
+        "The permutation length is guaranteed to be even.",
+        "The condition is about every possible signed subset sum, so ensure each weight itself is even."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        for (int i = 1; i <= n; ++i) {\n            int value = (i % 2 == 1 ? i + 1 : i - 1);\n            cout << value << (i == n ? '\\n' : ' ');\n        }\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int t = fs.nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            for (int i = 1; i <= n; ++i) {\n                int value = (i % 2 == 1 ? i + 1 : i - 1);\n                if (i > 1) out.append(' ');\n                out.append(value);\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    values = []\n    for n in data[1:1 + t]:\n        values.append(\" \".join(str(i + 1 if i % 2 == 1 else i - 1) for i in range(1, n + 1)))\n    sys.stdout.write(\"\\n\".join(values) + \"\\n\")\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2234,
+      "index": "B",
+      "name": "Palindrome, Twelve and Two Terms",
+      "rating": 800,
+      "idea": "We need a palindrome a with a congruent to n modulo 12; then b = n - a is automatically nonnegative and divisible by 12. A one-digit palindrome supplies every residue except 10, for which 22 is the smallest convenient palindrome.",
+      "approach": [
+        "For a beautiful pair, b = n - a must be a nonnegative multiple of 12, so it is enough to find a palindrome a <= n with a mod 12 equal to n mod 12.",
+        "If the remainder r is not 10, choose a = r. Values 0 through 9 are one-digit palindromes and 11 is also a palindrome, covering every such remainder.",
+        "For remainder 10, choose a = 22, which is a palindrome congruent to 10 modulo 12. It is valid whenever n >= 22; for the only smaller positive n with this remainder, n = 10, no such palindrome fits, so print -1."
+      ],
+      "complexity": {
+        "time": "O(1) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The output values may be zero, so a = 0 is valid when n is divisible by 12.",
+        "For remainder 10, check that 22 <= n before printing it."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        long long n;\n        cin >> n;\n        long long a = n % 12;\n        if (a == 10) a = 22;\n        if (a > n) cout << -1 << '\\n';\n        else cout << a << ' ' << n - a << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int t = fs.nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            long n = fs.nextLong();\n            long a = n % 12;\n            if (a == 10) a = 22;\n            if (a > n) out.append(-1);\n            else out.append(a).append(' ').append(n - a);\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    out = []\n    for n in data[1:1 + t]:\n        a = n % 12\n        if a == 10:\n            a = 22\n        if a > n:\n            out.append(\"-1\")\n        else:\n            out.append(str(a) + \" \" + str(n - a))\n    sys.stdout.write(\"\\n\".join(out) + \"\\n\")\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2259,
+      "index": "C",
+      "name": "101",
+      "rating": 1000,
+      "idea": "A valid scored interval may use unknown cells as its two 1 endpoints and unknown cells as interior zeros, but it cannot contain a fixed 1 strictly inside. Thus the best interval is the widest pair of nonzero-eligible positions within a region between consecutive fixed 1s.",
+      "approach": [
+        "For every possible scored subarray, both endpoints must be 1 and every strict interior cell must be 0. An unknown -1 can be assigned either way, so it is a valid endpoint and can be set to zero when it lies inside.",
+        "A fixed 1 cannot lie strictly inside a valid interval. Split the array into ranges between consecutive fixed 1 positions, including the prefix and suffix; in each range, find the first and last positions that are not fixed zero.",
+        "The widest such pair gives the maximum possible score. Set all unknown cells to zero, then set the chosen endpoint positions to one; this realizes that interval, and no longer valid interval can cross a fixed 1 in its interior."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "A fixed 1 can be an endpoint but never a strict interior position.",
+        "If there is no eligible pair, an unknown singleton can still be set to 1 and yield score 1."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        vector<int> a(n);\n        for (int &x : a) cin >> x;\n        int bestLeft = -1, bestRight = -1, bestLength = 0;\n        int leftBoundary = -1;\n        for (int rightBoundary = 0; rightBoundary <= n; ++rightBoundary) {\n            if (rightBoundary == n || a[rightBoundary] == 1) {\n                int lo = max(0, leftBoundary);\n                int hi = min(n - 1, rightBoundary);\n                int first = -1, last = -1;\n                for (int i = lo; i <= hi; ++i) {\n                    if (a[i] != 0) {\n                        if (first == -1) first = i;\n                        last = i;\n                    }\n                }\n                if (first != -1 && last - first + 1 > bestLength) {\n                    bestLength = last - first + 1;\n                    bestLeft = first;\n                    bestRight = last;\n                }\n                leftBoundary = rightBoundary;\n            }\n        }\n        for (int &x : a) if (x == -1) x = 0;\n        if (bestLeft != -1) {\n            a[bestLeft] = 1;\n            a[bestRight] = 1;\n        }\n        for (int i = 0; i < n; ++i) cout << a[i] << (i + 1 == n ? '\\n' : ' ');\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int t = fs.nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            int[] a = new int[n];\n            for (int i = 0; i < n; ++i) a[i] = fs.nextInt();\n            int bestLeft = -1, bestRight = -1, bestLength = 0;\n            int leftBoundary = -1;\n            for (int rightBoundary = 0; rightBoundary <= n; ++rightBoundary) {\n                if (rightBoundary == n || a[rightBoundary] == 1) {\n                    int lo = Math.max(0, leftBoundary);\n                    int hi = Math.min(n - 1, rightBoundary);\n                    int first = -1, last = -1;\n                    for (int i = lo; i <= hi; ++i) {\n                        if (a[i] != 0) {\n                            if (first == -1) first = i;\n                            last = i;\n                        }\n                    }\n                    if (first != -1 && last - first + 1 > bestLength) {\n                        bestLength = last - first + 1;\n                        bestLeft = first;\n                        bestRight = last;\n                    }\n                    leftBoundary = rightBoundary;\n                }\n            }\n            for (int i = 0; i < n; ++i) if (a[i] == -1) a[i] = 0;\n            if (bestLeft != -1) {\n                a[bestLeft] = 1;\n                a[bestRight] = 1;\n            }\n            for (int i = 0; i < n; ++i) {\n                if (i > 0) out.append(' ');\n                out.append(a[i]);\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        a = data[pos:pos + n]\n        pos += n\n        best_left = best_right = -1\n        best_length = 0\n        left_boundary = -1\n        for right_boundary in range(n + 1):\n            if right_boundary == n or a[right_boundary] == 1:\n                lo = max(0, left_boundary)\n                hi = min(n - 1, right_boundary)\n                eligible = [i for i in range(lo, hi + 1) if a[i] != 0]\n                if eligible and eligible[-1] - eligible[0] + 1 > best_length:\n                    best_length = eligible[-1] - eligible[0] + 1\n                    best_left, best_right = eligible[0], eligible[-1]\n                left_boundary = right_boundary\n        a = [0 if x == -1 else x for x in a]\n        if best_left != -1:\n            a[best_left] = 1\n            a[best_right] = 1\n        out.append(\" \".join(map(str, a)))\n    sys.stdout.write(\"\\n\".join(out) + \"\\n\")\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2250,
+      "index": "B",
+      "name": "String Construction",
+      "rating": 1000,
+      "idea": "If a binary string has r maximal runs of equal characters, it has exactly n - r equal adjacent pairs. Build r alternating runs, then distribute extra characters so the total zero and one counts differ by at most one.",
+      "approach": [
+        "Read n and k. A run of length L contributes L - 1 equal adjacent pairs, so the total number of equal pairs is n minus the number of runs; we therefore need exactly r = n - k runs.",
+        "If r = 1, the whole string is one character and the two character counts differ by n, which is greater than one for n >= 2, so no answer exists. Otherwise, alternate run characters starting with zero.",
+        "Give every run length one, then assign the remaining zeros to the first zero run and remaining ones to the first one run. The run counts are ceil(r/2) and floor(r/2), while the target totals are ceil(n/2) and floor(n/2), so these additions are nonnegative and yield balanced character counts."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "The impossible case is k = n - 1, which leaves only one run.",
+        "Adjacent equal pairs count within each run; transitions between alternating runs add none."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, k;\n        cin >> n >> k;\n        int runs = n - k;\n        if (runs == 1) {\n            cout << -1 << '\\n';\n            continue;\n        }\n        int zeroRuns = (runs + 1) / 2;\n        int oneRuns = runs / 2;\n        int extraZeros = (n + 1) / 2 - zeroRuns;\n        int extraOnes = n / 2 - oneRuns;\n        string answer;\n        answer.reserve(n);\n        for (int run = 0; run < runs; ++run) {\n            int length = 1;\n            if (run == 0) length += extraZeros;\n            if (run == 1) length += extraOnes;\n            answer.append(length, run % 2 == 0 ? '0' : '1');\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        int t = fs.nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = fs.nextInt(), k = fs.nextInt();\n            int runs = n - k;\n            if (runs == 1) {\n                out.append(-1).append('\\n');\n                continue;\n            }\n            int zeroRuns = (runs + 1) / 2;\n            int oneRuns = runs / 2;\n            int extraZeros = (n + 1) / 2 - zeroRuns;\n            int extraOnes = n / 2 - oneRuns;\n            StringBuilder answer = new StringBuilder(n);\n            for (int run = 0; run < runs; ++run) {\n                int length = 1;\n                if (run == 0) length += extraZeros;\n                if (run == 1) length += extraOnes;\n                char ch = run % 2 == 0 ? '0' : '1';\n                for (int j = 0; j < length; ++j) answer.append(ch);\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n, k = data[pos], data[pos + 1]\n        pos += 2\n        runs = n - k\n        if runs == 1:\n            out.append(\"-1\")\n            continue\n        zero_runs = (runs + 1) // 2\n        one_runs = runs // 2\n        extra_zeros = (n + 1) // 2 - zero_runs\n        extra_ones = n // 2 - one_runs\n        parts = []\n        for run in range(runs):\n            length = 1\n            if run == 0:\n                length += extra_zeros\n            if run == 1:\n                length += extra_ones\n            parts.append((\"0\" if run % 2 == 0 else \"1\") * length)\n        out.append(\"\".join(parts))\n    sys.stdout.write(\"\\n\".join(out) + \"\\n\")\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    }
+  ]
+}

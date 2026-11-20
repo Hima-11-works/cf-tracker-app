@@ -9,6 +9,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Production builds use their own folder, so a build never replaces files a running `next dev` is reading.
+  distDir: process.env.NODE_ENV === "production" ? ".next-build" : ".next",
   outputFileTracingRoot: process.cwd(),
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

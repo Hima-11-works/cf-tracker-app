@@ -45,9 +45,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <div className="site-frame">
           <a className="skip-link" href="#main-content">Skip to content</a>
           <header className="site-header">
-            <Link href="/leaderboard" className="brand" aria-label="Codeforces Probation Tracker home">
-              <span className="brand-mark" aria-hidden="true">CF</span>
-              <span className="brand-name">Probation tracker</span>
+            <Link href="/leaderboard" className="brand" aria-label="IoT Lab Probation home">
+              <img className="brand-mark" src="/logo.svg" alt="" width={36} height={36} />
+              <span className="brand-name">IoT Lab Probation</span>
             </Link>
             <MainNav />
           </header>
@@ -55,6 +55,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <footer className="site-footer">
             <span>CODEFORCES · PROBATION SHEET</span>
             <span>Accepted results stay cached in Supabase.</span>
+            <span className="site-footer-credits">
+              Credits: <a href="https://www.linkedin.com/in/polybit/" target="_blank" rel="noopener noreferrer" className="footer-credit-link">Swastik Biswas</a> and <a href="https://www.linkedin.com/in/himanshi-saxena-6094bb326/" target="_blank" rel="noopener noreferrer" className="footer-credit-link">Himanshi Saxena</a>
+            </span>
           </footer>
         </div>
       </body>

@@ -7,5 +7,5 @@ export const metadata = {
 };
 
 export default function UserPage() {
-  return <UserSheet />;
+  return <div className="page-compact"><UserSheet /></div>;
 }

@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 type ChartProblem = {
   section: string;
@@ -29,15 +28,15 @@ const RATING_COLORS = [
   "var(--chart-muted)",
 ] as const;
 
-const RADAR_CENTER_X = 210;
-const RADAR_CENTER_Y = 145;
-const RADAR_RADIUS = 100;
+const RADAR = { width: 300, height: 250, cx: 150, cy: 125, radius: 92, labelRadius: 110 } as const;
+const DONUT = { center: 100, radius: 74, stroke: 22 } as const;
+const DONUT_CIRCUMFERENCE = 2 * Math.PI * DONUT.radius;
 
 function radarPoint(index: number, count: number, radius: number) {
   const angle = -Math.PI / 2 + (2 * Math.PI * index) / count;
   return {
-    x: RADAR_CENTER_X + Math.cos(angle) * radius,
-    y: RADAR_CENTER_Y + Math.sin(angle) * radius,
+    x: RADAR.cx + Math.cos(angle) * radius,
+    y: RADAR.cy + Math.sin(angle) * radius,
   };
 }
 
@@ -45,42 +44,27 @@ function pointList(points: Array<{ x: number; y: number }>) {
   return points.map(({ x, y }) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
 }
 
-function piePoint(angle: number, radius: number) {
-  return {
-    x: 110 + Math.cos(angle) * radius,
-    y: 110 + Math.sin(angle) * radius,
-  };
-}
-
-function pieSlicePath(startAngle: number, endAngle: number) {
-  const radius = 88;
-  const start = piePoint(startAngle, radius);
-  const end = piePoint(endAngle, radius);
-  const largeArc = endAngle - startAngle > Math.PI ? 1 : 0;
-  return `M 110 110 L ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${radius} ${radius} 0 ${largeArc} 1 ${end.x.toFixed(2)} ${end.y.toFixed(2)} Z`;
-}
-
 function TopicRadar({ topics }: { topics: TopicProgress[] }) {
-  const gridLevels = [20, 40, 60, 80, 100];
-  const topicPoints = topics.map((topic, index) => radarPoint(index, topics.length, RADAR_RADIUS * topic.percent / 100));
-  const gridPoints = (level: number) => pointList(topics.map((_, index) => radarPoint(index, topics.length, RADAR_RADIUS * level / 100)));
+  const gridLevels = [25, 50, 75, 100];
+  const topicPoints = topics.map((topic, index) => radarPoint(index, topics.length, RADAR.radius * topic.percent / 100));
+  const gridPoints = (level: number) => pointList(topics.map((_, index) => radarPoint(index, topics.length, RADAR.radius * level / 100)));
   const description = topics.map((topic) => `${topic.section}: ${topic.accepted} of ${topic.total} accepted, ${topic.percent} percent`).join(". ");
 
   return (
-    <div className="topic-chart-layout">
-      <svg className="topic-radar" viewBox="0 0 420 290" role="img" aria-labelledby="topic-radar-title topic-radar-description">
+    <div className="chart-layout">
+      <svg className="topic-radar" viewBox={`0 0 ${RADAR.width} ${RADAR.height}`} role="img" aria-labelledby="topic-radar-title topic-radar-description">
         <title id="topic-radar-title">Accepted share by topic</title>
         <desc id="topic-radar-description">Radar chart with a zero to one hundred percent scale. {description}</desc>
         {gridLevels.map((level) => (
           topics.length >= 3 ? (
             <polygon key={level} className="radar-grid" points={gridPoints(level)} />
           ) : (
-            <circle key={level} className="radar-grid" cx={RADAR_CENTER_X} cy={RADAR_CENTER_Y} r={RADAR_RADIUS * level / 100} />
+            <circle key={level} className="radar-grid" cx={RADAR.cx} cy={RADAR.cy} r={RADAR.radius * level / 100} />
           )
         ))}
         {topics.map((topic, index) => {
-          const outer = radarPoint(index, topics.length, RADAR_RADIUS);
-          return <line key={`axis-${topic.section}`} className="radar-axis" x1={RADAR_CENTER_X} y1={RADAR_CENTER_Y} x2={outer.x} y2={outer.y} />;
+          const outer = radarPoint(index, topics.length, RADAR.radius);
+          return <line key={`axis-${topic.section}`} className="radar-axis" x1={RADAR.cx} y1={RADAR.cy} x2={outer.x} y2={outer.y} />;
         })}
         {topics.length >= 3 ? (
           <polygon className="radar-area" points={pointList(topicPoints)} />
@@ -88,20 +72,25 @@ function TopicRadar({ topics }: { topics: TopicProgress[] }) {
           <polyline className="radar-outline" points={pointList(topicPoints)} />
         ) : null}
         {topicPoints.map((point, index) => (
-          <circle key={`point-${topics[index].section}`} className="radar-point" cx={point.x} cy={point.y} r="4" />
+          <circle key={`point-${topics[index].section}`} className="radar-point" cx={point.x} cy={point.y} r="3.5" />
         ))}
         {topics.map((topic, index) => {
-          const label = radarPoint(index, topics.length, RADAR_RADIUS + 20);
+          const label = radarPoint(index, topics.length, RADAR.labelRadius);
           return <text key={`label-${topic.section}`} className="radar-index" x={label.x} y={label.y}>{index + 1}</text>;
         })}
       </svg>
 
-      <ol className="topic-progress-key" aria-label="Accepted problems by topic">
+      <ol className="chart-key" aria-label="Accepted problems by topic">
         {topics.map((topic, index) => (
-          <li className="topic-progress-item" key={topic.section}>
-            <span className="topic-progress-index">{index + 1}</span>
-            <span className="topic-progress-name">{topic.section}</span>
-            <span className="topic-progress-value">{topic.accepted}/{topic.total} · {topic.percent}%</span>
+          <li className="topic-key-item" key={topic.section}>
+            <span className="topic-key-index">{String(index + 1).padStart(2, "0")}</span>
+            <div className="topic-key-body">
+              <div className="topic-key-line">
+                <span className="topic-key-name">{topic.section}</span>
+                <span className="topic-key-value">{topic.accepted}/{topic.total} · {topic.percent}%</span>
+              </div>
+              <div className="topic-key-track" aria-hidden="true"><span style={{ width: topic.percent + "%" }} /></div>
+            </div>
           </li>
         ))}
       </ol>
@@ -109,31 +98,43 @@ function TopicRadar({ topics }: { topics: TopicProgress[] }) {
   );
 }
 
-function RatingPie({ ratings, total }: { ratings: RatingSlice[]; total: number }) {
+function RatingDonut({ ratings, total }: { ratings: RatingSlice[]; total: number }) {
   const visibleRatings = ratings.filter((rating) => rating.count > 0);
   let accumulated = 0;
-  const slices = visibleRatings.map((rating) => {
-    const start = -Math.PI / 2 + (2 * Math.PI * accumulated) / total;
+  const segments = visibleRatings.map((rating) => {
+    const length = (rating.count / total) * DONUT_CIRCUMFERENCE;
+    const offset = -(accumulated / total) * DONUT_CIRCUMFERENCE;
     accumulated += rating.count;
-    const end = -Math.PI / 2 + (2 * Math.PI * accumulated) / total;
-    return { ...rating, start, end };
+    return { ...rating, length, offset };
   });
   const description = visibleRatings.map((rating) => `${rating.label}: ${rating.count}`).join(". ");
 
   return (
-    <div className="rating-chart-layout">
-      <svg className="rating-pie" viewBox="0 0 220 220" role="img" aria-labelledby="rating-pie-title rating-pie-description">
-        <title id="rating-pie-title">Accepted problems by rating</title>
-        <desc id="rating-pie-description">Pie chart of {total} accepted problems with a rating, grouped by exact Codeforces rating. {description || "No accepted problems with a rating yet."}</desc>
-        {total === 0 ? <circle className="rating-pie-empty" cx="110" cy="110" r="88" /> : null}
-        {slices.length === 1 ? <circle cx="110" cy="110" r="88" fill={slices[0].color} /> : null}
-        {slices.length > 1 ? slices.map((slice) => (
-          <path key={slice.label} className="rating-slice" fill={slice.color} d={pieSlicePath(slice.start, slice.end)} />
-        )) : null}
+    <div className="chart-layout">
+      <svg className="rating-donut" viewBox="0 0 200 200" role="img" aria-labelledby="rating-donut-title rating-donut-description">
+        <title id="rating-donut-title">Accepted problems by rating</title>
+        <desc id="rating-donut-description">Donut chart of {total} accepted problems with a rating, grouped by exact Codeforces rating. {description || "No accepted problems with a rating yet."}</desc>
+        <circle className="rating-donut-track" cx={DONUT.center} cy={DONUT.center} r={DONUT.radius} strokeWidth={DONUT.stroke} />
+        {segments.map((segment) => (
+          <circle
+            key={segment.label}
+            className="rating-donut-segment"
+            cx={DONUT.center}
+            cy={DONUT.center}
+            r={DONUT.radius}
+            strokeWidth={DONUT.stroke}
+            stroke={segment.color}
+            strokeDasharray={`${segment.length} ${DONUT_CIRCUMFERENCE - segment.length}`}
+            strokeDashoffset={segment.offset}
+            transform={`rotate(-90 ${DONUT.center} ${DONUT.center})`}
+          />
+        ))}
+        <text className="rating-donut-total" x={DONUT.center} y={DONUT.center + 2}>{total}</text>
+        <text className="rating-donut-caption" x={DONUT.center} y={DONUT.center + 20}>rated solved</text>
       </svg>
 
       {total > 0 ? (
-        <ul className="rating-key" aria-label="Accepted problems by exact rating">
+        <ul className="chart-key" aria-label="Accepted problems by exact rating">
           {visibleRatings.map((rating) => (
             <li className="rating-key-item" key={rating.label}>
               <span className="rating-swatch" style={{ backgroundColor: rating.color }} aria-hidden="true" />
@@ -143,11 +144,12 @@ function RatingPie({ ratings, total }: { ratings: RatingSlice[]; total: number }
           ))}
         </ul>
       ) : (
-        <p className="rating-chart-empty">No accepted problems with a rating yet.</p>
+        <p className="chart-empty">No accepted problems with a rating yet.</p>
       )}
     </div>
   );
 }
+
 export function ProgressCharts({ problems }: { problems: ChartProblem[] }) {
   if (problems.length === 0) return null;
 
@@ -180,24 +182,18 @@ export function ProgressCharts({ problems }: { problems: ChartProblem[] }) {
     <section className="progress-charts" aria-label="Probation sheet progress charts">
       <Card className="progress-chart-card" aria-labelledby="topic-progress-heading">
         <CardHeader className="progress-chart-heading">
-          <div>
-            <CardTitle className="chart-card-title"><h3 id="topic-progress-heading">Topic progress</h3></CardTitle>
-            <CardDescription>Accepted share of problems in each section</CardDescription>
-          </div>
-          <Badge variant="secondary" className="chart-meta">0–100%</Badge>
+          <CardTitle className="chart-card-title"><h3 id="topic-progress-heading">Topic progress</h3></CardTitle>
+          <CardDescription>Accepted share of problems in each section</CardDescription>
         </CardHeader>
         <CardContent className="progress-chart-content"><TopicRadar topics={topics} /></CardContent>
       </Card>
 
       <Card className="progress-chart-card" aria-labelledby="rating-progress-heading">
         <CardHeader className="progress-chart-heading">
-          <div>
-            <CardTitle className="chart-card-title"><h3 id="rating-progress-heading">Solved by rating</h3></CardTitle>
-            <CardDescription>Accepted problems grouped by exact rating</CardDescription>
-          </div>
-          <Badge variant="secondary" className="chart-meta">{solvedCount} rated</Badge>
+          <CardTitle className="chart-card-title"><h3 id="rating-progress-heading">Solved by rating</h3></CardTitle>
+          <CardDescription>Accepted problems grouped by exact rating</CardDescription>
         </CardHeader>
-        <CardContent className="progress-chart-content"><RatingPie ratings={ratingSlices} total={solvedCount} /></CardContent>
+        <CardContent className="progress-chart-content"><RatingDonut ratings={ratingSlices} total={solvedCount} /></CardContent>
       </Card>
     </section>
   );
