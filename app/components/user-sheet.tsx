@@ -177,7 +177,6 @@ export function UserSheet() {
     const cacheKey = "user-sheet:" + clean.toLowerCase();
     const cached = readStaleCache<Sheet>(cacheKey);
     setHandle(clean);
-    rememberHandle(clean);
     setSheet(cached);
     setLoading(true);
     setError("");
@@ -196,6 +195,7 @@ export function UserSheet() {
       if (sequence !== lookupSequence.current) return;
       const freshSheet = payload as Sheet;
       writeStaleCache(cacheKey, freshSheet);
+      rememberHandle(clean);
       setSheet(freshSheet);
       setWarning(typeof payload.warning === "string" ? payload.warning : "");
     } catch (caught) {
@@ -267,7 +267,6 @@ export function UserSheet() {
               onChange={(event) => {
                 const nextHandle = event.target.value;
                 setHandle(nextHandle);
-                rememberHandle(nextHandle);
               }}
               placeholder="Enter a handle"
               autoComplete="off"
