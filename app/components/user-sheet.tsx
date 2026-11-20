@@ -290,7 +290,6 @@ export function UserSheet() {
                     {sheet.rank ? <span>{displayRank(sheet.rank)}</span> : null}
                   </Badge>
                 </div>
-                <p>Accepted problems are skipped on future status checks.</p>
                 </div>
               </div>
               <div className="progress-count" aria-label={`${sheet.solvedCount} of ${sheet.problemCount} problems accepted`}>
