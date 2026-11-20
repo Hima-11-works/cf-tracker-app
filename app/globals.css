@@ -875,3 +875,14 @@ a { color: inherit; text-underline-offset: 3px; }
 @media (max-width: 760px) {
   .leaderboard-table .handle-link { padding-block: 10px; }
 }
+
+/* Phone navigation: links move into a menu opened by the hamburger button. */
+.nav-menu-toggle { display: none; }
+.main-nav-links { display: flex; align-items: center; gap: 4px; }
+@media (max-width: 760px) {
+  .nav-menu-toggle { display: inline-flex; }
+  .main-nav { width: auto; height: auto; margin-left: auto; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
+  .main-nav-links { display: none; }
+  .main-nav[data-open="true"] .main-nav-links { display: flex; flex-direction: column; align-items: stretch; order: 5; width: 100%; gap: 4px; padding-top: 8px; }
+  .main-nav-links .nav-link { justify-content: flex-start; width: 100%; min-height: 44px; padding-inline: 12px; font-size: 15px; }
+}
