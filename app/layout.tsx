@@ -55,6 +55,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <footer className="site-footer">
             <span>CODEFORCES · PROBATION SHEET</span>
             <span>Accepted results stay cached in Supabase.</span>
+            <span className="site-footer-credits">
+              Credits: <a href="https://www.linkedin.com/in/polybit/" target="_blank" rel="noopener noreferrer" className="footer-credit-link">Swastik Biswas</a> and <a href="https://www.linkedin.com/in/himanshi-saxena-6094bb326/" target="_blank" rel="noopener noreferrer" className="footer-credit-link">Himanshi Saxena</a>
+            </span>
           </footer>
         </div>
       </body>
