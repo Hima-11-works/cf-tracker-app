@@ -122,10 +122,14 @@ function UserSheetLoading() {
       </section>
 
       <section className="user-loading-table-section" aria-hidden="true">
-        <div className="section-heading">
-          <Skeleton className="h-5 w-36" />
-          <Skeleton className="h-3 w-24" />
-        </div>
+        <div className="problem-section">
+          <div className="problem-section-head">
+            <div className="problem-section-title">
+              <Skeleton className="h-5 w-36" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+            <div className="problem-progress"><Skeleton className="h-full w-1/3" /></div>
+          </div>
         <div className="user-loading-table">
           {Array.from({ length: 5 }, (_, index) => (
             <div className="user-loading-row" key={index}>
@@ -139,6 +143,7 @@ function UserSheetLoading() {
               <Skeleton className="h-4 w-20" />
             </div>
           ))}
+        </div>
         </div>
       </section>
     </div>
@@ -310,18 +315,24 @@ export function UserSheet() {
 
           {sheet.problems.length === 0 ? (
             <Alert role="status" className="empty-sheet"><AlertDescription>No problems have been added to the probation sheet yet. Check back after the admin configures it.</AlertDescription></Alert>
-          ) : groups.map(([section, problems]) => (
-            <section key={section} aria-label={section}>
-              <div className="section-heading">
-                <h3>{section}</h3>
-                <span>{problems.filter((problem) => problem.status === "accepted").length} / {problems.length} accepted</span>
+          ) : groups.map(([section, problems]) => {
+            const acceptedInSection = problems.filter((problem) => problem.status === "accepted").length;
+            const percent = Math.round((acceptedInSection / problems.length) * 100);
+            return (
+            <section className="problem-section" key={section} aria-label={section}>
+              <div className="problem-section-head">
+                <div className="problem-section-title">
+                  <h3>{section}</h3>
+                  <span className="problem-section-count">{acceptedInSection} / {problems.length} accepted</span>
+                </div>
+                <div className="problem-progress" aria-hidden="true"><span style={{ width: percent + "%" }} /></div>
               </div>
               <div className="problem-table-wrap">
                 <Table className="problem-table">
                   <TableHeader><TableRow><TableHead>Problem</TableHead><TableHead>CF ID</TableHead><TableHead>Rating</TableHead><TableHead>Status</TableHead><TableHead>Accepted on</TableHead></TableRow></TableHeader>
                   <TableBody>
                     {problems.map((problem) => (
-                      <TableRow className={`status-${problem.status}`} key={problem.id}>
+                      <TableRow key={problem.id}>
                         <TableCell className="whitespace-normal">
                           <span className="problem-name">{problem.name}</span>
                           <span className="problem-subline">{problem.contestId}{problem.index}{problem.rating ? ` · ${problem.rating}` : ""}</span>
@@ -349,7 +360,8 @@ export function UserSheet() {
                 </Table>
               </div>
             </section>
-          ))}
+            );
+          })}
         </>
       ) : null}
     </>
