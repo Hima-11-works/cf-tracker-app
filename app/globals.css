@@ -268,21 +268,24 @@ a { color: inherit; text-underline-offset: 3px; }
 .muted { color: var(--muted-foreground); }
 .small { font-size: 12px; }
 
-.podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 12px; margin: 0 0 22px; }
+.podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; gap: 12px; margin: 0 0 22px; }
 .podium-place { display: flex; min-width: 0; }
 .podium-place-1 { order: 2; }
 .podium-place-2 { order: 1; }
 .podium-place-3 { order: 3; }
-.podium-stand { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; min-height: 190px; padding: 18px 12px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); text-align: center; }
-.podium-place-1 .podium-stand { min-height: 236px; border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); }
+.podium-stand { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 10px; min-height: 236px; padding: 18px 12px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); text-align: center; }
+.podium-place-1 .podium-stand { border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); }
 .podium-place-2 .podium-stand { border-color: color-mix(in srgb, var(--silver) 45%, var(--line)); }
 .podium-place-3 .podium-stand { border-color: color-mix(in srgb, var(--bronze) 45%, var(--line)); }
-.podium-position { color: var(--muted-foreground); font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; }
+.podium-position { display: inline-flex; align-items: center; justify-content: center; min-height: 24px; color: var(--muted-foreground); }
+.podium-position svg { width: 22px; height: 22px; }
 .podium-place-1 .podium-position { color: var(--gold); }
 .podium-place-2 .podium-position { color: var(--silver); }
 .podium-place-3 .podium-position { color: var(--bronze); }
 .podium-entry { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; max-width: 100%; }
+.podium-avatar-frame { display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; flex: 0 0 auto; }
 .podium-avatar { width: 56px; height: 56px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 0.5rem; background: var(--muted); object-fit: cover; }
+.podium-place-1 .podium-avatar { width: 72px; height: 72px; }
 .podium-avatar-fallback { display: inline-flex; align-items: center; justify-content: center; color: var(--muted-foreground); font-family: var(--mono); font-size: 18px; }
 .podium-name { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; max-width: 100%; }
 .podium-handle { font-size: 14px; }
@@ -292,8 +295,11 @@ a { color: inherit; text-underline-offset: 3px; }
 @media (max-width: 520px) {
   .podium { gap: 8px; }
   .podium-stand { min-height: 0; padding: 14px 8px; gap: 8px; }
-  .podium-place-1 .podium-stand { min-height: 0; }
+  .podium-position { min-height: 22px; }
+  .podium-position svg { width: 20px; height: 20px; }
+  .podium-avatar-frame { width: 56px; height: 56px; }
   .podium-avatar { width: 44px; height: 44px; }
+  .podium-place-1 .podium-avatar { width: 56px; height: 56px; }
   .podium-handle { font-size: 13px; }
 }
 .toolbar-line { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: flex-end; gap: 16px 20px; padding: 8px 0 0; }

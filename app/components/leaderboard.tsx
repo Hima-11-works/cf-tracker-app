@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { RefreshCw } from "lucide-react";
+import { Medal, RefreshCw } from "lucide-react";
 import { fetchDeduped } from "@/lib/client-fetch";
 import { readStaleRecord, writeStaleCache } from "@/lib/stale-cache";
 
@@ -23,7 +23,7 @@ type LeaderboardPayload = {
 type PodiumProfile = { avatar: string | null; rating: number | null };
 
 const PODIUM_ENTRIES_PER_PLACE = 3;
-const PODIUM_ORDINALS = { 1: "1st", 2: "2nd", 3: "3rd" } as const;
+const PODIUM_MEDAL_LABELS = { 1: "1st place", 2: "2nd place", 3: "3rd place" } as const;
 
 function Podium({ rows, profiles }: { rows: LeaderboardRow[]; profiles: Record<string, PodiumProfile> }) {
   return (
@@ -34,17 +34,22 @@ function Podium({ rows, profiles }: { rows: LeaderboardRow[]; profiles: Record<s
         return (
           <div className={"podium-place podium-place-" + place} key={place}>
             <div className="podium-stand">
-              <span className="podium-position">{PODIUM_ORDINALS[place]}</span>
+              <span className="podium-position">
+                <Medal aria-hidden="true" />
+                <span className="sr-only">{PODIUM_MEDAL_LABELS[place]}</span>
+              </span>
               {entries.length === 0 ? <span className="podium-empty">No one yet</span> : null}
               {entries.slice(0, PODIUM_ENTRIES_PER_PLACE).map((row) => {
                 const profile = profiles[row.handle.toLowerCase()];
                 return (
                   <div className="podium-entry" key={row.handle}>
-                    {profile?.avatar ? (
-                      <img className="podium-avatar" src={profile.avatar} alt="" width={56} height={56} loading="lazy" referrerPolicy="no-referrer" />
-                    ) : (
-                      <span className="podium-avatar podium-avatar-fallback" aria-hidden="true">{row.handle.charAt(0).toUpperCase()}</span>
-                    )}
+                    <span className="podium-avatar-frame">
+                      {profile?.avatar ? (
+                        <img className="podium-avatar" src={profile.avatar} alt="" width={56} height={56} loading="lazy" referrerPolicy="no-referrer" />
+                      ) : (
+                        <span className="podium-avatar podium-avatar-fallback" aria-hidden="true">{row.handle.charAt(0).toUpperCase()}</span>
+                      )}
+                    </span>
                     <span className="podium-name">
                       <Link className="handle-link podium-handle" href={"/user?handle=" + encodeURIComponent(row.handle)}>{row.handle}</Link>
                       {profile ? <span className="podium-rating">({profile.rating ?? "Unrated"})</span> : null}
