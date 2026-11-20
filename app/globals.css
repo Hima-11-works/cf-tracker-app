@@ -364,35 +364,48 @@ a { color: inherit; text-underline-offset: 3px; }
 .status-chip.tle_mle { border-color: color-mix(in srgb, var(--yellow) 34%, var(--line)); background: var(--yellow-bg); color: var(--yellow); }
 .status-chip.wrong_answer { border-color: var(--red-border); background: var(--red-bg); color: var(--red-ink); }
 .status-dot { width: 8px; height: 8px; flex: 0 0 auto; border: 1px solid currentColor; border-radius: 0.5rem; background: currentColor; }
-.progress-charts { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr); gap: 16px; margin: 24px 0 32px; }
-.progress-chart-card { min-width: 0; gap: 0; padding: 0; border: 1px solid var(--line); border-radius: 0.5rem; background: var(--paper); }
-.progress-chart-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 12px; }
-.progress-chart-heading h3 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
-.progress-chart-heading [data-slot="card-description"] { margin: 4px 0 0; color: var(--muted-foreground); font-size: 11px; }
-.progress-chart-content { padding-bottom: 16px; }
-.topic-chart-layout { display: grid; grid-template-columns: minmax(190px, 0.9fr) minmax(0, 1.1fr); align-items: center; gap: 10px; }
-.topic-radar { display: block; width: 100%; max-width: 340px; height: auto; margin: 0 auto; overflow: visible; }
-.radar-grid { fill: none; stroke: var(--line); stroke-dasharray: 3 4; stroke-width: 1; }
-.radar-axis { stroke: var(--line-dark); stroke-width: 1; }
-.radar-area { fill: color-mix(in srgb, var(--brand-strong) 16%, transparent); stroke: var(--brand-strong); stroke-width: 2; stroke-linejoin: round; }
-.radar-outline { fill: none; stroke: var(--brand-strong); stroke-width: 2; stroke-linejoin: round; }
-.radar-point { fill: var(--paper); stroke: var(--brand-strong); stroke-width: 2; }
+
+.progress-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: 16px; margin: 24px 0 0; }
+.progress-chart-card { display: flex; flex-direction: column; min-width: 0; gap: 0; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+.progress-chart-heading { display: grid; gap: 4px; margin: 0; padding: 18px 20px 0; }
+.progress-chart-heading h3 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.02em; }
+.progress-chart-heading [data-slot="card-description"] { margin: 0; color: var(--muted-foreground); font-size: 12px; }
+.progress-chart-content { flex: 1; display: flex; align-items: center; justify-content: center; min-height: 260px; padding: 16px 20px 20px; }
+.chart-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: center; gap: 24px; width: 100%; }
+.topic-radar { display: block; width: 100%; max-width: 280px; height: auto; justify-self: center; overflow: visible; }
+.radar-grid { fill: none; stroke: var(--line); stroke-width: 1; }
+.radar-axis { stroke: var(--line); stroke-width: 1; }
+.radar-area { fill: color-mix(in srgb, var(--brand) 14%, transparent); stroke: var(--brand); stroke-width: 1.5; stroke-linejoin: round; }
+.radar-outline { fill: none; stroke: var(--brand); stroke-width: 1.5; stroke-linejoin: round; }
+.radar-point { fill: var(--paper); stroke: var(--brand); stroke-width: 1.5; }
 .radar-index { fill: var(--muted-foreground); font-family: var(--mono); font-size: 10px; text-anchor: middle; dominant-baseline: middle; }
-.topic-progress-key { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.topic-progress-item { display: grid; grid-template-columns: 18px minmax(0, 1fr) auto; align-items: start; gap: 7px; font-size: 11px; }
-.topic-progress-index { padding-top: 1px; color: var(--muted-foreground); font-family: var(--mono); font-size: 10px; }
-.topic-progress-name { min-width: 0; color: var(--ink); overflow-wrap: anywhere; }
-.topic-progress-value { color: var(--muted-foreground); font-family: var(--mono); font-size: 10px; white-space: nowrap; }
-.rating-chart-layout { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr); align-items: center; gap: 12px; }
-.rating-pie { display: block; width: 100%; max-width: 220px; height: auto; margin: 0 auto; }
-.rating-slice { stroke: var(--paper); stroke-width: 2; stroke-linejoin: round; }
-.rating-pie-empty { fill: var(--line); }
-.rating-key { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
-.rating-key-item { display: grid; grid-template-columns: 9px minmax(0, 1fr) auto; align-items: center; gap: 7px; font-size: 10px; }
-.rating-swatch { width: 9px; height: 9px; border-radius: 0.5rem; }
-.rating-key-label { color: var(--muted-foreground); }
-.rating-key-count { color: var(--ink); font-family: var(--mono); white-space: nowrap; }
-.rating-chart-empty { margin: 0; color: var(--muted-foreground); font-size: 12px; }
+.chart-key { display: grid; gap: 12px; min-width: 0; margin: 0; padding: 0; list-style: none; }
+.topic-key-item { display: grid; grid-template-columns: 24px minmax(0, 1fr); align-items: start; gap: 8px; }
+.topic-key-index { padding-top: 1px; color: var(--muted-foreground); font-family: var(--mono); font-size: 10px; font-variant-numeric: tabular-nums; }
+.topic-key-body { display: grid; gap: 6px; min-width: 0; }
+.topic-key-line { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 12px; }
+.topic-key-name { min-width: 0; color: var(--ink); overflow-wrap: anywhere; }
+.topic-key-value { flex: 0 0 auto; color: var(--muted-foreground); font-family: var(--mono); font-size: 10px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.topic-key-track { height: 3px; overflow: hidden; border-radius: 999px; background: var(--muted); }
+.topic-key-track > span { display: block; height: 100%; border-radius: inherit; background: var(--brand); }
+.rating-donut { display: block; width: 100%; max-width: 200px; height: auto; justify-self: center; overflow: visible; }
+.rating-donut-track { fill: none; stroke: var(--muted); }
+.rating-donut-segment { fill: none; }
+.rating-donut-total { fill: var(--ink); font-family: var(--mono); font-size: 30px; font-weight: 500; font-variant-numeric: tabular-nums; text-anchor: middle; dominant-baseline: middle; }
+.rating-donut-caption { fill: var(--muted-foreground); font-family: var(--mono); font-size: 9px; letter-spacing: 0.05em; text-transform: uppercase; text-anchor: middle; dominant-baseline: middle; }
+.rating-key-item { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; align-items: center; gap: 9px; font-size: 12px; }
+.rating-swatch { width: 8px; height: 8px; border-radius: 2px; }
+.rating-key-label { color: var(--ink); font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.rating-key-count { color: var(--muted-foreground); font-family: var(--mono); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chart-empty { margin: 0; color: var(--muted-foreground); font-size: 12px; }
+@media (max-width: 760px) {
+  .progress-charts { grid-template-columns: 1fr; }
+  .progress-chart-content { min-height: 0; }
+  .chart-layout { grid-template-columns: 1fr; justify-items: center; gap: 18px; }
+  .chart-key { width: 100%; }
+  .topic-radar { max-width: 240px; }
+  .rating-donut { max-width: 170px; }
+}
 .problem-section { margin-top: 28px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
 .problem-section-head { display: grid; gap: 10px; padding: 14px 18px 12px; border-bottom: 1px solid var(--line); }
 .problem-section-title { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 16px; }
@@ -501,9 +514,6 @@ a { color: inherit; text-underline-offset: 3px; }
   .user-summary { margin: 20px 0 24px; }
   .user-summary-content { align-items: start; flex-direction: column; gap: 14px; }
   .user-summary h2 { font-size: 22px; }
-  .progress-charts { grid-template-columns: 1fr; }
-  .topic-chart-layout { grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1.1fr); }
-  .rating-chart-layout { grid-template-columns: minmax(180px, 220px) minmax(0, 1fr); justify-content: center; }
   .progress-count strong { font-size: 25px; }
   .admin-toolbar { align-items: stretch; flex-direction: column; gap: 12px; }
   .admin-toolbar-actions { justify-content: flex-end; }
@@ -525,11 +535,6 @@ a { color: inherit; text-underline-offset: 3px; }
   .leaderboard-handle, .handle-link { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
   .lookup-form { display: flex; align-items: stretch; flex-direction: column; }
   .lookup-form [data-slot="button"] { width: 100%; }
-  .progress-chart-card { padding: 0; }
-  .topic-chart-layout, .rating-chart-layout { grid-template-columns: 1fr; }
-  .topic-progress-key, .rating-key { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .topic-radar { max-width: 340px; }
-  .rating-pie { max-width: 190px; }
   .problem-table-wrap { overflow: visible; }
   .problem-table, .problem-table tbody { display: block; width: 100%; }
   .problem-table thead { display: none; }
