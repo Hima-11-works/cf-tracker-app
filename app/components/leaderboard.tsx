@@ -21,6 +21,48 @@ type LeaderboardPayload = {
   hasMore: boolean;
 };
 
+type PodiumProfile = { avatar: string | null; rating: number | null };
+
+const PODIUM_ENTRIES_PER_PLACE = 3;
+const PODIUM_ORDINALS = { 1: "1st", 2: "2nd", 3: "3rd" } as const;
+
+function Podium({ rows, profiles }: { rows: LeaderboardRow[]; profiles: Record<string, PodiumProfile> }) {
+  return (
+    <section className="podium" aria-label="Top three">
+      {([1, 2, 3] as const).map((place) => {
+        const entries = rows.filter((row) => row.rank === place);
+        const hidden = entries.length - PODIUM_ENTRIES_PER_PLACE;
+        return (
+          <div className={"podium-place podium-place-" + place} key={place}>
+            <div className="podium-stand">
+              <span className="podium-position">{PODIUM_ORDINALS[place]}</span>
+              {entries.length === 0 ? <span className="podium-empty">No one yet</span> : null}
+              {entries.slice(0, PODIUM_ENTRIES_PER_PLACE).map((row) => {
+                const profile = profiles[row.handle.toLowerCase()];
+                return (
+                  <div className="podium-entry" key={row.handle}>
+                    {profile?.avatar ? (
+                      <img className="podium-avatar" src={profile.avatar} alt="" width={56} height={56} loading="lazy" referrerPolicy="no-referrer" />
+                    ) : (
+                      <span className="podium-avatar podium-avatar-fallback" aria-hidden="true">{row.handle.charAt(0).toUpperCase()}</span>
+                    )}
+                    <span className="podium-name">
+                      <Link className="handle-link podium-handle" href={"/user?handle=" + encodeURIComponent(row.handle)}>{row.handle}</Link>
+                      {profile ? <span className="podium-rating">({profile.rating ?? "Unrated"})</span> : null}
+                    </span>
+                    <span className="podium-solved">{row.solved} solved</span>
+                  </div>
+                );
+              })}
+              {hidden > 0 ? <span className="podium-more">+{hidden} more</span> : null}
+            </div>
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
 export function Leaderboard() {
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
   const [problemCount, setProblemCount] = useState(0);
@@ -33,6 +75,25 @@ export function Leaderboard() {
   const [error, setError] = useState("");
   const requestVersion = useRef(0);
   const loadingMoreRef = useRef(false);
+  const [profiles, setProfiles] = useState<Record<string, PodiumProfile>>({});
+  const podiumKey = rows
+    .filter((row) => row.rank <= 3)
+    .slice(0, 10)
+    .map((row) => row.handle.toLowerCase())
+    .join(",");
+
+  // Avatars and ratings come from a separate request, so the table is not held up while they load.
+  useEffect(() => {
+    if (!podiumKey) return;
+    let cancelled = false;
+    fetchDeduped("/api/leaderboard/profiles?handles=" + encodeURIComponent(podiumKey), { cache: "no-store" })
+      .then((response) => response.json() as Promise<{ profiles?: Record<string, PodiumProfile> }>)
+      .then((payload) => {
+        if (!cancelled && payload.profiles) setProfiles((current) => ({ ...current, ...payload.profiles }));
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [podiumKey]);
 
   const loadFirstPage = useCallback(async (forceRefresh = false) => {
     const version = ++requestVersion.current;
@@ -118,6 +179,8 @@ export function Leaderboard() {
 
   return (
     <>
+      {rows.some((row) => row.rank <= 3) ? <Podium rows={rows.filter((row) => row.rank <= 3)} profiles={profiles} /> : null}
+
       <div className="toolbar-line">
         <h2 className="sr-only">Current standings</h2>
         <div className="toolbar-controls leaderboard-controls">
