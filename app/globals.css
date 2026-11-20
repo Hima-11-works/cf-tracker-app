@@ -911,3 +911,10 @@ a { color: inherit; text-underline-offset: 3px; }
   .progress-chart-card { flex: 0 0 88%; scroll-snap-align: start; }
   .progress-chart-content { min-height: 0; }
 }
+
+/* Phone admin toolbar: action buttons share the row and wrap when needed. */
+@media (max-width: 520px) {
+  .admin-toolbar-actions { width: 100%; flex-wrap: wrap; }
+  .admin-toolbar-actions > [data-slot="button"]:not(:has(> svg:only-child)) { flex: 1 1 auto; }
+  .admin-toolbar-actions > [data-slot="button"]:has(> svg:only-child) { flex: 0 0 auto; }
+}
