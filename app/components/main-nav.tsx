@@ -14,6 +14,7 @@ import { readStaleRecord, writeStaleCache } from "@/lib/stale-cache";
 const links = [
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/user", label: "User sheet" },
+  { href: "/solutions", label: "Solutions" },
   { href: "/admin", label: "Admin" },
 ];
 

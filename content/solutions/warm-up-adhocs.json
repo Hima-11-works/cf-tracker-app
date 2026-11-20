@@ -1,0 +1,425 @@
+{
+  "section": "Warm Up - Adhocs",
+  "problems": [
+    {
+      "contestId": 2102,
+      "index": "A",
+      "name": "Dinner Time",
+      "rating": 900,
+      "idea": "The array repeats every p positions, so each complete block contributes exactly q to the total. Only when n is divisible by p is there no partial block whose sum can absorb a discrepancy.",
+      "approach": [
+        "Each test case gives n, m, p, and q; decide whether an integer array of length n can have total m while every p-step block sums to q. Once the first p values are chosen, the recurrence forces each later value to repeat the value p positions earlier.",
+        "If p divides n, the array consists of n/p complete blocks, so its total is fixed at (n/p)*q. This condition is both necessary and sufficient because the first block can be any integer sequence summing to q.",
+        "If p does not divide n, the final block is only a prefix of the first block. Choose that prefix to supply the difference between m and the complete blocks, then choose the rest of the first block to make its full sum q.",
+        "Negative values are allowed, so these sums can be adjusted without bounds. Print NO only when p divides n and the forced total differs from m."
+      ],
+      "complexity": {
+        "time": "O(1)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Check divisibility before comparing totals; a nonzero remainder always permits an adjustment.",
+        "Use 64-bit integers for the product (n/p)*q.",
+        "The recurrence repeats values, not blocks that are independently chosen."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        long long n, m, p, q;\n        cin >> n >> m >> p >> q;\n        bool possible = (n % p != 0) || ((n / p) * q == m);\n        cout << (possible ? \"YES\" : \"NO\") << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            long n = fs.nextLong();\n            long m = fs.nextLong();\n            long p = fs.nextLong();\n            long q = fs.nextLong();\n            boolean possible = (n % p != 0) || ((n / p) * q == m);\n            out.append(possible ? \"YES\" : \"NO\").append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        m = int(next(it))\n        p = int(next(it))\n        q = int(next(it))\n        possible = (n % p != 0) or ((n // p) * q == m)\n        out.append(\"YES\" if possible else \"NO\")\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2094,
+      "index": "C",
+      "name": "Brr Brrr Patapim",
+      "rating": 900,
+      "idea": "Every cell on diagonal i+j stores the same permutation value p[i+j]. The grid exposes every position p[2] through p[2n], leaving p[1] as the unique value missing from 1..2n.",
+      "approach": [
+        "Each test case gives an n by n grid and asks for the encoded permutation of length 2n. With one-based row and column indices, a cell at (i,j) contains p[i+j].",
+        "The first row supplies p[2] through p[n+1], and the last row supplies p[n+1] through p[2n]. Read the whole grid, recording values from those boundary rows into the corresponding permutation positions.",
+        "Mark every value seen in the grid. Since the grid is guaranteed to come from a permutation of 1..2n, the only value not seen is p[1].",
+        "Print the recovered sequence from p[1] through p[2n]. The overlapping value p[n+1] is consistent because each diagonal has one common value."
+      ],
+      "complexity": {
+        "time": "O(n^2)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Use the one-based formula p[i+j]; p[1] is absent from all cells.",
+        "Even when n=1, the sole grid cell gives p[2] and the missing-value step gives p[1].",
+        "Read all n^2 entries even though only the first and last rows are used directly."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        vector<int> p(2 * n + 1, 0);\n        vector<char> seen(2 * n + 1, false);\n        for (int i = 1; i <= n; ++i) {\n            for (int j = 1; j <= n; ++j) {\n                int value;\n                cin >> value;\n                seen[value] = true;\n                if (i == 1 || i == n) p[i + j] = value;\n            }\n        }\n        for (int value = 1; value <= 2 * n; ++value) {\n            if (!seen[value]) {\n                p[1] = value;\n                break;\n            }\n        }\n        for (int i = 1; i <= 2 * n; ++i) {\n            cout << p[i] << (i == 2 * n ? '\\n' : ' ');\n        }\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            int[] p = new int[2 * n + 1];\n            boolean[] seen = new boolean[2 * n + 1];\n            for (int i = 1; i <= n; i++) {\n                for (int j = 1; j <= n; j++) {\n                    int value = fs.nextInt();\n                    seen[value] = true;\n                    if (i == 1 || i == n) p[i + j] = value;\n                }\n            }\n            for (int value = 1; value <= 2 * n; value++) {\n                if (!seen[value]) {\n                    p[1] = value;\n                    break;\n                }\n            }\n            for (int i = 1; i <= 2 * n; i++) {\n                if (i > 1) out.append(' ');\n                out.append(p[i]);\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        p = [0] * (2 * n + 1)\n        seen = [False] * (2 * n + 1)\n        for i in range(1, n + 1):\n            for j in range(1, n + 1):\n                value = int(next(it))\n                seen[value] = True\n                if i == 1 or i == n:\n                    p[i + j] = value\n        for value in range(1, 2 * n + 1):\n            if not seen[value]:\n                p[1] = value\n                break\n        out.append(\" \".join(str(p[i]) for i in range(1, 2 * n + 1)))\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2093,
+      "index": "B",
+      "name": "Expensive Number",
+      "rating": 900,
+      "idea": "A positive integer is at least the sum of its digits, and the minimum possible cost is 1. Cost 1 is achieved by keeping only leading zeros followed by one nonzero digit, so we retain as many zeros before a nonzero as possible.",
+      "approach": [
+        "Each test case gives a decimal string and asks for the fewest deletions that attain the minimum value of number divided by its digit sum. This ratio is at least 1 for every positive integer.",
+        "Equality holds when the retained string consists of zero or more leading zeros followed by exactly one nonzero digit. Any other nonzero digit or any trailing digit after that nonzero makes the numerical value larger than the digit sum.",
+        "For a chosen nonzero digit, all earlier zeros can be retained while every other character is deleted. To retain the most digits, choose the last nonzero digit in the original string.",
+        "Scan right to left, counting zeros only after encountering that last nonzero. If that count is z and the original length is n, keep z+1 digits and print n-(z+1)."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Leading zeros in the remaining number are allowed and should be counted as kept digits.",
+        "Do not count zeros after the last nonzero; they would become trailing zeros and increase the cost.",
+        "The input number can have up to 100 digits, so read it as a string."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        string s;\n        cin >> s;\n        int zerosBeforeLastNonzero = 0;\n        bool foundNonzero = false;\n        for (int i = (int)s.size() - 1; i >= 0; --i) {\n            if (s[i] != '0') {\n                foundNonzero = true;\n            } else if (foundNonzero) {\n                ++zerosBeforeLastNonzero;\n            }\n        }\n        cout << (int)s.size() - zerosBeforeLastNonzero - 1 << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            String s = fs.next();\n            int zerosBeforeLastNonzero = 0;\n            boolean foundNonzero = false;\n            for (int i = s.length() - 1; i >= 0; i--) {\n                if (s.charAt(i) != '0') {\n                    foundNonzero = true;\n                } else if (foundNonzero) {\n                    zerosBeforeLastNonzero++;\n                }\n            }\n            out.append(s.length() - zerosBeforeLastNonzero - 1).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        s = next(it).decode()\n        zeros_before_last_nonzero = 0\n        found_nonzero = False\n        for ch in reversed(s):\n            if ch != \"0\":\n                found_nonzero = True\n            elif found_nonzero:\n                zeros_before_last_nonzero += 1\n        out.append(str(len(s) - zeros_before_last_nonzero - 1))\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2085,
+      "index": "A",
+      "name": "Serval and String Theory",
+      "rating": 900,
+      "idea": "A string is universal exactly when it is lexicographically smaller than its reversal. If it already is, no swaps are needed; otherwise one swap can make it so if and only if the string contains at least two distinct letters.",
+      "approach": [
+        "Each test case provides n, a swap budget k, and a lowercase string s; print whether s can be made lexicographically smaller than its reversal. Compare s directly with its reversed copy first.",
+        "If s is already smaller, it is a valid answer without using an operation. If k is zero and this comparison fails, the string cannot change.",
+        "With at least one allowed swap and at least two different letters, a swap can bring a smaller character toward the front and create the required first differing mirrored pair. If all letters are identical, every swap leaves a palindrome and success is impossible.",
+        "Thus the condition is s < reverse(s), or k > 0 and min(s) != max(s)."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "The swap limit is at most k operations, so k=0 must be handled separately.",
+        "A string of identical letters is impossible even with many swaps.",
+        "Compare against the reversal, not against a sorted string."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, k;\n        string s;\n        cin >> n >> k >> s;\n        string reversed = s;\n        reverse(reversed.begin(), reversed.end());\n        bool differentLetters = (*min_element(s.begin(), s.end()) != *max_element(s.begin(), s.end()));\n        bool possible = (s < reversed) || (k > 0 && differentLetters);\n        cout << (possible ? \"YES\" : \"NO\") << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            int k = fs.nextInt();\n            String s = fs.next();\n            String reversed = new StringBuilder(s).reverse().toString();\n            char minChar = s.charAt(0);\n            char maxChar = s.charAt(0);\n            for (int i = 1; i < s.length(); i++) {\n                minChar = (char)Math.min(minChar, s.charAt(i));\n                maxChar = (char)Math.max(maxChar, s.charAt(i));\n            }\n            boolean possible = s.compareTo(reversed) < 0 || (k > 0 && minChar != maxChar);\n            out.append(possible ? \"YES\" : \"NO\").append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        k = int(next(it))\n        s = next(it).decode()\n        possible = s < s[::-1] or (k > 0 and min(s) != max(s))\n        out.append(\"YES\" if possible else \"NO\")\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2072,
+      "index": "B",
+      "name": "Having Been a Treasurer in the Past, I Help Goblins Deceive",
+      "rating": 900,
+      "idea": "Each subsequence '-_-' uses one underscore and one dash on each side. For a fixed number of dashes, the product of the left and right dash counts is maximized by splitting them as evenly as possible, with every underscore placed between the groups.",
+      "approach": [
+        "Each test case gives a string of dashes and underscores; after rearranging it, maximize the number of '-_-' subsequences. A subsequence chooses indices in increasing order, so a middle underscore contributes the product of the number of dashes before and after it.",
+        "If there are D dashes and U underscores, put L dashes first, all U underscores next, and the remaining D-L dashes last. This arrangement creates U*L*(D-L) subsequences.",
+        "For fixed D, the product L*(D-L) is largest when the two dash groups are as balanced as possible. Use floor(D/2) and ceil(D/2), then multiply by U.",
+        "Count the two characters in one pass and calculate the result with a 64-bit integer."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "If there are fewer than two dashes or no underscores, the formula naturally gives zero.",
+        "The two dash groups must be balanced; placing all dashes on one side gives no subsequences.",
+        "Use 64-bit arithmetic because the product can be quadratic in n."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        string s;\n        cin >> n >> s;\n        long long dashes = count(s.begin(), s.end(), '-');\n        long long underscores = n - dashes;\n        long long left = dashes / 2;\n        long long right = dashes - left;\n        cout << left * right * underscores << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            String s = fs.next();\n            long dashes = 0;\n            for (int i = 0; i < s.length(); i++) {\n                if (s.charAt(i) == '-') dashes++;\n            }\n            long underscores = n - dashes;\n            long left = dashes / 2;\n            long right = dashes - left;\n            out.append(left * right * underscores).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        s = next(it).decode()\n        dashes = s.count(\"-\")\n        underscores = n - dashes\n        left = dashes // 2\n        right = dashes - left\n        out.append(str(left * right * underscores))\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2060,
+      "index": "C",
+      "name": "Game of Mathletes",
+      "rating": 900,
+      "idea": "The game value is the maximum number of disjoint pairs whose values sum to k. Bob can complete a pair whenever Alice chooses one of its members, while picks with no complement can be paired among themselves because their count is even.",
+      "approach": [
+        "Each test case gives an even-sized multiset and a target k; output the score when Alice minimizes it and Bob maximizes it. Alice's choice of order does not prevent Bob from completing any available complementary pair.",
+        "Pair each value x with k-x, using the smaller available frequency. When x equals k-x, pair equal values with each other, contributing floor(freq[x]/2).",
+        "Build a frequency array because values are between 1 and n. Visit each complementary value pair only once, so no pair is counted from both ends.",
+        "The result is the number of disjoint pairs; all remaining values are unmatchable and cannot add to the score."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Count equal-value pairs as freq[x]/2, not freq[x].",
+        "Avoid double counting by processing only x < k-x for distinct complements.",
+        "A complement outside 1..n contributes nothing."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, k;\n        cin >> n >> k;\n        vector<int> frequency(n + 1, 0);\n        for (int i = 0; i < n; ++i) {\n            int x;\n            cin >> x;\n            ++frequency[x];\n        }\n        int answer = 0;\n        for (int x = 1; x <= n; ++x) {\n            int y = k - x;\n            if (y < 1 || y > n) continue;\n            if (x < y) answer += min(frequency[x], frequency[y]);\n            else if (x == y) answer += frequency[x] / 2;\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            int k = fs.nextInt();\n            int[] frequency = new int[n + 1];\n            for (int i = 0; i < n; i++) frequency[fs.nextInt()]++;\n            int answer = 0;\n            for (int x = 1; x <= n; x++) {\n                int y = k - x;\n                if (y < 1 || y > n) continue;\n                if (x < y) answer += Math.min(frequency[x], frequency[y]);\n                else if (x == y) answer += frequency[x] / 2;\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        k = int(next(it))\n        frequency = [0] * (n + 1)\n        for _ in range(n):\n            frequency[int(next(it))] += 1\n        answer = 0\n        for x in range(1, n + 1):\n            y = k - x\n            if 1 <= y <= n:\n                if x < y:\n                    answer += min(frequency[x], frequency[y])\n                elif x == y:\n                    answer += frequency[x] // 2\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2048,
+      "index": "B",
+      "name": "Kevin and Permutation",
+      "rating": 900,
+      "idea": "A value placed at one position can be the minimum of at most k length-k windows. Put 1,2,... at positions k,2k,... so each small value controls a separate block of k windows, then fill all other positions with larger values.",
+      "approach": [
+        "Each test case gives n and k and asks for a permutation minimizing the sum of the minimum over every length-k subarray. The smallest values should appear where as many windows as possible contain them.",
+        "Place value x at the one-based position x*k for every x from 1 through floor(n/k). Each such position is the end of a consecutive block of windows, and the windows containing it do not overlap the blocks assigned to the other small values.",
+        "Fill all remaining positions in any order with the unused values floor(n/k)+1 through n. No other placement can let one value affect more than k windows, so this layout maximizes the contribution of the smallest values to the window minima.",
+        "Output the constructed permutation for each test case."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "The construction positions are one-based multiples of k; in zero-based code they are k-1, 2k-1, and so on.",
+        "When k=1, every position is a marked position and the output is 1..n.",
+        "Every number from 1 to n must appear exactly once."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, k;\n        cin >> n >> k;\n        vector<int> p(n, 0);\n        int value = 1;\n        for (int pos = k - 1; pos < n; pos += k) p[pos] = value++;\n        int nextValue = value;\n        for (int i = 0; i < n; ++i) {\n            if (p[i] == 0) p[i] = nextValue++;\n        }\n        for (int i = 0; i < n; ++i) {\n            cout << p[i] << (i + 1 == n ? '\\n' : ' ');\n        }\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            int k = fs.nextInt();\n            int[] p = new int[n];\n            int value = 1;\n            for (int pos = k - 1; pos < n; pos += k) p[pos] = value++;\n            int nextValue = value;\n            for (int i = 0; i < n; i++) {\n                if (p[i] == 0) p[i] = nextValue++;\n            }\n            for (int i = 0; i < n; i++) {\n                if (i > 0) out.append(' ');\n                out.append(p[i]);\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        k = int(next(it))\n        p = [0] * n\n        value = 1\n        for pos in range(k - 1, n, k):\n            p[pos] = value\n            value += 1\n        next_value = value\n        for i in range(n):\n            if p[i] == 0:\n                p[i] = next_value\n                next_value += 1\n        out.append(\" \".join(map(str, p)))\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2164,
+      "index": "B",
+      "name": "Even Modulo Pair",
+      "rating": 1000,
+      "idea": "A valid pair is easy to verify by checking the remainder y mod x. If none exists, there can be at most one even value and the odd values must grow at least geometrically, so the first 32 elements are enough to find a pair or prove none exists.",
+      "approach": [
+        "Each test case gives a strictly increasing sequence of positive integers up to 10^9. Search pairs x=a[i], y=a[j] with i<j and accept one exactly when y%x is even.",
+        "If two values are even, their remainder is even because both y and every multiple of even x are even. If two odd values satisfy x<y<2x, then y%x=y-x is even.",
+        "Therefore, in a sequence with no answer there is at most one even number, and every later odd number must be at least twice the preceding odd number. Since the values are at most 10^9, there can be at most 29 odd numbers and at most 30 total elements without a valid pair.",
+        "Read the sequence but retain only its first 32 elements, then check all pairs among them. If none works, print -1; any larger sequence would contradict the bound."
+      ],
+      "complexity": {
+        "time": "O(n + 32^2)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The condition is that the remainder itself is even; divisibility is only one way for the remainder to be even.",
+        "The fixed search bound relies on the maximum value 10^9 and the sequence being strictly increasing.",
+        "Print the values x and y, not their positions."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        vector<long long> a;\n        for (int i = 0; i < n; ++i) {\n            long long value;\n            cin >> value;\n            if (i < 32) a.push_back(value);\n        }\n        bool found = false;\n        long long x = 0, y = 0;\n        for (int i = 0; i < (int)a.size() && !found; ++i) {\n            for (int j = i + 1; j < (int)a.size(); ++j) {\n                if ((a[j] % a[i]) % 2 == 0) {\n                    x = a[i];\n                    y = a[j];\n                    found = true;\n                    break;\n                }\n            }\n        }\n        if (found) cout << x << ' ' << y << '\\n';\n        else cout << -1 << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            long[] a = new long[Math.min(n, 32)];\n            for (int i = 0; i < n; i++) {\n                long value = fs.nextLong();\n                if (i < a.length) a[i] = value;\n            }\n            boolean found = false;\n            long x = 0, y = 0;\n            for (int i = 0; i < a.length && !found; i++) {\n                for (int j = i + 1; j < a.length; j++) {\n                    if ((a[j] % a[i]) % 2 == 0) {\n                        x = a[i];\n                        y = a[j];\n                        found = true;\n                        break;\n                    }\n                }\n            }\n            if (found) out.append(x).append(' ').append(y).append('\\n');\n            else out.append(-1).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        a = []\n        for i in range(n):\n            value = int(next(it))\n            if i < 32:\n                a.append(value)\n        answer = None\n        for i in range(len(a)):\n            for j in range(i + 1, len(a)):\n                if (a[j] % a[i]) % 2 == 0:\n                    answer = (a[i], a[j])\n                    break\n            if answer is not None:\n                break\n        out.append(f\"{answer[0]} {answer[1]}\" if answer is not None else \"-1\")\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2162,
+      "index": "B",
+      "name": "Beautiful String",
+      "rating": 1000,
+      "idea": "Choose every zero as the subsequence: zeros in order form a non-decreasing string, and the remaining characters are all ones, which is a palindrome. This also works when either set of indices is empty.",
+      "approach": [
+        "Each test case gives a binary string and asks for indices forming a non-decreasing subsequence whose removal leaves a palindrome. Output the subsequence length followed by its one-based indices.",
+        "Take all positions containing zero. The selected subsequence consists only of zeros, so it is non-decreasing regardless of where those positions occur in the original string.",
+        "After removing those positions, only ones remain in their original order. A string made entirely of one repeated character is a palindrome, so this construction always succeeds.",
+        "Collect the zero positions in one pass and print them; when there are no zeros, print length zero and an empty second line."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "The output asks for indices of a subsequence, not the subsequence characters.",
+        "Indices in the output are one-based.",
+        "Print the second line even when the chosen subsequence is empty."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        string s;\n        cin >> n >> s;\n        vector<int> indices;\n        for (int i = 0; i < n; ++i) {\n            if (s[i] == '0') indices.push_back(i + 1);\n        }\n        cout << indices.size() << '\\n';\n        for (int i = 0; i < (int)indices.size(); ++i) {\n            cout << indices[i] << (i + 1 == (int)indices.size() ? '\\n' : ' ');\n        }\n        if (indices.empty()) cout << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            String s = fs.next();\n            ArrayList<Integer> indices = new ArrayList<>();\n            for (int i = 0; i < n; i++) {\n                if (s.charAt(i) == '0') indices.add(i + 1);\n            }\n            out.append(indices.size()).append('\\n');\n            for (int i = 0; i < indices.size(); i++) {\n                if (i > 0) out.append(' ');\n                out.append(indices.get(i));\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        s = next(it).decode()\n        indices = [str(i + 1) for i, ch in enumerate(s) if ch == \"0\"]\n        out.append(str(len(indices)))\n        out.append(\" \".join(indices))\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2154,
+      "index": "B",
+      "name": "Make it Zigzag",
+      "rating": 1000,
+      "idea": "Even one-based positions are peaks and can be raised to the maximum of their original prefix. Once those peaks are maximized, each odd position is an independent valley that only needs to be decreased below its neighboring peak or peaks.",
+      "approach": [
+        "Each test case gives a positive array; the target inequalities alternate as a1<a2>a3<a4. Operation 1 can raise a selected value to its prefix maximum, while operation 2 lowers any value at a cost of one per decrement.",
+        "For every even one-based position, apply operation 1 before doing any decrements. Its highest attainable value is the maximum of the original prefix ending there, and lowering these peaks could only make the valley constraints harder.",
+        "An odd position must be at most one less than each adjacent even position. Let cap be the smaller adjacent peak, or the sole adjacent peak at an endpoint; the minimum required decrements there are max(0, a[i]-(cap-1)).",
+        "Compute prefix maxima, sum this excess over odd one-based positions, and print the result. These valley adjustments do not interfere because each inequality has a distinct odd endpoint."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Strict inequalities require lowering a valley to peak-1, not merely to the peak.",
+        "Use prefix maxima from the original array before applying the conceptual valley decrements.",
+        "In zero-based code, valley positions have even indices and peak positions have odd indices."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        vector<long long> a(n), prefixMax(n);\n        for (long long &x : a) cin >> x;\n        for (int i = 0; i < n; ++i) {\n            prefixMax[i] = (i == 0 ? a[i] : max(prefixMax[i - 1], a[i]));\n        }\n        long long answer = 0;\n        for (int i = 0; i < n; i += 2) {\n            long long cap = LLONG_MAX;\n            if (i > 0) cap = min(cap, prefixMax[i - 1]);\n            if (i + 1 < n) cap = min(cap, prefixMax[i + 1]);\n            long long target = cap - 1;\n            if (a[i] > target) answer += a[i] - target;\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            long[] a = new long[n];\n            long[] prefixMax = new long[n];\n            for (int i = 0; i < n; i++) a[i] = fs.nextLong();\n            for (int i = 0; i < n; i++) {\n                prefixMax[i] = (i == 0 ? a[i] : Math.max(prefixMax[i - 1], a[i]));\n            }\n            long answer = 0;\n            for (int i = 0; i < n; i += 2) {\n                long cap = Long.MAX_VALUE;\n                if (i > 0) cap = Math.min(cap, prefixMax[i - 1]);\n                if (i + 1 < n) cap = Math.min(cap, prefixMax[i + 1]);\n                long target = cap - 1;\n                if (a[i] > target) answer += a[i] - target;\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        a = [int(next(it)) for _ in range(n)]\n        prefix_max = [0] * n\n        for i, value in enumerate(a):\n            prefix_max[i] = value if i == 0 else max(prefix_max[i - 1], value)\n        answer = 0\n        for i in range(0, n, 2):\n            cap = 10**30\n            if i > 0:\n                cap = min(cap, prefix_max[i - 1])\n            if i + 1 < n:\n                cap = min(cap, prefix_max[i + 1])\n            target = cap - 1\n            answer += max(0, a[i] - target)\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2148,
+      "index": "D",
+      "name": "Destruction of the Dandelion Fields",
+      "rating": 1000,
+      "idea": "Visiting an odd field switches the mower, while visiting an even field does not. Start on the largest odd field, take every even field, then use the mower on every other odd field by choosing the largest odd values for its on-visits.",
+      "approach": [
+        "Each test case gives the grass amounts on fields; maximize the amount collected under the mower's parity toggle rule. If every amount is even, there is no odd field to turn the mower on, so the collected amount is zero.",
+        "When odd fields exist, visit the largest odd field first to turn the mower on and collect its grass. Every even field can then be collected without switching the mower off, so include their full sum.",
+        "Among odd fields, every visit toggles the mower. Thus, only ceil(oddCount/2) odd fields can be collected while it is on, and the optimal choice is the largest ceil(oddCount/2) values.",
+        "Sort the odd values in descending order and add entries at indices 0,2,4,... to the sum of all even values."
+      ],
+      "complexity": {
+        "time": "O(n log n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "If there are no odd values, output zero rather than the sum of even values.",
+        "The count of collectible odd values is rounded up because the first odd visit turns the mower on.",
+        "Use 64-bit sums for large field amounts."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        long long answer = 0;\n        vector<long long> odd;\n        for (int i = 0; i < n; ++i) {\n            long long x;\n            cin >> x;\n            if (x % 2 == 0) answer += x;\n            else odd.push_back(x);\n        }\n        if (odd.empty()) {\n            cout << 0 << '\\n';\n            continue;\n        }\n        sort(odd.begin(), odd.end(), greater<long long>());\n        for (int i = 0; i < (int)odd.size(); i += 2) answer += odd[i];\n        cout << answer << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            long answer = 0;\n            ArrayList<Long> odd = new ArrayList<>();\n            for (int i = 0; i < n; i++) {\n                long x = fs.nextLong();\n                if (x % 2 == 0) answer += x;\n                else odd.add(x);\n            }\n            if (odd.isEmpty()) {\n                out.append(0).append('\\n');\n                continue;\n            }\n            odd.sort(Collections.reverseOrder());\n            for (int i = 0; i < odd.size(); i += 2) answer += odd.get(i);\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        even_sum = 0\n        odd = []\n        for _ in range(n):\n            x = int(next(it))\n            if x % 2 == 0:\n                even_sum += x\n            else:\n                odd.append(x)\n        if not odd:\n            out.append(\"0\")\n            continue\n        odd.sort(reverse=True)\n        answer = even_sum + sum(odd[::2])\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2147,
+      "index": "B",
+      "name": "Multiple Construction",
+      "rating": 1000,
+      "idea": "A simple layout is n,n-1,...,1,n,1,2,...,n-1. The two copies of n are n positions apart, and every x<n is placed 2x positions apart, so each required distance is a multiple of its value.",
+      "approach": [
+        "Each test case gives n and asks for 2n entries containing every value from 1 through n twice. The two positions of x must differ by a multiple of x.",
+        "Print the first block in descending order from n to 1, then print n followed by 1 through n-1. This uses each value exactly twice.",
+        "For x<n, its first position is n-x+1 and its second is n+1+x, so the gap is 2x. The two copies of n are at positions 1 and n+1, whose gap is n.",
+        "Every gap is therefore divisible by the corresponding value, and the construction takes linear time."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Print 2n numbers, with n appearing once at the end of the first block and once at the start of the second.",
+        "Reason about one-based positions when verifying the gap formula.",
+        "The distance need only be a multiple of x; it need not equal x."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        bool first = true;\n        for (int x = n; x >= 1; --x) {\n            if (!first) cout << ' ';\n            cout << x;\n            first = false;\n        }\n        cout << ' ' << n;\n        for (int x = 1; x < n; ++x) cout << ' ' << x;\n        cout << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            for (int x = n; x >= 1; x--) {\n                if (x != n) out.append(' ');\n                out.append(x);\n            }\n            out.append(' ').append(n);\n            for (int x = 1; x < n; x++) out.append(' ').append(x);\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        values = list(range(n, 0, -1)) + [n] + list(range(1, n))\n        out.append(\" \".join(map(str, values)))\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2143,
+      "index": "B",
+      "name": "Discounts",
+      "rating": 1000,
+      "idea": "Every voucher makes the cheapest product in its group free, so minimizing cost is maximizing the value of the free products. Sort prices from expensive to cheap and voucher sizes from small to large so each free item is as expensive as possible.",
+      "approach": [
+        "Each test case gives product prices and voucher sizes; output the minimum total price. Start from the sum of all prices and view each used voucher as saving the cheapest price in its group.",
+        "Sort prices in descending order. Assigning the highest remaining products to a voucher gives it the highest possible free item, and consecutive chunks make the free item the last price of that chunk.",
+        "Process voucher sizes in ascending order. A smaller chunk reaches an earlier, more expensive free item, and any unused products can simply be bought individually; if the next voucher does not fit, later vouchers cannot fit either.",
+        "For each fitting voucher of size x, advance the used-product pointer by x and subtract the price at the end of that chunk from the total."
+      ],
+      "complexity": {
+        "time": "O(n log n + k log k)",
+        "space": "O(n + k)"
+      },
+      "pitfalls": [
+        "A voucher of size x consumes x products, even though only x-1 are paid for.",
+        "Sort voucher sizes ascending, not descending, to maximize the prices of the free products.",
+        "Do not use a voucher if its full group cannot fit among the remaining products."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, k;\n        cin >> n >> k;\n        vector<long long> prices(n);\n        vector<int> vouchers(k);\n        long long answer = 0;\n        for (long long &price : prices) {\n            cin >> price;\n            answer += price;\n        }\n        for (int &x : vouchers) cin >> x;\n        sort(prices.begin(), prices.end(), greater<long long>());\n        sort(vouchers.begin(), vouchers.end());\n        int used = 0;\n        for (int x : vouchers) {\n            if (used + x > n) break;\n            used += x;\n            answer -= prices[used - 1];\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            int k = fs.nextInt();\n            long[] prices = new long[n];\n            int[] vouchers = new int[k];\n            long answer = 0;\n            for (int i = 0; i < n; i++) {\n                prices[i] = fs.nextLong();\n                answer += prices[i];\n            }\n            for (int i = 0; i < k; i++) vouchers[i] = fs.nextInt();\n            Arrays.sort(prices);\n            Arrays.sort(vouchers);\n            int used = 0;\n            for (int x : vouchers) {\n                if (used + x > n) break;\n                used += x;\n                answer -= prices[n - used];\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        k = int(next(it))\n        prices = [int(next(it)) for _ in range(n)]\n        vouchers = [int(next(it)) for _ in range(k)]\n        answer = sum(prices)\n        prices.sort(reverse=True)\n        vouchers.sort()\n        used = 0\n        for x in vouchers:\n            if used + x > n:\n                break\n            used += x\n            answer -= prices[used - 1]\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2258,
+      "index": "B1",
+      "name": "Carrot Chopdown (Easy Version)",
+      "rating": 900,
+      "idea": "With exactly one cut parameter x, every carrot of length at least x can provide one piece of length x. A carrot of length exactly 2x provides a second such piece, so count those extra pieces for every possible target x.",
+      "approach": [
+        "Each test case gives n carrot lengths and a maximum length m; in this easy version exactly one machine operation is allowed. Find the largest number of final pieces that can all have one common length.",
+        "Fix the desired common length x. An original carrot shorter than x cannot contribute, while each carrot of length at least x can be selected and split to produce one x-piece, or already has length x and contributes one unchanged piece.",
+        "If a carrot has length 2x, splitting it at x creates two pieces of length x instead of one, so add one extra for each such carrot. The total for this target is count(length>=x)+count(length=2x).",
+        "Count frequencies, scan x from 1 through m while maintaining the suffix count of lengths at least x, and retain the maximum."
+      ],
+      "complexity": {
+        "time": "O(n + m)",
+        "space": "O(m)"
+      },
+      "pitfalls": [
+        "The operation count is exactly one, but the chosen set of carrots may be empty or selective.",
+        "A carrot of length 2x contributes two target pieces; count it once in the suffix and once as an extra.",
+        "Only consider target lengths from 1 through m."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, m;\n        cin >> n >> m;\n        vector<long long> frequency(m + 1, 0);\n        for (int i = 0; i < n; ++i) {\n            int x;\n            cin >> x;\n            ++frequency[x];\n        }\n        long long suffix = 0, answer = 0;\n        for (int x = m; x >= 1; --x) {\n            suffix += frequency[x];\n            long long current = suffix;\n            if (2 * x <= m) current += frequency[2 * x];\n            answer = max(answer, current);\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            int m = fs.nextInt();\n            long[] frequency = new long[m + 1];\n            for (int i = 0; i < n; i++) frequency[fs.nextInt()]++;\n            long suffix = 0;\n            long answer = 0;\n            for (int x = m; x >= 1; x--) {\n                suffix += frequency[x];\n                long current = suffix;\n                if (2 * x <= m) current += frequency[2 * x];\n                answer = Math.max(answer, current);\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        m = int(next(it))\n        frequency = [0] * (m + 1)\n        for _ in range(n):\n            frequency[int(next(it))] += 1\n        suffix = 0\n        answer = 0\n        for x in range(m, 0, -1):\n            suffix += frequency[x]\n            current = suffix\n            if 2 * x <= m:\n                current += frequency[2 * x]\n            answer = max(answer, current)\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2238,
+      "index": "B",
+      "name": "Crimson Triples",
+      "rating": 900,
+      "idea": "The identity gcd(lcm(a,b),lcm(b,c))=gcd(a,c) holds exactly when b divides both a and c. For a fixed b, there are floor(n/b) choices each for a and c, so its contribution is the square of that count.",
+      "approach": [
+        "Each test case gives n and asks for the number of ordered triples (a,b,c) with entries from 1 through n satisfying the stated gcd/lcm identity. The triple entries are allowed to be equal.",
+        "Consider the exponent of any prime in a, b, and c. The identity reduces to max(exponent(b), min(exponent(a), exponent(c))) = min(exponent(a), exponent(c)), which holds exactly when b's exponent is no larger than either other exponent.",
+        "Requiring this for every prime is equivalent to b dividing a and b dividing c. For a fixed b, both a and c can be any multiple of b up to n, giving floor(n/b)^2 ordered choices.",
+        "Sum this quantity for b from 1 through n. Use 64-bit arithmetic because the total grows on the order of n squared."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The triples are ordered, so choosing a and c in opposite orders counts separately when they differ.",
+        "The values a, b, and c are not required to be distinct.",
+        "Use 64-bit arithmetic for the sum of squared quotient counts."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        long long n;\n        cin >> n;\n        long long answer = 0;\n        for (long long b = 1; b <= n; ++b) {\n            long long choices = n / b;\n            answer += choices * choices;\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}\n",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static class FastScanner {\n        private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        private StringTokenizer st;\n\n        String next() throws IOException {\n            while (st == null || !st.hasMoreTokens()) {\n                String line = br.readLine();\n                if (line == null) return null;\n                st = new StringTokenizer(line);\n            }\n            return st.nextToken();\n        }\n\n        int nextInt() throws IOException { return Integer.parseInt(next()); }\n        long nextLong() throws IOException { return Long.parseLong(next()); }\n    }\n\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            long n = fs.nextLong();\n            long answer = 0;\n            for (long b = 1; b <= n; b++) {\n                long choices = n / b;\n                answer += choices * choices;\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}\n",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    it = iter(data)\n    out = []\n    t = int(next(it))\n    for _ in range(t):\n        n = int(next(it))\n        answer = 0\n        for b in range(1, n + 1):\n            choices = n // b\n            answer += choices * choices\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out) + (\"\\n\" if out else \"\"))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    }
+  ]
+}

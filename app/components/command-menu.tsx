@@ -20,6 +20,7 @@ type Action = {
 const actions: Action[] = [
   { id: "leaderboard", label: "Open leaderboard", detail: "View accepted problem standings", keywords: "rank standings solved", href: "/leaderboard" },
   { id: "user", label: "Open user sheet", detail: "Look up a whitelisted Codeforces handle", keywords: "profile sheet progress", href: "/user?focus=handle" },
+  { id: "solutions", label: "Open solutions", detail: "Read solution notes for sheet problems", keywords: "notes approach code complexity pitfalls", href: "/solutions" },
   { id: "admin", label: "Open admin", detail: "Manage the whitelist and probation sheet", keywords: "settings problems whitelist", href: "/admin?focus=whitelist" },
   { id: "theme", label: "Toggle theme", detail: "Switch between light and dark appearance", keywords: "dark light appearance", theme: true },
 ];
