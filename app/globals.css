@@ -58,9 +58,6 @@
   --gold: #85600f;
   --silver: #5c6870;
   --bronze: #8a512d;
-  --iot-badge-ink: #1e4eb4;
-  --iot-badge-bg: #eff5ff;
-  --iot-badge-border: #cad8f4;
   --mono: var(--font-dm-mono), "SFMono-Regular", Consolas, monospace;
   --sans: var(--font-geist-sans), "Segoe UI", system-ui, sans-serif;
   --background: oklch(1 0 0);
@@ -150,9 +147,6 @@
   --gold: #f1cc72;
   --silver: #c6d0d4;
   --bronze: #db9a6a;
-  --iot-badge-ink: #a7d8ff;
-  --iot-badge-bg: #1a3450;
-  --iot-badge-border: #365675;
   --background: #09090b;
   --foreground: #fafafa;
   --card: #111113;
@@ -324,7 +318,7 @@ a { color: inherit; text-underline-offset: 3px; }
 .handle-link { color: var(--ink); font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
 .handle-link:hover { text-decoration: underline; text-decoration-color: var(--brand); }
 .leaderboard-handle { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 5px 9px; }
-.iot-member-badge { display: inline-flex; align-items: center; min-height: 21px; padding: 2px 7px; border: 1px solid var(--iot-badge-border); border-radius: 0.5rem; background: var(--iot-badge-bg); color: var(--iot-badge-ink); font-size: 10px; font-weight: 600; line-height: 1.2; white-space: nowrap; }
+.iot-member-logo { display: block; width: 20px; height: auto; flex: 0 0 auto; }
 .solved-value { font-family: var(--mono); font-size: 15px; font-weight: 500; color: var(--ink); }
 .leaderboard-problems { color: var(--muted-foreground); font-family: var(--mono); font-size: 13px; }
 .leaderboard-empty { margin-top: 0; padding: 16px 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
@@ -646,7 +640,7 @@ a { color: inherit; text-underline-offset: 3px; }
   --radius-4xl: var(--radius);
 }
 
-[data-slot="button"], [data-slot="input"], [data-slot="textarea"], [data-slot="card"], [data-slot="badge"], [data-slot="alert"], [data-slot="skeleton"], [data-slot="switch"], [data-slot="switch-thumb"], .site-header, .skip-link, .nav-link, .theme-toggle, .rank-badge, .iot-member-badge, .progress-chart-card {
+[data-slot="button"], [data-slot="input"], [data-slot="textarea"], [data-slot="card"], [data-slot="badge"], [data-slot="alert"], [data-slot="skeleton"], [data-slot="switch"], [data-slot="switch-thumb"], .site-header, .skip-link, .nav-link, .theme-toggle, .rank-badge, .progress-chart-card {
   border-radius: 0.5rem;
 }
 
@@ -861,7 +855,7 @@ a { color: inherit; text-underline-offset: 3px; }
   [data-slot="input"], [data-slot="textarea"] { min-height: 44px; font-size: 16px; }
   .leaderboard-filter { min-height: 44px; font-size: 14px; }
   .problem-subline, .status-chip, .problem-section-count, .topic-key-index, .topic-key-value, .rating-key-count,
-  .podium-rating, .podium-meta, .podium-empty, .podium-more, .user-last-online, .codeforces-rating span, .iot-member-badge,
+  .podium-rating, .podium-meta, .podium-empty, .podium-more, .user-last-online, .codeforces-rating span,
   .admin-problem-rating, .admin-problem-unrated, .admin-problem-id, .admin-pagination span, .date-cell { font-size: 12px; }
   .problem-table td, .leaderboard-table td { font-size: 14px; }
   .leaderboard-table th, .problem-table th { font-size: 11px; }

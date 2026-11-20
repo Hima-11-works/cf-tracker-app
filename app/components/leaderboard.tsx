@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -231,7 +230,7 @@ export function Leaderboard() {
                     <TableCell className="whitespace-normal">
                       <span className="leaderboard-handle">
                         <Link className="handle-link" href={"/user?handle=" + encodeURIComponent(row.handle)}>{row.handle}</Link>
-                        {row.isIotLabMember ? <Badge variant="outline" className="iot-member-badge">IoT Lab Member</Badge> : null}
+                        {row.isIotLabMember ? <img className="iot-member-logo" src="/images/iot-lab-logo.webp" alt="IoT Lab member" title="IoT Lab member" width={20} height={21} loading="lazy" /> : null}
                       </span>
                     </TableCell>
                     <TableCell className="leaderboard-problems">{problemCount ? row.solved + " / " + problemCount : "—"}</TableCell>
