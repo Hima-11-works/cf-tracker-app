@@ -96,6 +96,7 @@ export async function GET(request: NextRequest) {
       rating: profileResult.profile?.rating ?? null,
       rank: profileResult.profile?.rank ?? null,
       avatar: profileResult.profile?.avatar ?? null,
+      lastOnlineAt: profileResult.profile?.lastOnlineAt ?? null,
       profileAvailable: profileResult.profile !== null,
       problems: result,
       solvedCount: result.filter((problem) => problem.status === "accepted").length,

@@ -28,6 +28,7 @@ type Sheet = {
   rating: number | null;
   rank: string | null;
   avatar: string | null;
+  lastOnlineAt?: string | null;
   profileAvailable: boolean;
   problems: Problem[];
   solvedCount: number;
@@ -78,6 +79,17 @@ function rememberHandle(value: string) {
 function formatAcceptedDate(value: string | null) {
   if (!value) return "—";
   return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
+}
+
+// Relative wording such as "3 hours ago"; the exact time is in the tooltip.
+function formatLastOnline(iso: string) {
+  const seconds = Math.round((new Date(iso).getTime() - Date.now()) / 1000);
+  const formatter = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+  const units: Array<[Intl.RelativeTimeFormatUnit, number]> = [["day", 86400], ["hour", 3600], ["minute", 60]];
+  for (const [unit, size] of units) {
+    if (Math.abs(seconds) >= size) return formatter.format(Math.round(seconds / size), unit);
+  }
+  return "just now";
 }
 
 function UserSheetLoading() {
@@ -290,6 +302,11 @@ export function UserSheet() {
                     {sheet.rank ? <span>{displayRank(sheet.rank)}</span> : null}
                   </Badge>
                 </div>
+                {sheet.lastOnlineAt ? (
+                  <p className="user-last-online">
+                    Last online <time dateTime={sheet.lastOnlineAt} title={new Date(sheet.lastOnlineAt).toLocaleString("en", { dateStyle: "medium", timeStyle: "short" })}>{formatLastOnline(sheet.lastOnlineAt)}</time>
+                  </p>
+                ) : null}
                 </div>
               </div>
               <div className="progress-count" aria-label={`${sheet.solvedCount} of ${sheet.problemCount} problems accepted`}>

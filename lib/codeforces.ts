@@ -11,6 +11,7 @@ export interface CodeforcesUserProfile {
   rating: number | null;
   rank: string | null;
   avatar: string | null;
+  lastOnlineAt: string | null;
 }
 
 interface CodeforcesResponse {
@@ -22,7 +23,7 @@ interface CodeforcesResponse {
 interface CodeforcesUserInfoResponse {
   status: string;
   comment?: string;
-  result?: Array<{ handle?: string; rank?: string; rating?: number; avatar?: string }>;
+  result?: Array<{ handle?: string; rank?: string; rating?: number; avatar?: string; lastOnlineTimeSeconds?: number }>;
 }
 
 const CODEFORCES_API_INTERVAL_MS = 2_000;
@@ -111,6 +112,7 @@ export async function getUserInfo(handle: string): Promise<CodeforcesUserProfile
       rating: typeof user.rating === "number" && Number.isInteger(user.rating) ? user.rating : null,
       rank: typeof user.rank === "string" ? user.rank : null,
       avatar: typeof user.avatar === "string" && user.avatar.startsWith("https://") ? user.avatar : null,
+      lastOnlineAt: typeof user.lastOnlineTimeSeconds === "number" ? new Date(user.lastOnlineTimeSeconds * 1000).toISOString() : null,
     };
     userProfileCache.set(cacheKey, { profile, expiresAt: Date.now() + USER_PROFILE_CACHE_MS });
     return profile;
@@ -143,6 +145,7 @@ export async function getUsersInfo(handles: string[]): Promise<Map<string, Codef
       rating: typeof user.rating === "number" && Number.isInteger(user.rating) ? user.rating : null,
       rank: typeof user.rank === "string" ? user.rank : null,
       avatar: typeof user.avatar === "string" && user.avatar.startsWith("https://") ? user.avatar : null,
+      lastOnlineAt: typeof user.lastOnlineTimeSeconds === "number" ? new Date(user.lastOnlineTimeSeconds * 1000).toISOString() : null,
     };
     const key = user.handle.toLowerCase();
     userProfileCache.set(key, { profile, expiresAt: Date.now() + USER_PROFILE_CACHE_MS });
