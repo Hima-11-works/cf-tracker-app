@@ -903,3 +903,11 @@ a { color: inherit; text-underline-offset: 3px; }
   .leaderboard-filter { min-height: 44px; font-size: 14px; gap: 10px; }
   .leaderboard-controls > [data-slot="button"] { min-width: 44px; }
 }
+
+/* Phone charts: the two cards swipe sideways instead of stacking into a long column. */
+@media (max-width: 760px) {
+  .progress-charts { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: -12px; padding-inline: 12px; padding-bottom: 6px; scrollbar-width: none; }
+  .progress-charts::-webkit-scrollbar { display: none; }
+  .progress-chart-card { flex: 0 0 88%; scroll-snap-align: start; }
+  .progress-chart-content { min-height: 0; }
+}
