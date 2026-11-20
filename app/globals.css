@@ -344,6 +344,9 @@ a { color: inherit; text-underline-offset: 3px; }
 .user-summary h2 a { text-decoration: none; }
 .user-summary h2 a:hover { text-decoration: underline; text-underline-offset: 5px; }
 .user-profile-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 7px 12px; }
+.user-identity { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.user-identity-text { min-width: 0; }
+.user-avatar { width: 44px; height: 44px; flex: 0 0 auto; border: 1px solid var(--line); border-radius: 0.5rem; background: var(--muted); object-fit: cover; }
 .codeforces-rating { min-height: 26px; display: inline-flex; align-items: baseline; gap: 6px; border-color: color-mix(in srgb, var(--cf-rank-color, var(--cf-rank-unrated)) 38%, var(--border)); background: color-mix(in srgb, var(--cf-rank-color, var(--cf-rank-unrated)) 7%, var(--card)); color: var(--cf-rank-color, var(--cf-rank-unrated)); font-family: var(--mono); font-size: 13px; white-space: nowrap; }
 .codeforces-rating strong { color: var(--cf-rank-color, var(--cf-rank-unrated)); font-size: 16px; font-weight: 600; }
 .codeforces-rating span { color: var(--cf-rank-color, var(--cf-rank-unrated)); font-family: var(--sans); font-size: 11px; font-weight: 600; }

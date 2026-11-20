@@ -27,6 +27,7 @@ type Sheet = {
   handle: string;
   rating: number | null;
   rank: string | null;
+  avatar: string | null;
   profileAvailable: boolean;
   problems: Problem[];
   solvedCount: number;
@@ -277,7 +278,11 @@ export function UserSheet() {
         <>
           <Card className="user-summary" aria-label="User progress">
             <CardContent className="user-summary-content">
-              <div>
+              <div className="user-identity">
+                {sheet.avatar ? (
+                  <img className="user-avatar" src={sheet.avatar} alt="" width={44} height={44} loading="lazy" referrerPolicy="no-referrer" />
+                ) : null}
+                <div className="user-identity-text">
                 <div className="user-profile-line">
                   <h2><a href={`https://codeforces.com/profile/${encodeURIComponent(sheet.handle)}`} target="_blank" rel="noreferrer">{sheet.handle}</a></h2>
                   <Badge variant="outline" className="codeforces-rating" data-rank={rankSlug(sheet.rank)} aria-label={sheet.profileAvailable ? `Codeforces rating ${sheet.rating ?? "unrated"}${sheet.rank ? `, ${sheet.rank}` : ""}` : "Codeforces rating unavailable"}>
@@ -286,6 +291,7 @@ export function UserSheet() {
                   </Badge>
                 </div>
                 <p>Accepted problems are skipped on future status checks.</p>
+                </div>
               </div>
               <div className="progress-count" aria-label={`${sheet.solvedCount} of ${sheet.problemCount} problems accepted`}>
                 <strong>{String(sheet.solvedCount).padStart(2, "0")}</strong>

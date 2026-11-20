@@ -10,6 +10,7 @@ export interface CodeforcesSubmission {
 export interface CodeforcesUserProfile {
   rating: number | null;
   rank: string | null;
+  avatar: string | null;
 }
 
 interface CodeforcesResponse {
@@ -21,7 +22,7 @@ interface CodeforcesResponse {
 interface CodeforcesUserInfoResponse {
   status: string;
   comment?: string;
-  result?: Array<{ rank?: string; rating?: number }>;
+  result?: Array<{ rank?: string; rating?: number; avatar?: string }>;
 }
 
 const CODEFORCES_API_INTERVAL_MS = 2_000;
@@ -109,6 +110,7 @@ export async function getUserInfo(handle: string): Promise<CodeforcesUserProfile
     const profile = {
       rating: typeof user.rating === "number" && Number.isInteger(user.rating) ? user.rating : null,
       rank: typeof user.rank === "string" ? user.rank : null,
+      avatar: typeof user.avatar === "string" && user.avatar.startsWith("https://") ? user.avatar : null,
     };
     userProfileCache.set(cacheKey, { profile, expiresAt: Date.now() + USER_PROFILE_CACHE_MS });
     return profile;

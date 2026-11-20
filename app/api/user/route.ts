@@ -143,6 +143,7 @@ export async function GET(request: NextRequest) {
       handle: user.codeforces_handle,
       rating: profileResult.profile?.rating ?? null,
       rank: profileResult.profile?.rank ?? null,
+      avatar: profileResult.profile?.avatar ?? null,
       profileAvailable: profileResult.profile !== null,
       problems: result,
       solvedCount: result.filter((problem) => problem.status === "accepted").length,
