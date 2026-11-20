@@ -851,3 +851,33 @@ a { color: inherit; text-underline-offset: 3px; }
   .admin-undo-toast { gap: 6px; padding-left: 10px; font-size: 11px; }
   .admin-undo-toast [data-slot="button"] { padding-inline: 8px; }
 }
+
+/* Mobile pass: touch targets of at least 44px, labels no smaller than 11px, and inputs at 16px so iOS does not zoom on focus. */
+@media (max-width: 760px) {
+  [data-slot="button"] { min-height: 44px; }
+  [data-slot="button"]:has(> svg:only-child) { min-width: 44px; }
+  .theme-toggle, .command-trigger { min-width: 44px; min-height: 44px; }
+  .main-nav .nav-link { min-height: 44px; padding-inline: 10px; }
+  [data-slot="input"], [data-slot="textarea"] { min-height: 44px; font-size: 16px; }
+  .leaderboard-filter { min-height: 44px; font-size: 14px; }
+  .problem-subline, .status-chip, .problem-section-count, .topic-key-index, .topic-key-value, .rating-key-count,
+  .podium-rating, .podium-meta, .podium-empty, .podium-more, .user-last-online, .codeforces-rating span, .iot-member-badge,
+  .admin-problem-rating, .admin-problem-unrated, .admin-problem-id, .admin-pagination span, .date-cell { font-size: 12px; }
+  .problem-table td, .leaderboard-table td { font-size: 14px; }
+  .leaderboard-table th, .problem-table th { font-size: 11px; }
+  .progress-count span { font-size: 13px; }
+}
+@media (max-width: 520px) {
+  .main-nav { height: auto; flex-wrap: wrap; row-gap: 4px; padding-block: 4px; }
+}
+@media (max-width: 520px) {
+  .main-nav { gap: 2px; }
+  .main-nav .nav-link { padding-inline: 4px; }
+  .theme-toggle, .command-trigger { min-width: 40px; }
+}
+@media (max-width: 520px) {
+  .podium { align-items: stretch; }
+}
+@media (max-width: 760px) {
+  .leaderboard-table .handle-link { padding-block: 10px; }
+}
