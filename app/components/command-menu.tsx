@@ -130,6 +130,7 @@ export function CommandMenu() {
         ref={triggerRef}
         type="button"
         variant="outline"
+        size="icon"
         className="command-trigger"
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
@@ -137,8 +138,7 @@ export function CommandMenu() {
         title="Open command menu (Ctrl/⌘ K)"
       >
         <Search aria-hidden="true" />
-        <span>Search</span>
-        <kbd className="command-trigger-hint">Ctrl/⌘ K</kbd>
+        <span className="sr-only">Search</span>
       </Button>
 
       {open ? (

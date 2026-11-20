@@ -681,7 +681,7 @@ a { color: inherit; text-underline-offset: 3px; }
 
 /* Responsive command menu, touch targets, and live update feedback. */
 .page-transition-surface { min-height: 1px; }
-.command-trigger { min-width: 72px; gap: 7px; }
+.command-trigger { gap: 7px; }
 .command-trigger > svg { width: 15px; height: 15px; }
 .command-trigger-hint, .command-dialog kbd, .shortcut-hint {
   display: inline-flex;

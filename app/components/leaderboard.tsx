@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { RefreshCw } from "lucide-react";
 import { fetchDeduped } from "@/lib/client-fetch";
 import { readStaleRecord, writeStaleCache } from "@/lib/stale-cache";
 
@@ -128,8 +129,8 @@ export function Leaderboard() {
             />
             <span>Exclude IoT Lab members</span>
           </Label>
-          <Button variant="outline" type="button" onClick={() => void loadFirstPage(true)} disabled={loading}>
-            {loading ? "Updating..." : "Refresh standings"}
+          <Button variant="outline" size="icon" type="button" onClick={() => void loadFirstPage(true)} disabled={loading} aria-label={loading ? "Updating standings" : "Refresh standings"} aria-busy={loading} title="Refresh standings">
+            <RefreshCw className={loading ? "animate-spin" : undefined} aria-hidden="true" />
           </Button>
         </div>
       </div>
