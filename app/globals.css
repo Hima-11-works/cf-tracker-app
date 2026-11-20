@@ -895,3 +895,11 @@ a { color: inherit; text-underline-offset: 3px; }
   .command-search input { height: 44px; font-size: 16px; }
   .command-results { flex: 1; max-height: none; min-height: 0; }
 }
+
+/* Phone leaderboard controls: the switch and refresh button span the full width. */
+@media (max-width: 520px) {
+  .toolbar-line { justify-content: stretch; padding-top: 0; }
+  .leaderboard-controls { width: 100%; justify-content: space-between; flex-wrap: nowrap; }
+  .leaderboard-filter { min-height: 44px; font-size: 14px; gap: 10px; }
+  .leaderboard-controls > [data-slot="button"] { min-width: 44px; }
+}
