@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getRecentSubmissions, getUserInfo, statusFromVerdict } from "@/lib/codeforces";
+import { getRecentSubmissions, getUserInfo } from "@/lib/codeforces";
+import { saveSubmissionProgress } from "@/lib/progress-sync";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 const HANDLE_RE = /^[A-Za-z0-9._-]{1,64}$/;
-
-function problemKey(contestId: number, index: string) {
-  return `${contestId}:${index.toUpperCase()}`;
-}
 
 export async function GET(request: NextRequest) {
   const requestedHandle = request.nextUrl.searchParams.get("handle")?.trim() ?? "";
@@ -68,58 +65,13 @@ export async function GET(request: NextRequest) {
         refreshWarning = "Codeforces is temporarily unavailable. Showing saved results; try again to refresh.";
       }
       if (submissions) {
-        const pendingKeys = new Set(pendingProblems.map((problem) => problemKey(problem.contest_id, problem.problem_index)));
-        const latestByKey = new Map<string, { status: string; acceptedAt: string | null }>();
-
-        // Codeforces returns submissions newest first. The newest recognized
-        // non-accepted verdict is retained, while any observed OK wins.
-        for (const submission of submissions) {
-          if (submission.problem.contestId == null) continue;
-          const key = problemKey(submission.problem.contestId, submission.problem.index);
-          if (!pendingKeys.has(key)) continue;
-          const verdict = statusFromVerdict(submission.verdict);
-          if (!verdict) continue;
-
-          const current = latestByKey.get(key);
-          if (verdict === "OK") {
-            if (current?.status !== "accepted") {
-              latestByKey.set(key, {
-                status: "accepted",
-                acceptedAt: new Date(submission.creationTimeSeconds * 1000).toISOString(),
-              });
-            }
-          } else if (!current) {
-            latestByKey.set(key, {
-              status: verdict === "WRONG_ANSWER" ? "wrong_answer" : "tle_mle",
-              acceptedAt: null,
-            });
-          }
-        }
-
-        const checkedAt = new Date().toISOString();
-        const rowsToSave = pendingProblems.map((problem) => {
-          const latest = latestByKey.get(problemKey(problem.contest_id, problem.problem_index));
-          const previous = savedByProblem.get(problem.id);
-          const status = latest?.status ?? previous?.status ?? "not_attempted";
-          return {
-            codeforces_handle: user.codeforces_handle,
-            problem_id: problem.id,
-            status,
-            accepted_at: status === "accepted" ? latest?.acceptedAt ?? previous?.accepted_at ?? null : null,
-            last_checked_at: checkedAt,
-            updated_at: checkedAt,
-          };
+        await saveSubmissionProgress({
+          supabase,
+          handle: user.codeforces_handle,
+          pendingProblems,
+          savedByProblem,
+          submissions,
         });
-
-        const { error: saveError } = await supabase
-          .from("problem_progress")
-          .upsert(rowsToSave, { onConflict: "codeforces_handle,problem_id" });
-        if (saveError) throw saveError;
-
-        for (const row of rowsToSave) {
-          const problem = pendingProblems.find((item) => item.id === row.problem_id);
-          if (problem) savedByProblem.set(problem.id, row);
-        }
       }
     }
 
