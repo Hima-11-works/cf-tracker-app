@@ -886,3 +886,12 @@ a { color: inherit; text-underline-offset: 3px; }
   .main-nav[data-open="true"] .main-nav-links { display: flex; flex-direction: column; align-items: stretch; order: 5; width: 100%; gap: 4px; padding-top: 8px; }
   .main-nav-links .nav-link { justify-content: flex-start; width: 100%; min-height: 44px; padding-inline: 12px; font-size: 15px; }
 }
+
+/* Phone command menu: a full-height sheet instead of a floating box. */
+@media (max-width: 520px) {
+  .command-overlay { padding: 0; align-items: stretch; }
+  .command-dialog { width: 100%; height: 100dvh; margin-top: 0; display: flex; flex-direction: column; border: 0; border-radius: 0; padding-top: env(safe-area-inset-top); }
+  .command-search { padding: 10px 12px; }
+  .command-search input { height: 44px; font-size: 16px; }
+  .command-results { flex: 1; max-height: none; min-height: 0; }
+}
