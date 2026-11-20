@@ -97,13 +97,6 @@ function UserSheetLoading() {
         </CardContent>
       </Card>
 
-      <div className="user-loading-legend" aria-hidden="true">
-        <Skeleton className="user-loading-chip w-24" />
-        <Skeleton className="user-loading-chip w-20" />
-        <Skeleton className="user-loading-chip w-24" />
-        <Skeleton className="user-loading-chip w-24" />
-      </div>
-
       <section className="progress-charts user-loading-charts" aria-hidden="true">
         {Array.from({ length: 2 }, (_, index) => (
           <Card className="progress-chart-card user-loading-chart-card" key={index}>
@@ -112,7 +105,6 @@ function UserSheetLoading() {
                 <Skeleton className="h-5 w-32" />
                 <Skeleton className="h-3 w-48 max-w-full" />
               </div>
-              <Skeleton className="h-5 w-16" />
             </CardHeader>
             <CardContent className="progress-chart-content">
               <Skeleton className="loading-chart-surface h-48 w-full" />
@@ -301,15 +293,6 @@ export function UserSheet() {
               </div>
             </CardContent>
           </Card>
-
-          <div className="legend" aria-label="Problem status legend">
-            {(Object.keys(statusLabels) as ProblemStatus[]).map((status) => (
-              <Badge variant="outline" className={`legend-item status-chip ${status}`} key={status}>
-                <span className="status-dot" aria-hidden="true" />
-                {statusLabels[status]}
-              </Badge>
-            ))}
-          </div>
 
           {sheet.problems.length > 0 ? <ProgressCharts problems={sheet.problems} /> : null}
 

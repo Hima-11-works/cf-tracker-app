@@ -314,8 +314,6 @@ a { color: inherit; text-underline-offset: 3px; }
 .user-sheet-loading { display: block; }
 .user-loading-profile { display: grid; gap: 8px; min-width: 0; }
 .user-loading-identity { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.user-loading-legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 20px; }
-.user-loading-chip { height: 24px; }
 .user-loading-charts { margin: 24px 0 32px; }
 .user-loading-chart-card { min-height: 280px; }
 .user-loading-chart-heading { display: grid; gap: 6px; }
@@ -360,7 +358,6 @@ a { color: inherit; text-underline-offset: 3px; }
 .progress-count { display: flex; align-items: baseline; gap: 7px; font-family: var(--mono); white-space: nowrap; }
 .progress-count strong { font-size: 29px; font-weight: 500; letter-spacing: -0.04em; }
 .progress-count span { color: var(--muted-foreground); font-size: 12px; }
-.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 20px; }
 .status-chip { min-height: 24px; height: auto; padding: 3px 9px; gap: 6px; border-color: var(--line); background: var(--muted); color: var(--muted-foreground); font-size: 11px; line-height: 1.2; }
 .status-chip.not_attempted { border-color: var(--line); background: var(--muted); color: var(--muted-foreground); }
 .status-chip.accepted { border-color: var(--green-border); background: var(--green-bg); color: var(--green-ink); }
@@ -373,7 +370,6 @@ a { color: inherit; text-underline-offset: 3px; }
 .progress-chart-heading h3 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -0.02em; }
 .progress-chart-heading [data-slot="card-description"] { margin: 4px 0 0; color: var(--muted-foreground); font-size: 11px; }
 .progress-chart-content { padding-bottom: 16px; }
-.chart-meta { flex: 0 0 auto; color: var(--muted-foreground); font-family: var(--mono); font-size: 10px; white-space: nowrap; }
 .topic-chart-layout { display: grid; grid-template-columns: minmax(190px, 0.9fr) minmax(0, 1.1fr); align-items: center; gap: 10px; }
 .topic-radar { display: block; width: 100%; max-width: 340px; height: auto; margin: 0 auto; overflow: visible; }
 .radar-grid { fill: none; stroke: var(--line); stroke-dasharray: 3 4; stroke-width: 1; }
@@ -529,7 +525,6 @@ a { color: inherit; text-underline-offset: 3px; }
   .leaderboard-handle, .handle-link { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
   .lookup-form { display: flex; align-items: stretch; flex-direction: column; }
   .lookup-form [data-slot="button"] { width: 100%; }
-  .legend { gap: 9px 13px; font-size: 10px; }
   .progress-chart-card { padding: 0; }
   .topic-chart-layout, .rating-chart-layout { grid-template-columns: 1fr; }
   .topic-progress-key, .rating-key { grid-template-columns: repeat(2, minmax(0, 1fr)); }

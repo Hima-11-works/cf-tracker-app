@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 
 type ChartProblem = {
   section: string;
@@ -184,7 +183,6 @@ export function ProgressCharts({ problems }: { problems: ChartProblem[] }) {
             <CardTitle className="chart-card-title"><h3 id="topic-progress-heading">Topic progress</h3></CardTitle>
             <CardDescription>Accepted share of problems in each section</CardDescription>
           </div>
-          <Badge variant="secondary" className="chart-meta">0–100%</Badge>
         </CardHeader>
         <CardContent className="progress-chart-content"><TopicRadar topics={topics} /></CardContent>
       </Card>
@@ -195,7 +193,6 @@ export function ProgressCharts({ problems }: { problems: ChartProblem[] }) {
             <CardTitle className="chart-card-title"><h3 id="rating-progress-heading">Solved by rating</h3></CardTitle>
             <CardDescription>Accepted problems grouped by exact rating</CardDescription>
           </div>
-          <Badge variant="secondary" className="chart-meta">{solvedCount} rated</Badge>
         </CardHeader>
         <CardContent className="progress-chart-content"><RatingPie ratings={ratingSlices} total={solvedCount} /></CardContent>
       </Card>
