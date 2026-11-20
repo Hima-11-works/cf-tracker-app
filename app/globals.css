@@ -254,6 +254,7 @@ a { color: inherit; text-underline-offset: 3px; }
 :root[data-theme="dark"] .theme-icon-sun { display: initial; }
 :root[data-theme="dark"] .theme-icon-moon { display: none; }
 .main-content { width: min(1220px, calc(100% - 48px)); margin: 0 auto; flex: 1; padding: clamp(24px, 4vw, 44px) 0 96px; }
+.main-content:has(> * > .page-compact) { padding-top: clamp(10px, 1.6vw, 18px); }
 .site-footer {
   min-height: 56px;
   padding: 16px clamp(20px, 5vw, 76px);

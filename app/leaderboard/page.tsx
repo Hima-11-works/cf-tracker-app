@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function LeaderboardPage() {
-  return <Leaderboard />;
+  return <div className="page-compact"><Leaderboard /></div>;
 }
