@@ -1,0 +1,407 @@
+{
+  "section": "Bit Manipulation",
+  "problems": [
+    {
+      "contestId": 1559,
+      "index": "A",
+      "name": "Mocha and Math",
+      "rating": 900,
+      "idea": "Every interval operation replaces mirrored entries by their bitwise AND, so it only clears bits. A bit present in every input value cannot be removed, while any bit absent from at least one value can be propagated away; the minimum possible maximum is therefore the AND of the full array.",
+      "approach": [
+        "Read each test case as an array and return the smallest maximum value reachable after any number of operations. The operation never creates a set bit at any position, so the AND of all original values is a lower bound for the final maximum.",
+        "Consider one bit at a time. If that bit is set in every element, every pairwise AND preserves it everywhere; if at least one element lacks it, suitable mirrored intervals can repeatedly combine positions until that bit is cleared from the whole sequence.",
+        "Compute the bitwise AND while reading the values and print it. This achieves the lower bound and is optimal; no array or sequence of operations needs to be stored."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Use AND over all values, not OR or XOR.",
+        "The required result is the minimum possible maximum, not the minimum array element."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        int answer;\n        cin >> answer;\n        for (int i = 1; i < n; ++i) {\n            int value;\n            cin >> value;\n            answer &= value;\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            int answer = nextInt();\n            for (int i = 1; i < n; i++) answer &= nextInt();\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        answer = data[pos]\n        pos += 1\n        for _ in range(n - 1):\n            answer &= data[pos]\n            pos += 1\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1805,
+      "index": "A",
+      "name": "We Need the Zero",
+      "rating": 800,
+      "idea": "XOR distributes across the transformed array as XOR(a_i) XOR (x repeated n times). Thus x cancels for even n, while for odd n the unique useful choice is the XOR of all input values.",
+      "approach": [
+        "For each test case, read the array and output a valid x or -1 if no x can make the transformed XOR zero. Let S be the XOR of all original elements.",
+        "XORing every transformed value gives S XOR x when n is odd, because x appears an odd number of times. When n is even, the x terms cancel in pairs and the result remains S regardless of the choice.",
+        "For odd n, choose x = S. For even n, choose zero when S is zero and otherwise print -1. The input values are below 256, so the computed choice also meets the stated bound."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The answer is the actual value x, not a YES or NO string.",
+        "For even n, changing x cannot affect the total XOR.",
+        "When n is even and S is zero, zero is a valid choice."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        int total = 0;\n        for (int i = 0; i < n; ++i) {\n            int value;\n            cin >> value;\n            total ^= value;\n        }\n        if (n % 2 == 1) cout << total << '\\n';\n        else cout << (total == 0 ? 0 : -1) << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            int total = 0;\n            for (int i = 0; i < n; i++) total ^= nextInt();\n            if ((n & 1) == 1) out.append(total).append('\\n');\n            else out.append(total == 0 ? 0 : -1).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        total = 0\n        for _ in range(n):\n            total ^= data[pos]\n            pos += 1\n        if n % 2 == 1:\n            out.append(str(total))\n        else:\n            out.append(str(0 if total == 0 else -1))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1699,
+      "index": "B",
+      "name": "Almost Ternary Matrix",
+      "rating": 900,
+      "idea": "Tile the grid with 2 by 2 diagonal patterns, alternating their orientation between neighboring tiles. Each cell then has one opposite-valued neighbor inside its tile in each direction, while any neighbor across a tile boundary has the same value.",
+      "approach": [
+        "Read even dimensions n and m for each test case and print any binary matrix satisfying the neighbor condition. Use zero-based row i and column j to define each cell directly, so the construction needs no matrix storage.",
+        "Inside a 2 by 2 tile, toggling the low parity of either coordinate flips the value, giving one different horizontal neighbor and one different vertical neighbor. Across a tile boundary, the within-tile parity and tile index parity both toggle, so the value stays the same.",
+        "Set the value to (i mod 2) XOR (j mod 2) XOR ((floor(i/2) + floor(j/2)) mod 2). Every cell has one internal differing neighbor horizontally and vertically, and boundary-crossing neighbors do not add differences."
+      ],
+      "complexity": {
+        "time": "O(n*m)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Both dimensions are even and at least two, so every cell has its internal horizontal and vertical neighbor.",
+        "Print n rows and m values per row, with spaces between values.",
+        "Do not use a plain checkerboard; its interior cells have four differing neighbors."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, m;\n        cin >> n >> m;\n        for (int i = 0; i < n; ++i) {\n            for (int j = 0; j < m; ++j) {\n                int value = (i & 1) ^ (j & 1) ^ (((i / 2 + j / 2) & 1));\n                if (j) cout << ' ';\n                cout << value;\n            }\n            cout << '\\n';\n        }\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(System.out)));\n        while (t-- > 0) {\n            int n = nextInt();\n            int m = nextInt();\n            for (int i = 0; i < n; i++) {\n                for (int j = 0; j < m; j++) {\n                    int value = (i & 1) ^ (j & 1) ^ (((i / 2 + j / 2) & 1));\n                    if (j > 0) out.print(' ');\n                    out.print(value);\n                }\n                out.println();\n            }\n        }\n        out.flush();\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n, m = data[pos], data[pos + 1]\n        pos += 2\n        for i in range(n):\n            row = []\n            for j in range(m):\n                value = (i & 1) ^ (j & 1) ^ (((i // 2 + j // 2) & 1))\n                row.append(str(value))\n            out.append(\" \".join(row))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 484,
+      "index": "A",
+      "name": "Bits",
+      "rating": 1700,
+      "idea": "Within a fixed interval, adding a previously unset low bit is the cheapest numeric change, so try zero bits from least significant upward and keep each change that stays at most r. This maximizes the number of set bits and favors the smallest value when the count ties.",
+      "approach": [
+        "Each query provides inclusive bounds l and r, and asks for the smallest number in that interval with maximum popcount. Start from l, which is already feasible, and only turn zero bits into one bits.",
+        "Process bit positions from low to high. For each bit, form the candidate obtained by setting it in the current answer; accept it exactly when the candidate is no greater than r.",
+        "A lower bit costs less value than any higher bit, so this order preserves as many later set bits as possible while producing the numerically smallest maximum-popcount choice. Values can be up to 10^18, so use a 64-bit type and inspect through bit 60."
+      ],
+      "complexity": {
+        "time": "O(61*q)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The interval includes both endpoints.",
+        "Use 64-bit integers for bounds and bit shifts.",
+        "Set bits from low to high to respect the smallest-value tie break."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int q;\n    cin >> q;\n    while (q--) {\n        long long l, r;\n        cin >> l >> r;\n        long long answer = l;\n        for (int bit = 0; bit <= 60; ++bit) {\n            long long candidate = answer | (1LL << bit);\n            if (candidate <= r) answer = candidate;\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static long nextLong() throws IOException { return Long.parseLong(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int q = Integer.parseInt(next());\n        StringBuilder out = new StringBuilder();\n        while (q-- > 0) {\n            long l = nextLong();\n            long r = nextLong();\n            long answer = l;\n            for (int bit = 0; bit <= 60; bit++) {\n                long candidate = answer | (1L << bit);\n                if (candidate <= r) answer = candidate;\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    q = data[0]\n    pos = 1\n    out = []\n    for _ in range(q):\n        r = data[pos + 1]\n        answer = data[pos]\n        pos += 2\n        for bit in range(61):\n            candidate = answer | (1 << bit)\n            if candidate <= r:\n                answer = candidate\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1421,
+      "index": "A",
+      "name": "XORwice",
+      "rating": 800,
+      "idea": "For each bit, if a and b differ then exactly one of a XOR x and b XOR x has that bit set, regardless of x. If they agree, choose x's bit to clear both contributions, so the minimum sum is a XOR b.",
+      "approach": [
+        "Read a and b for each test case and minimize the sum of the two XOR results over all choices of x. The sum can be analyzed independently at every bit because binary place values add without carries between these two bitwise results.",
+        "When the input bits differ, toggling both by the same x keeps them different, so exactly one result contributes that place value. When they agree, choose the corresponding bit of x to make both output bits zero.",
+        "The unavoidable contribution is therefore exactly the set of positions where a and b differ. Print a XOR b for each case."
+      ],
+      "complexity": {
+        "time": "O(1)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The objective is a sum, but the minimum equals XOR rather than AND.",
+        "Do not search over x; each bit can be optimized independently."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int a, b;\n        cin >> a >> b;\n        cout << (a ^ b) << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) out.append(nextInt() ^ nextInt()).append('\\n');\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    out = []\n    pos = 1\n    for _ in range(t):\n        out.append(str(data[pos] ^ data[pos + 1]))\n        pos += 2\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1527,
+      "index": "A",
+      "name": "And Then There Were K",
+      "rating": 800,
+      "idea": "The AND of a consecutive range stays nonzero while every number in it shares the highest set bit of n. It first becomes zero when the range includes the number immediately below that power of two.",
+      "approach": [
+        "For each test case, read n and find the highest power of two p not exceeding it. The desired k is the largest endpoint for which the AND of all values from n down through k is zero.",
+        "For any k at least p, every value in [k,n] has the highest bit of n set, so their AND cannot be zero. Choosing k = p - 1 includes both p and p - 1, whose highest-bit values differ, clearing that bit in the AND.",
+        "No larger k can work, so print p - 1. Build p by repeatedly doubling from one while twice p is at most n."
+      ],
+      "complexity": {
+        "time": "O(log n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The answer is one less than the highest power of two, not the power itself.",
+        "For n equal to a power of two, the answer is n/2 - 1."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        int power = 1;\n        while (power * 2 <= n) power *= 2;\n        cout << power - 1 << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            int power = 1;\n            while (power * 2 <= n) power *= 2;\n            out.append(power - 1).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    out = []\n    for n in data[1:1 + t]:\n        power = 1\n        while power * 2 <= n:\n            power *= 2\n        out.append(str(power - 1))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1514,
+      "index": "B",
+      "name": "AND 0, Sum Big",
+      "rating": 1200,
+      "idea": "To maximize the sum, each of the k bit positions should be set in as many array elements as possible. The AND-zero constraint requires omitting that bit from at least one element, and choosing which element is omitted gives n independent choices per bit.",
+      "approach": [
+        "The input gives n, the array length, and k, the number of usable bit positions. Count ordered arrays whose total AND is zero and whose sum is as large as possible.",
+        "For a maximum sum, each allowed bit should occur in n - 1 entries; omitting it from more entries would only decrease the sum. This also guarantees that the AND over all entries is zero at that bit.",
+        "For each of k bits independently, choose one of n positions to omit it from. These choices fully determine the maximum-sum arrays, so the count is n raised to k modulo 1,000,000,007."
+      ],
+      "complexity": {
+        "time": "O(log k)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The array entries are ordered, so different omitted indices count as different arrays.",
+        "Apply the modulo during exponentiation.",
+        "The exponent is k, not n."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nconst long long MOD = 1000000007LL;\nlong long modPow(long long base, int exp) {\n    long long result = 1;\n    while (exp > 0) {\n        if (exp & 1) result = result * base % MOD;\n        base = base * base % MOD;\n        exp >>= 1;\n    }\n    return result;\n}\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        long long n;\n        int k;\n        cin >> n >> k;\n        cout << modPow(n, k) << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static final long MOD = 1000000007L;\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static long nextLong() throws IOException { return Long.parseLong(next()); }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    static long modPow(long base, int exp) {\n        long result = 1;\n        base %= MOD;\n        while (exp > 0) {\n            if ((exp & 1) == 1) result = result * base % MOD;\n            base = base * base % MOD;\n            exp >>= 1;\n        }\n        return result;\n    }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) out.append(modPow(nextLong(), nextInt())).append('\\n');\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\nMOD = 1000000007\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    out = []\n    pos = 1\n    for _ in range(t):\n        n, k = data[pos], data[pos + 1]\n        pos += 2\n        out.append(str(pow(n, k, MOD)))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1682,
+      "index": "B",
+      "name": "AND Sorting",
+      "rating": 1100,
+      "idea": "Every misplaced value must participate in a swap, so the allowed X must be a bitwise subset of every value currently in a wrong position. The AND of all misplaced values is also sufficient because every such value can swap with the value X, connecting all displaced values through a pivot.",
+      "approach": [
+        "Read the permutation and inspect only positions i where p[i] is not i. These are exactly the values that need to move, and every value in this set must be involved in at least one permitted swap.",
+        "A swap involving value v is possible only when v AND its partner equals X, which forces every set bit of X to also be present in v. Therefore X cannot exceed the AND of all misplaced values.",
+        "Choose that full AND as X. Each misplaced value shares exactly those required bits with the value X, so swaps through X connect the displaced values and let their permutation cycle be sorted; output the AND accumulated over misplaced positions."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "AND only values in wrong positions; fixed values impose no restriction.",
+        "The permutation values start at zero, so do not use one-based target indices.",
+        "The statement guarantees the input permutation is initially unsorted."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        int answer = (1 << 30) - 1;\n        for (int i = 0; i < n; ++i) {\n            int value;\n            cin >> value;\n            if (value != i) answer &= value;\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            int answer = (1 << 30) - 1;\n            for (int i = 0; i < n; i++) {\n                int value = nextInt();\n                if (value != i) answer &= value;\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        answer = (1 << 30) - 1\n        for i in range(n):\n            value = data[pos]\n            pos += 1\n            if value != i:\n                answer &= value\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1973,
+      "index": "B",
+      "name": "Cat, Fox and the Lonely Array",
+      "rating": 1300,
+      "idea": "Every length-k window must contain every bit that appears anywhere in the array, or its OR would be smaller than another window's. For each present bit, the minimum k is one more than the longest consecutive run of positions where that bit is absent.",
+      "approach": [
+        "Read the array and compute its global OR. Any bit present in that OR must appear in every window if all window ORs are to match, since some window contains the position where the bit occurs.",
+        "For each globally present bit, scan the array and track the longest gap between occurrences, including the prefix before its first occurrence and the suffix after its last occurrence. A window of length greater than that gap cannot miss the bit.",
+        "Take one plus the largest such gap over all present bits. If the global OR is zero, every window OR is already zero and the answer is one."
+      ],
+      "complexity": {
+        "time": "O(20*n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Include gaps at both ends of the array.",
+        "Bits absent from the entire array impose no constraint.",
+        "For an all-zero array, the smallest positive k is one."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        vector<int> a(n);\n        int all = 0;\n        for (int &value : a) {\n            cin >> value;\n            all |= value;\n        }\n        int answer = 1;\n        for (int bit = 0; bit < 20; ++bit) {\n            if (((all >> bit) & 1) == 0) continue;\n            int last = -1;\n            int largestGap = 0;\n            for (int i = 0; i < n; ++i) {\n                if ((a[i] >> bit) & 1) {\n                    largestGap = max(largestGap, i - last - 1);\n                    last = i;\n                }\n            }\n            largestGap = max(largestGap, n - last - 1);\n            answer = max(answer, largestGap + 1);\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            int[] a = new int[n];\n            int all = 0;\n            for (int i = 0; i < n; i++) {\n                a[i] = nextInt();\n                all |= a[i];\n            }\n            int answer = 1;\n            for (int bit = 0; bit < 20; bit++) {\n                if (((all >>> bit) & 1) == 0) continue;\n                int last = -1;\n                int largestGap = 0;\n                for (int i = 0; i < n; i++) {\n                    if (((a[i] >>> bit) & 1) != 0) {\n                        largestGap = Math.max(largestGap, i - last - 1);\n                        last = i;\n                    }\n                }\n                largestGap = Math.max(largestGap, n - last - 1);\n                answer = Math.max(answer, largestGap + 1);\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        a = data[pos:pos + n]\n        pos += n\n        all_bits = 0\n        for value in a:\n            all_bits |= value\n        answer = 1\n        for bit in range(20):\n            if not ((all_bits >> bit) & 1):\n                continue\n            last = -1\n            largest_gap = 0\n            for i, value in enumerate(a):\n                if (value >> bit) & 1:\n                    largest_gap = max(largest_gap, i - last - 1)\n                    last = i\n            largest_gap = max(largest_gap, n - last - 1)\n            answer = max(answer, largest_gap + 1)\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2200,
+      "index": "B",
+      "name": "Deletion Sort",
+      "rating": 800,
+      "idea": "If the initial array has a descent, keep that inverted pair while deleting every other element; the pair keeps the game active until one final deletion leaves a singleton. If there is no descent, the game ends immediately and no deletion is allowed.",
+      "approach": [
+        "Read each test case and check whether the array is already non-decreasing. The game stops before any move in that case, so all n elements remain.",
+        "If a[i] > a[j] for some i < j, retain those two elements while deleting all others. Their order remains inverted, so the current array cannot become non-decreasing before only the pair remains.",
+        "One more permitted deletion leaves a singleton, which is sorted and is the minimum possible nonempty final size. Thus print one for an initially unsorted array and n otherwise."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "A sorted input permits no deletions at all.",
+        "A singleton is non-decreasing, so the minimum result for an unsorted input is one.",
+        "Check for any adjacent descent; non-decreasing allows equal neighbors."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        vector<int> a(n);\n        for (int &value : a) cin >> value;\n        bool sorted = true;\n        for (int i = 1; i < n; ++i) {\n            if (a[i - 1] > a[i]) sorted = false;\n        }\n        cout << (sorted ? n : 1) << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            int previous = nextInt();\n            boolean sorted = true;\n            for (int i = 1; i < n; i++) {\n                int current = nextInt();\n                if (previous > current) sorted = false;\n                previous = current;\n            }\n            out.append(sorted ? n : 1).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        a = data[pos:pos + n]\n        pos += n\n        sorted_array = all(a[i - 1] <= a[i] for i in range(1, n))\n        out.append(str(n if sorted_array else 1))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2153,
+      "index": "B",
+      "name": "Bitwise Reversion",
+      "rating": 800,
+      "idea": "At a single bit, if any pairwise AND output is one then both source variables in that pair are one, which forces the third pairwise AND to be one too. Therefore the three target numbers are feasible exactly when their pairwise ANDs are all equal.",
+      "approach": [
+        "For each test case, read the requested pairwise AND values x, y, and z and decide whether some a, b, c can produce them. Bit positions are independent, so reason about one bit at a time.",
+        "A target bit pattern with exactly two of x, y, z set is impossible: the two corresponding pairwise intersections force all three source bits to one, making the third target bit one as well. Patterns with none, exactly one, or all three target bits set can be constructed.",
+        "The invalid exactly-two pattern is excluded precisely when x AND y, x AND z, and y AND z are equal at every bit. Compare those three integer intersections and print YES if all match, otherwise NO."
+      ],
+      "complexity": {
+        "time": "O(1)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Compare all three pairwise intersections, not just x AND y with one value.",
+        "The valid target bit patterns include exactly one set bit as well as zero or three.",
+        "The output is YES or NO for each test case."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int x, y, z;\n        cin >> x >> y >> z;\n        int xy = x & y;\n        int yz = y & z;\n        int xz = x & z;\n        cout << ((xy == yz && yz == xz) ? \"YES\" : \"NO\") << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int x = nextInt();\n            int y = nextInt();\n            int z = nextInt();\n            int xy = x & y;\n            int yz = y & z;\n            int xz = x & z;\n            out.append(xy == yz && yz == xz ? \"YES\" : \"NO\").append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        x, y, z = data[pos], data[pos + 1], data[pos + 2]\n        pos += 3\n        xy = x & y\n        yz = y & z\n        xz = x & z\n        out.append(\"YES\" if xy == yz == xz else \"NO\")\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2119,
+      "index": "A",
+      "name": "Add or XOR",
+      "rating": 800,
+      "idea": "Adding one always moves upward, while XOR with one moves an odd value down by one and an even value up by one. On an upward path, an even step can use the cheaper of the two operations, but an odd step must use addition.",
+      "approach": [
+        "Each test case gives starting value a, target b, and operation costs x for increment and y for XOR with one. If a is already b, the minimum cost is zero.",
+        "When moving upward, from an even value both operations reach the next odd value, so use the cheaper cost. From an odd value, XOR with one would move backward, making increment the only useful forward move.",
+        "Sum the appropriate cost for each current value from a through b - 1. If a is larger than b, the only possible decrease is a single XOR step from an odd value to the preceding even value; every other downward target is impossible."
+      ],
+      "complexity": {
+        "time": "O(|b-a|)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "XOR with one decreases odd values but increases even values.",
+        "When a > b, only a = b + 1 with odd a is reachable.",
+        "Use a 64-bit accumulator for the total cost."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        long long a, b, x, y;\n        cin >> a >> b >> x >> y;\n        if (a == b) {\n            cout << 0 << '\\n';\n        } else if (a > b) {\n            if (a == b + 1 && (a & 1LL)) cout << y << '\\n';\n            else cout << -1 << '\\n';\n        } else {\n            long long cost = 0;\n            for (long long value = a; value < b; ++value) {\n                cost += (value % 2 == 0 ? min(x, y) : x);\n            }\n            cout << cost << '\\n';\n        }\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static long nextLong() throws IOException { return Long.parseLong(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = Integer.parseInt(next());\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            long a = nextLong();\n            long b = nextLong();\n            long x = nextLong();\n            long y = nextLong();\n            if (a == b) {\n                out.append(0).append('\\n');\n            } else if (a > b) {\n                if (a == b + 1 && (a & 1L) == 1L) out.append(y).append('\\n');\n                else out.append(-1).append('\\n');\n            } else {\n                long cost = 0;\n                for (long value = a; value < b; value++) {\n                    cost += (value % 2 == 0 ? Math.min(x, y) : x);\n                }\n                out.append(cost).append('\\n');\n            }\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        a, b, x, y = data[pos:pos + 4]\n        pos += 4\n        if a == b:\n            cost = 0\n        elif a > b:\n            cost = y if a == b + 1 and a % 2 == 1 else -1\n        else:\n            cost = sum(min(x, y) if value % 2 == 0 else x for value in range(a, b))\n        out.append(str(cost))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2261,
+      "index": "B",
+      "name": "What's the Capital of France?",
+      "rating": 1100,
+      "idea": "An adjacent operation can raise the smaller rating toward the larger one, so ratings never exceed the global maximum. The global minimum can be raised to any value up to that maximum, and ORing such a value with the maximum captures the best possible OR over the interval.",
+      "approach": [
+        "Read the restaurant ratings and find their minimum lo and maximum hi. Any updated rating stays at most hi because an operation increments only the smaller of two neighbors and stops increasing it once it reaches its neighbor.",
+        "By propagating increases along the line, a restaurant with the minimum value can be raised to any chosen integer between lo and hi while the maximum rating remains available. Thus the best delicacy is the OR of some value in [lo, hi] with hi.",
+        "Let b be the highest bit where lo and hi differ. The interval includes a value formed from lo by setting all bits below b, and that value is at most hi; ORing it with hi sets every lower bit. Construct a mask of ones through b - 1 and print hi OR mask."
+      ],
+      "complexity": {
+        "time": "O(n + log(max(a)))",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The answer can exceed the largest rating, as in ratings 4 and 6.",
+        "If lo equals hi, the differing-bit mask is zero and the answer is hi.",
+        "A bitwise OR over the interval is not generally just lo OR hi."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        int low = INT_MAX;\n        int high = 0;\n        for (int i = 0; i < n; ++i) {\n            int value;\n            cin >> value;\n            low = min(low, value);\n            high = max(high, value);\n        }\n        int diff = low ^ high;\n        int mask = 0;\n        while (diff > 0) {\n            mask = (mask << 1) | 1;\n            diff >>= 1;\n        }\n        cout << (high | mask) << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            int low = Integer.MAX_VALUE;\n            int high = 0;\n            for (int i = 0; i < n; i++) {\n                int value = nextInt();\n                low = Math.min(low, value);\n                high = Math.max(high, value);\n            }\n            int diff = low ^ high;\n            int mask = 0;\n            while (diff > 0) {\n                mask = (mask << 1) | 1;\n                diff >>>= 1;\n            }\n            out.append(high | mask).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        values = data[pos:pos + n]\n        pos += n\n        low = min(values)\n        high = max(values)\n        diff = low ^ high\n        mask = 0\n        while diff:\n            mask = (mask << 1) | 1\n            diff >>= 1\n        out.append(str(high | mask))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2218,
+      "index": "E",
+      "name": "The 67th XOR Problem",
+      "rating": 1200,
+      "idea": "At every stage, the active values can be viewed as their corresponding original values XORed with one common anchor. Removing one active value changes the anchor to the selected original value, so the last operation leaves the XOR of two original array elements.",
+      "approach": [
+        "The input is an array of n non-negative integers; choose n - 1 operations and maximize the last remaining value. Store the original values because the order of removals does not change the form of the final result.",
+        "Maintain the invariant that every active element corresponds to some untouched original a[j] XORed with a common value c. If the selected element corresponds to a[i] XOR c, XORing it into every active value cancels c and makes the survivors a[j] XOR a[i].",
+        "When two elements remain, the final operation therefore leaves a[i] XOR a[j] for their two original indices. Any pair can be left until the end by removing all other indices first, so the answer is the maximum pairwise XOR."
+      ],
+      "complexity": {
+        "time": "O(n^2)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "The final answer is a pairwise XOR, not the XOR of the entire array.",
+        "Consider distinct indices; n is at least two.",
+        "The total n is small enough for checking every pair."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        cin >> n;\n        vector<int> a(n);\n        for (int &value : a) cin >> value;\n        int answer = 0;\n        for (int i = 0; i < n; ++i) {\n            for (int j = i + 1; j < n; ++j) {\n                answer = max(answer, a[i] ^ a[j]);\n            }\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            int[] a = new int[n];\n            for (int i = 0; i < n; i++) a[i] = nextInt();\n            int answer = 0;\n            for (int i = 0; i < n; i++) {\n                for (int j = i + 1; j < n; j++) answer = Math.max(answer, a[i] ^ a[j]);\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        a = data[pos:pos + n]\n        pos += n\n        answer = 0\n        for i in range(n):\n            for j in range(i + 1, n):\n                answer = max(answer, a[i] ^ a[j])\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2194,
+      "index": "C",
+      "name": "Secret message",
+      "rating": 1300,
+      "idea": "A character for each message position can be chosen independently from the letters available in that column. A candidate period d works exactly when every residue class modulo d has at least one letter shared by all its columns.",
+      "approach": [
+        "Read k strings of length n and build a 26-bit mask for each column, recording which lowercase letters appear there. Any valid decrypted message must choose one available letter independently at every position.",
+        "The informativity of a length-n message is its smallest repeating block length, which must divide n. Test divisors d in increasing order; for each residue r, intersect the letter masks of columns r, r+d, r+2d, and so on.",
+        "If any intersection is empty, no message with period d exists. Otherwise choose one letter from every intersection and repeat those d choices across all n positions; the first feasible divisor is the minimum informativity."
+      ],
+      "complexity": {
+        "time": "O(n*k + n*tau(n))",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Only divisors of n can be repeating block lengths.",
+        "Intersect letter availability across positions in a residue class; taking a union is not sufficient.",
+        "The strings are strips, so each column mask is assembled from all k input strings."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, k;\n        cin >> n >> k;\n        vector<int> masks(n, 0);\n        for (int row = 0; row < k; ++row) {\n            string s;\n            cin >> s;\n            for (int col = 0; col < n; ++col) masks[col] |= 1 << (s[col] - 'a');\n        }\n        string answer;\n        for (int d = 1; d <= n && answer.empty(); ++d) {\n            if (n % d != 0) continue;\n            vector<int> chosen(d, -1);\n            bool possible = true;\n            for (int r = 0; r < d && possible; ++r) {\n                int common = (1 << 26) - 1;\n                for (int pos = r; pos < n; pos += d) common &= masks[pos];\n                if (common == 0) {\n                    possible = false;\n                } else {\n                    chosen[r] = __builtin_ctz((unsigned)common);\n                }\n            }\n            if (possible) {\n                answer.resize(n);\n                for (int i = 0; i < n; ++i) answer[i] = char('a' + chosen[i % d]);\n            }\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n    static String next() throws IOException {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n    static int nextInt() throws IOException { return Integer.parseInt(next()); }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            int k = nextInt();\n            int[] masks = new int[n];\n            for (int row = 0; row < k; row++) {\n                String s = next();\n                for (int col = 0; col < n; col++) masks[col] |= 1 << (s.charAt(col) - 'a');\n            }\n            String answer = null;\n            for (int d = 1; d <= n && answer == null; d++) {\n                if (n % d != 0) continue;\n                int[] chosen = new int[d];\n                boolean possible = true;\n                for (int r = 0; r < d && possible; r++) {\n                    int common = (1 << 26) - 1;\n                    for (int pos = r; pos < n; pos += d) common &= masks[pos];\n                    if (common == 0) {\n                        possible = false;\n                    } else {\n                        chosen[r] = Integer.numberOfTrailingZeros(common);\n                    }\n                }\n                if (possible) {\n                    StringBuilder message = new StringBuilder(n);\n                    for (int i = 0; i < n; i++) message.append((char)('a' + chosen[i % d]));\n                    answer = message.toString();\n                }\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    t = int(data[0])\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = int(data[pos])\n        k = int(data[pos + 1])\n        pos += 2\n        masks = [0] * n\n        for _ in range(k):\n            row = data[pos]\n            pos += 1\n            for col, letter in enumerate(row):\n                masks[col] |= 1 << (letter - 97)\n        answer = None\n        for d in range(1, n + 1):\n            if n % d != 0:\n                continue\n            chosen = [0] * d\n            possible = True\n            for r in range(d):\n                common = (1 << 26) - 1\n                for column in range(r, n, d):\n                    common &= masks[column]\n                if common == 0:\n                    possible = False\n                    break\n                chosen[r] = (common & -common).bit_length() - 1\n            if possible:\n                answer = \"\".join(chr(97 + chosen[i % d]) for i in range(n))\n                break\n        out.append(answer)\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    }
+  ]
+}

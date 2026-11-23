@@ -68,8 +68,8 @@ async function readLeaderboardFallback(
 
   let previousSolved: number | null = null;
   let currentRank = 0;
-  const ranked: LeaderboardEntry[] = sorted.map((entry, index) => {
-    if (entry.solved !== previousSolved) currentRank = index + 1;
+  const ranked: LeaderboardEntry[] = sorted.map((entry) => {
+    if (entry.solved !== previousSolved) currentRank += 1;
     previousSolved = entry.solved;
     return { ...entry, rank: currentRank };
   });

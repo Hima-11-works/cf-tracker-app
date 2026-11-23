@@ -5,7 +5,6 @@ import { ProgressCharts } from "./progress-charts";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -28,6 +27,8 @@ type Sheet = {
   handle: string;
   rating: number | null;
   rank: string | null;
+  avatar: string | null;
+  lastOnlineAt?: string | null;
   profileAvailable: boolean;
   problems: Problem[];
   solvedCount: number;
@@ -80,6 +81,17 @@ function formatAcceptedDate(value: string | null) {
   return new Intl.DateTimeFormat(undefined, { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
+// Relative wording such as "3 hours ago"; the exact time is in the tooltip.
+function formatLastOnline(iso: string) {
+  const seconds = Math.round((new Date(iso).getTime() - Date.now()) / 1000);
+  const formatter = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+  const units: Array<[Intl.RelativeTimeFormatUnit, number]> = [["day", 86400], ["hour", 3600], ["minute", 60]];
+  for (const [unit, size] of units) {
+    if (Math.abs(seconds) >= size) return formatter.format(Math.round(seconds / size), unit);
+  }
+  return "just now";
+}
+
 function UserSheetLoading() {
   return (
     <div className="user-sheet-loading" role="status" aria-busy="true">
@@ -98,13 +110,6 @@ function UserSheetLoading() {
         </CardContent>
       </Card>
 
-      <div className="user-loading-legend" aria-hidden="true">
-        <Skeleton className="user-loading-chip w-24" />
-        <Skeleton className="user-loading-chip w-20" />
-        <Skeleton className="user-loading-chip w-24" />
-        <Skeleton className="user-loading-chip w-24" />
-      </div>
-
       <section className="progress-charts user-loading-charts" aria-hidden="true">
         {Array.from({ length: 2 }, (_, index) => (
           <Card className="progress-chart-card user-loading-chart-card" key={index}>
@@ -113,7 +118,6 @@ function UserSheetLoading() {
                 <Skeleton className="h-5 w-32" />
                 <Skeleton className="h-3 w-48 max-w-full" />
               </div>
-              <Skeleton className="h-5 w-16" />
             </CardHeader>
             <CardContent className="progress-chart-content">
               <Skeleton className="loading-chart-surface h-48 w-full" />
@@ -123,10 +127,14 @@ function UserSheetLoading() {
       </section>
 
       <section className="user-loading-table-section" aria-hidden="true">
-        <div className="section-heading">
-          <Skeleton className="h-5 w-36" />
-          <Skeleton className="h-3 w-24" />
-        </div>
+        <div className="problem-section">
+          <div className="problem-section-head">
+            <div className="problem-section-title">
+              <Skeleton className="h-5 w-36" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+            <div className="problem-progress"><Skeleton className="h-full w-1/3" /></div>
+          </div>
         <div className="user-loading-table">
           {Array.from({ length: 5 }, (_, index) => (
             <div className="user-loading-row" key={index}>
@@ -140,6 +148,7 @@ function UserSheetLoading() {
               <Skeleton className="h-4 w-20" />
             </div>
           ))}
+        </div>
         </div>
       </section>
     </div>
@@ -168,7 +177,6 @@ export function UserSheet() {
     const cacheKey = "user-sheet:" + clean.toLowerCase();
     const cached = readStaleCache<Sheet>(cacheKey);
     setHandle(clean);
-    rememberHandle(clean);
     setSheet(cached);
     setLoading(true);
     setError("");
@@ -187,6 +195,7 @@ export function UserSheet() {
       if (sequence !== lookupSequence.current) return;
       const freshSheet = payload as Sheet;
       writeStaleCache(cacheKey, freshSheet);
+      rememberHandle(clean);
       setSheet(freshSheet);
       setWarning(typeof payload.warning === "string" ? payload.warning : "");
     } catch (caught) {
@@ -215,12 +224,13 @@ export function UserSheet() {
       return;
     }
 
+    let savedHandle: string | undefined;
     try {
-      const savedHandle = window.localStorage.getItem(LAST_HANDLE_STORAGE_KEY)?.trim();
-      if (savedHandle) setHandle(savedHandle);
+      savedHandle = window.localStorage.getItem(LAST_HANDLE_STORAGE_KEY)?.trim();
     } catch {
       // Keep the form usable when browser storage is unavailable.
     }
+    if (savedHandle) void lookup(savedHandle);
   }, [lookup]);
 
   const groups = useMemo(() => {
@@ -248,20 +258,15 @@ export function UserSheet() {
   return (
     <>
       <section className="lookup-row" aria-label="Find a user">
-        <div className="lookup-intro">
-          <strong>Find a probation sheet</strong>
-          <span>Only handles on the admin whitelist can view a sheet.</span>
-        </div>
         <form className="lookup-form" onSubmit={onSubmit}>
           <div className="field handle-input">
-            <Label htmlFor="codeforces-handle">Codeforces ID</Label>
             <Input
               id="codeforces-handle"
+              aria-label="Codeforces ID"
               value={handle}
               onChange={(event) => {
                 const nextHandle = event.target.value;
                 setHandle(nextHandle);
-                rememberHandle(nextHandle);
               }}
               placeholder="Enter a handle"
               autoComplete="off"
@@ -284,7 +289,11 @@ export function UserSheet() {
         <>
           <Card className="user-summary" aria-label="User progress">
             <CardContent className="user-summary-content">
-              <div>
+              <div className="user-identity">
+                {sheet.avatar ? (
+                  <img className="user-avatar" src={sheet.avatar} alt="" width={44} height={44} loading="lazy" referrerPolicy="no-referrer" />
+                ) : null}
+                <div className="user-identity-text">
                 <div className="user-profile-line">
                   <h2><a href={`https://codeforces.com/profile/${encodeURIComponent(sheet.handle)}`} target="_blank" rel="noreferrer">{sheet.handle}</a></h2>
                   <Badge variant="outline" className="codeforces-rating" data-rank={rankSlug(sheet.rank)} aria-label={sheet.profileAvailable ? `Codeforces rating ${sheet.rating ?? "unrated"}${sheet.rank ? `, ${sheet.rank}` : ""}` : "Codeforces rating unavailable"}>
@@ -292,7 +301,12 @@ export function UserSheet() {
                     {sheet.rank ? <span>{displayRank(sheet.rank)}</span> : null}
                   </Badge>
                 </div>
-                <p>Accepted problems are skipped on future status checks.</p>
+                {sheet.lastOnlineAt ? (
+                  <p className="user-last-online">
+                    Last online <time dateTime={sheet.lastOnlineAt} title={new Date(sheet.lastOnlineAt).toLocaleString("en", { dateStyle: "medium", timeStyle: "short" })}>{formatLastOnline(sheet.lastOnlineAt)}</time>
+                  </p>
+                ) : null}
+                </div>
               </div>
               <div className="progress-count" aria-label={`${sheet.solvedCount} of ${sheet.problemCount} problems accepted`}>
                 <strong>{String(sheet.solvedCount).padStart(2, "0")}</strong>
@@ -301,31 +315,28 @@ export function UserSheet() {
             </CardContent>
           </Card>
 
-          <div className="legend" aria-label="Problem status legend">
-            {(Object.keys(statusLabels) as ProblemStatus[]).map((status) => (
-              <Badge variant="outline" className={`legend-item status-chip ${status}`} key={status}>
-                <span className="status-dot" aria-hidden="true" />
-                {statusLabels[status]}
-              </Badge>
-            ))}
-          </div>
-
           {sheet.problems.length > 0 ? <ProgressCharts problems={sheet.problems} /> : null}
 
           {sheet.problems.length === 0 ? (
             <Alert role="status" className="empty-sheet"><AlertDescription>No problems have been added to the probation sheet yet. Check back after the admin configures it.</AlertDescription></Alert>
-          ) : groups.map(([section, problems]) => (
-            <section key={section} aria-label={section}>
-              <div className="section-heading">
-                <h3>{section}</h3>
-                <span>{problems.filter((problem) => problem.status === "accepted").length} / {problems.length} accepted</span>
+          ) : groups.map(([section, problems]) => {
+            const acceptedInSection = problems.filter((problem) => problem.status === "accepted").length;
+            const percent = Math.round((acceptedInSection / problems.length) * 100);
+            return (
+            <section className="problem-section" key={section} aria-label={section}>
+              <div className="problem-section-head">
+                <div className="problem-section-title">
+                  <h3>{section}</h3>
+                  <span className="problem-section-count">{acceptedInSection} / {problems.length} accepted</span>
+                </div>
+                <div className="problem-progress" aria-hidden="true"><span style={{ width: percent + "%" }} /></div>
               </div>
               <div className="problem-table-wrap">
                 <Table className="problem-table">
                   <TableHeader><TableRow><TableHead>Problem</TableHead><TableHead>CF ID</TableHead><TableHead>Rating</TableHead><TableHead>Status</TableHead><TableHead>Accepted on</TableHead></TableRow></TableHeader>
                   <TableBody>
                     {problems.map((problem) => (
-                      <TableRow className={`status-${problem.status}`} key={problem.id}>
+                      <TableRow key={problem.id}>
                         <TableCell className="whitespace-normal">
                           <span className="problem-name">{problem.name}</span>
                           <span className="problem-subline">{problem.contestId}{problem.index}{problem.rating ? ` · ${problem.rating}` : ""}</span>
@@ -353,7 +364,8 @@ export function UserSheet() {
                 </Table>
               </div>
             </section>
-          ))}
+            );
+          })}
         </>
       ) : null}
     </>

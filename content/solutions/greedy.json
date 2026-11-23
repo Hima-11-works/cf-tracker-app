@@ -1,0 +1,419 @@
+{
+  "section": "Greedy",
+  "problems": [
+    {
+      "contestId": 1834,
+      "index": "A",
+      "name": "Unit Array",
+      "rating": 800,
+      "idea": "The product is positive exactly when the number of -1 values is even, while the sum is n - 2 times that count. Changing a -1 to 1 both raises the sum by two and toggles the product sign, so only the negative count matters.",
+      "approach": [
+        "Each test case gives an array of 1 and -1 values, and asks for the fewest sign flips that make its sum nonnegative and its product equal to 1. Count the negative values; the positive count is then n minus this count.",
+        "The sum condition is equivalent to having at least as many positive values as negative values, so flip negatives until the negative count is at most n/2. Every such flip improves the sum by two, and flipping a positive instead would make the sum worse.",
+        "The product condition requires an even number of negatives. If the count left after enforcing the sum condition is odd, flip one more negative to positive; this also improves the sum, so it preserves feasibility.",
+        "Apply these two count adjustments and print the number of flips. The rule is optimal because any feasible array must satisfy both the half-count bound and even parity."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The sum may be zero and is still valid.",
+        "The product condition is parity of the negative count, not whether negatives exist.",
+        "If the remaining negative count is odd, flipping a negative fixes both parity and sum."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        int n, neg = 0;\n        cin >> n;\n        for (int i = 0, x; i < n; ++i) {\n            cin >> x;\n            neg += (x == -1);\n        }\n        int ans = 0;\n        while (2 * neg > n) { --neg; ++ans; }\n        if (neg % 2) ++ans;\n        cout << ans << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws Exception { return Integer.parseInt(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt(), neg = 0;\n            for (int i = 0; i < n; i++) if (fs.nextInt() == -1) neg++;\n            int ans = 0;\n            while (2 * neg > n) { neg--; ans++; }\n            if ((neg & 1) != 0) ans++;\n            out.append(ans).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t, pos = data[0], 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        neg = sum(x == -1 for x in data[pos:pos + n])\n        pos += n\n        ans = 0\n        while 2 * neg > n:\n            neg -= 1\n            ans += 1\n        if neg % 2:\n            ans += 1\n        out.append(str(ans))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1806,
+      "index": "A",
+      "name": "Walking Master",
+      "rating": 800,
+      "idea": "A diagonal up-right move is the only move that can increase y, so the vertical difference fixes exactly how many such moves are needed. After those moves, only left moves remain useful, which determines both whether the target is reachable and the minimum count.",
+      "approach": [
+        "Each test case gives a start point (a,b) and target (c,d), and asks for the minimum moves using up-right steps and left steps. If d < b, the target is unreachable because neither move decreases y.",
+        "When d is at least b, exactly d-b up-right moves are required, leaving the x-coordinate at a+(d-b). Left moves can only reduce x, so reachability requires c to be no greater than this value.",
+        "If reachable, take the required up-right moves and then move left until x=c. The total is (d-b) + (a+d-b-c), with the second term nonnegative by the reachability check."
+      ],
+      "complexity": {
+        "time": "O(1) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Check vertical reachability before calculating the answer.",
+        "The required diagonal moves also increase x.",
+        "Use a wide integer type for coordinate differences."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        long long a, b, c, d;\n        cin >> a >> b >> c >> d;\n        if (d < b || c > a + (d - b)) cout << -1 << '\\n';\n        else cout << (d - b) + (a + d - b - c) << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        long nextLong() throws Exception { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = (int) fs.nextLong();\n        while (t-- > 0) {\n            long a = fs.nextLong(), b = fs.nextLong(), c = fs.nextLong(), d = fs.nextLong();\n            if (d < b || c > a + d - b) out.append(-1);\n            else out.append((d - b) + (a + d - b - c));\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t, pos = data[0], 1\n    out = []\n    for _ in range(t):\n        a, b, c, d = data[pos:pos + 4]\n        pos += 4\n        if d < b or c > a + d - b:\n            out.append(\"-1\")\n        else:\n            out.append(str((d - b) + (a + d - b - c)))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1875,
+      "index": "A",
+      "name": "Jellyfish and Undertale",
+      "rating": 900,
+      "idea": "A tool has its greatest possible effect when the timer is 1: it then adds min(x_i, a-1) usable seconds before the cap. Using it earlier can only waste part of its increase against the cap, so each tool can be counted independently at timer 1.",
+      "approach": [
+        "For each test case, read the timer cap a, initial timer b, and the n one-use tool increases. The output is the maximum number of seconds before the timer reaches zero.",
+        "A tool used when the timer is c contributes min(x_i, a-c) extra timer units. This contribution is largest at the smallest safe timer value, c=1, giving min(x_i,a-1).",
+        "Start with b seconds and add this maximum contribution for every tool. The timer naturally counts down between uses, so this sum is the total optimal lifetime; use a 64-bit accumulator because increases may be large."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The tool is used before that second's countdown.",
+        "The contribution is capped at a-1, not a.",
+        "Each tool is used at most once; the sum can exceed 32-bit range."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        long long a, b;\n        int n;\n        cin >> a >> b >> n;\n        long long ans = b;\n        for (int i = 0; i < n; ++i) {\n            long long x; cin >> x;\n            ans += min(x, a - 1);\n        }\n        cout << ans << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        long nextLong() throws Exception { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = (int) fs.nextLong();\n        while (t-- > 0) {\n            long a = fs.nextLong(), b = fs.nextLong();\n            int n = (int) fs.nextLong();\n            long ans = b;\n            for (int i = 0; i < n; i++) ans += Math.min(fs.nextLong(), a - 1);\n            out.append(ans).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t, pos = data[0], 1\n    out = []\n    for _ in range(t):\n        a, b, n = data[pos:pos + 3]\n        pos += 3\n        ans = b\n        for x in data[pos:pos + n]:\n            ans += min(x, a - 1)\n        pos += n\n        out.append(str(ans))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2033,
+      "index": "B",
+      "name": "Sakurako and Water",
+      "rating": 900,
+      "idea": "Every operation affects cells on one northwest-to-southeast diagonal, and no operation crosses between these diagonals. On a diagonal, applying an increment to its whole length raises every negative cell together, so the number needed is the magnitude of its most negative cell.",
+      "approach": [
+        "Each test case gives an n by n height matrix; the goal is to remove all negative entries using increments along square main diagonals. Group cells by the invariant row-column, since exactly those cells lie on the same northwest-to-southeast diagonal.",
+        "For a fixed diagonal, let its minimum height be mn. At least -mn increments are needed if mn is negative, because that lowest cell must reach zero; applying an increment along the entire diagonal raises all its cells simultaneously.",
+        "Scan the matrix once, keeping the minimum for each of the 2n-1 diagonals, then sum max(0,-mn) across them. A full diagonal is a valid square main diagonal, so this count is attainable and no other diagonal can help."
+      ],
+      "complexity": {
+        "time": "O(n^2) per test case",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Use row-column as the diagonal key; row+column groups the other diagonal direction.",
+        "Only negative diagonal minima contribute.",
+        "A diagonal operation increments by one, so add the full deficit."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        int n; cin >> n;\n        vector<int> mn(2 * n - 1, INT_MAX);\n        for (int i = 0; i < n; ++i) {\n            for (int j = 0; j < n; ++j) {\n                int x; cin >> x;\n                mn[i - j + n - 1] = min(mn[i - j + n - 1], x);\n            }\n        }\n        long long ans = 0;\n        for (int x : mn) if (x < 0) ans -= x;\n        cout << ans << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws Exception { return Integer.parseInt(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            int[] mn = new int[2 * n - 1];\n            Arrays.fill(mn, Integer.MAX_VALUE);\n            for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) {\n                int x = fs.nextInt(), d = i - j + n - 1;\n                mn[d] = Math.min(mn[d], x);\n            }\n            long ans = 0;\n            for (int x : mn) if (x < 0) ans -= x;\n            out.append(ans).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t, pos = data[0], 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        mn = [10**18] * (2 * n - 1)\n        for i in range(n):\n            for j in range(n):\n                x = data[pos]\n                pos += 1\n                d = i - j + n - 1\n                mn[d] = min(mn[d], x)\n        out.append(str(sum(-x for x in mn if x < 0)))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1951,
+      "index": "A",
+      "name": "Dual Trigger",
+      "rating": 900,
+      "idea": "Every operation turns on exactly two lamps, so the number of target 1s must be even. With exactly two 1s they also must be non-adjacent; with four or more 1s, they can be paired so each pair is non-adjacent.",
+      "approach": [
+        "Each test case gives the target binary configuration of n lamps. Print YES exactly when it can be built by repeatedly choosing two currently-off, non-adjacent lamps and turning both on.",
+        "Count the 1s first: an odd count is impossible because no operation turns on a single lamp. If the count is zero, no operations are needed.",
+        "For any even count of at least four, pair the first half of the 1 positions with the second half in order. Each pair's positions differ by at least two, so they can be turned on together; repeat for all pairs."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The all-off target is reachable with zero operations.",
+        "Only the exactly-two case needs an adjacency check.",
+        "Lamp 1 and lamp n are not a special adjacent pair."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        int n; string s;\n        cin >> n >> s;\n        vector<int> ones;\n        for (int i = 0; i < n; ++i) if (s[i] == '1') ones.push_back(i);\n        bool ok = ones.size() % 2 == 0;\n        if (ones.size() == 2 && ones[1] == ones[0] + 1) ok = false;\n        cout << (ok ? \"YES\\n\" : \"NO\\n\");\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws Exception { return Integer.parseInt(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            String s = fs.next();\n            int count = 0, first = -1, last = -1;\n            for (int i = 0; i < n; i++) if (s.charAt(i) == '1') {\n                if (first == -1) first = i;\n                last = i;\n                count++;\n            }\n            boolean ok = count % 2 == 0 && !(count == 2 && last == first + 1);\n            out.append(ok ? \"YES\\n\" : \"NO\\n\");\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    lines = sys.stdin.buffer.read().split()\n    t, pos = int(lines[0]), 1\n    out = []\n    for _ in range(t):\n        n = int(lines[pos])\n        s = lines[pos + 1].decode()\n        pos += 2\n        ones = [i for i, c in enumerate(s) if c == \"1\"]\n        ok = len(ones) % 2 == 0\n        if len(ones) == 2 and ones[1] == ones[0] + 1:\n            ok = False\n        out.append(\"YES\" if ok else \"NO\")\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2266,
+      "index": "C",
+      "name": "AND, OR, Sort!",
+      "rating": 1000,
+      "idea": "If the first bit is 1, it cannot change, so every sorted result must be all ones. If it is 0, the first 1 in the final string must be an original 1; choose that pivot, zero earlier 1s and set later 0s to one, then minimize over pivots.",
+      "approach": [
+        "Each test case gives a binary string and asks for the fewest prefix-AND or prefix-OR replacements needed to sort it as 0s followed by 1s. The first bit never changes because the prefix of length one has the same AND and OR value as that bit.",
+        "If the first bit is 1, sorted order forces the entire string to become ones, so the cost is the number of zeros. If the first bit is 0, consider each original 1 as the possible first 1 in the final sorted string.",
+        "For a chosen original 1 at position p, every earlier original 1 must be changed to zero and every later original 0 to one. These edits are feasible left to right: prefix AND can clear earlier ones because the first bit is zero, and prefix OR can set later zeros because the pivot one is already present.",
+        "Count ones before each pivot plus zeros after it and keep the minimum; also consider making the whole string zero, costing the total number of ones. This enumerates all possible sorted targets that the operations can reach."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "If the first bit is 1, it cannot change, so the sorted target must be all ones.",
+        "When the first bit is 0, include the all-zero target as a candidate.",
+        "The pivot itself is not changed.",
+        "Prefix operations depend on the current prefix, so process edits in order."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        int n; string s;\n        cin >> n >> s;\n        int ones = count(s.begin(), s.end(), '1');\n        int ans = s[0] == '1' ? n - ones : ones;\n        if (s[0] == '0') {\n            int zerosAfter = n - ones, onesBefore = 0;\n            for (char c : s) {\n                if (c == '1') ans = min(ans, onesBefore + zerosAfter);\n                if (c == '1') ++onesBefore;\n                else --zerosAfter;\n            }\n        }\n        cout << ans << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws Exception { return Integer.parseInt(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            String s = fs.next();\n            int ones = 0;\n            for (int i = 0; i < n; i++) if (s.charAt(i) == '1') ones++;\n            int ans = s.charAt(0) == '1' ? n - ones : ones;\n            if (s.charAt(0) == '0') {\n                int zerosAfter = n - ones, onesBefore = 0;\n                for (int i = 0; i < n; i++) {\n                    char c = s.charAt(i);\n                    if (c == '1') ans = Math.min(ans, onesBefore + zerosAfter);\n                    if (c == '1') onesBefore++;\n                    else zerosAfter--;\n                }\n            }\n            out.append(ans).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    lines = sys.stdin.buffer.read().split()\n    t, pos = int(lines[0]), 1\n    out = []\n    for _ in range(t):\n        n = int(lines[pos])\n        s = lines[pos + 1].decode()\n        pos += 2\n        ones = s.count(\"1\")\n        ans = n - ones if s[0] == \"1\" else ones\n        if s[0] == \"0\":\n            zeros_after = n - ones\n            ones_before = 0\n            for c in s:\n                if c == \"1\":\n                    ans = min(ans, ones_before + zeros_after)\n                    ones_before += 1\n                else:\n                    zeros_after -= 1\n        out.append(str(ans))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2194,
+      "index": "B",
+      "name": "Offshores",
+      "rating": 1000,
+      "idea": "For a chosen destination bank, each other bank can send floor(a_i/x) transfers directly, contributing y per transfer; its remainder cannot make another transfer. Keeping one bank untouched preserves its entire balance, so choose the bank with the largest preserved amount a_i - floor(a_i/x)*y.",
+      "approach": [
+        "Each test case gives balances in n banks and a fixed transfer rule: x leaves one bank while y is credited to another. The goal is the largest balance that can end in any one bank.",
+        "Choose the final destination i and leave its balance intact. Every other bank can directly send as many full x-ruble transfers as its initial balance allows, adding floor(a_j/x)*y; anything left below x cannot be transferred.",
+        "Let base be the sum of those transfer credits for all banks. Replacing bank i's credit contribution with its full starting balance gives base + a_i - floor(a_i/x)*y, so take the maximum over i.",
+        "Using an intermediate bank cannot improve this bound: received y is at most the x that must later be paid out, so routing funds through another account cannot create extra transferable value. A single scan computes the base and best preserved amount."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The chosen final bank contributes its full balance, not just its remainder.",
+        "Transfers credit y, not x.",
+        "Use 64-bit arithmetic for accumulated balances."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        int n;\n        long long x, y;\n        cin >> n >> x >> y;\n        long long base = 0, keep = 0;\n        for (int i = 0; i < n; ++i) {\n            long long a; cin >> a;\n            long long credit = (a / x) * y;\n            base += credit;\n            keep = max(keep, a - credit);\n        }\n        cout << base + keep << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        long nextLong() throws Exception { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = (int) fs.nextLong();\n        while (t-- > 0) {\n            int n = (int) fs.nextLong();\n            long x = fs.nextLong(), y = fs.nextLong();\n            long base = 0, keep = 0;\n            for (int i = 0; i < n; i++) {\n                long a = fs.nextLong(), credit = (a / x) * y;\n                base += credit;\n                keep = Math.max(keep, a - credit);\n            }\n            out.append(base + keep).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t, pos = data[0], 1\n    out = []\n    for _ in range(t):\n        n, x, y = data[pos:pos + 3]\n        pos += 3\n        base = 0\n        keep = 0\n        for a in data[pos:pos + n]:\n            credit = (a // x) * y\n            base += credit\n            keep = max(keep, a - credit)\n        pos += n\n        out.append(str(base + keep))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2264,
+      "index": "B",
+      "name": "Knife's Pill Farm",
+      "rating": 1000,
+      "idea": "The score telescopes: for a chosen subsequence of length m it equals m times the last value minus the sum of the previous m-1 values. Therefore, for each possible last index, the best prefix is the m-1 smallest earlier values.",
+      "approach": [
+        "Each test case gives n ratings and asks for the maximum score from publishing exactly m of them in original order. The score weights each change from the previous chosen rating by its one-based publication position.",
+        "Expand the sum of weighted differences: every interior chosen value cancels except for a coefficient of -1, while the last value keeps coefficient m. Thus a subsequence ending at value v scores m*v minus the sum of its preceding m-1 values.",
+        "Scan possible last positions from left to right and maintain a max-heap containing the m-1 smallest values seen before the current position. When it has size m-1, evaluate the formula, then insert the current value and discard the largest if the heap grows too large.",
+        "The heap sum gives the minimum possible prefix sum for that endpoint, so maximizing across endpoints covers every valid subsequence. Use 64-bit sums because both ratings and m can be large."
+      ],
+      "complexity": {
+        "time": "O(n log m) per test case",
+        "space": "O(m)"
+      },
+      "pitfalls": [
+        "The score simplifies to m times the final chosen rating minus earlier chosen values.",
+        "Evaluate an endpoint before inserting it into the heap.",
+        "Ratings can be negative, so keep the smallest earlier values rather than the largest."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        int n, m; cin >> n >> m;\n        priority_queue<long long> pq;\n        long long sum = 0, ans = LLONG_MIN;\n        for (int i = 0; i < n; ++i) {\n            long long v; cin >> v;\n            if ((int)pq.size() == m - 1) ans = max(ans, 1LL * m * v - sum);\n            if (m > 1) {\n                pq.push(v);\n                sum += v;\n                if ((int)pq.size() > m - 1) {\n                    sum -= pq.top();\n                    pq.pop();\n                }\n            }\n        }\n        cout << ans << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        long nextLong() throws Exception { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = (int) fs.nextLong();\n        while (t-- > 0) {\n            int n = (int) fs.nextLong(), m = (int) fs.nextLong();\n            PriorityQueue<Long> pq = new PriorityQueue<>(Collections.reverseOrder());\n            long sum = 0, ans = Long.MIN_VALUE;\n            for (int i = 0; i < n; i++) {\n                long v = fs.nextLong();\n                if (pq.size() == m - 1) ans = Math.max(ans, (long) m * v - sum);\n                if (m > 1) {\n                    pq.add(v);\n                    sum += v;\n                    if (pq.size() > m - 1) sum -= pq.remove();\n                }\n            }\n            out.append(ans).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\nimport heapq\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t, pos = data[0], 1\n    out = []\n    for _ in range(t):\n        n, m = data[pos:pos + 2]\n        pos += 2\n        pq = []\n        total = 0\n        ans = -10**30\n        for v in data[pos:pos + n]:\n            if len(pq) == m - 1:\n                ans = max(ans, m * v - total)\n            if m > 1:\n                heapq.heappush(pq, -v)\n                total += v\n                if len(pq) > m - 1:\n                    total += heapq.heappop(pq)\n        pos += n\n        out.append(str(ans))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2195,
+      "index": "C",
+      "name": "Dice Roll Sequence",
+      "rating": 1100,
+      "idea": "Two die faces are adjacent exactly when they are neither equal nor opposite; opposite faces sum to 7. Each position has only six possible final faces, so a small dynamic program can retain the cheapest valid prefix for each ending face.",
+      "approach": [
+        "Each test case gives a sequence of die faces from 1 to 6, and asks for the fewest replacements that make every neighboring pair lie on adjacent cube sides. A face pair is invalid if it is equal or sums to 7.",
+        "Let dp[v] be the minimum replacements for the processed prefix when its last face is v. Initialize the first position with cost zero for its original face and one for each other face.",
+        "For every next position and candidate face v, take the minimum dp[u] over previous faces u that differ from v and do not sum to 7, then add one if v differs from the input face. The minimum final state is the answer."
+      ],
+      "complexity": {
+        "time": "O(36n) per test case",
+        "space": "O(6)"
+      },
+      "pitfalls": [
+        "Equal faces are not adjacent, even though they are not opposite.",
+        "Opposite pairs are those summing to 7.",
+        "For n=1, there are no pair restrictions and the answer is zero."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    const int INF = 1e9;\n    while (t--) {\n        int n; cin >> n;\n        vector<int> a(n);\n        for (int &x : a) cin >> x;\n        int dp[7], ndp[7];\n        for (int v = 1; v <= 6; ++v) dp[v] = (v != a[0]);\n        for (int i = 1; i < n; ++i) {\n            for (int v = 1; v <= 6; ++v) {\n                ndp[v] = INF;\n                for (int u = 1; u <= 6; ++u)\n                    if (u != v && u + v != 7)\n                        ndp[v] = min(ndp[v], dp[u] + (v != a[i]));\n            }\n            for (int v = 1; v <= 6; ++v) dp[v] = ndp[v];\n        }\n        cout << *min_element(dp + 1, dp + 7) << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws Exception { return Integer.parseInt(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt(), inf = 1000000000;\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            int[] a = new int[n];\n            for (int i = 0; i < n; i++) a[i] = fs.nextInt();\n            int[] dp = new int[7], ndp = new int[7];\n            for (int v = 1; v <= 6; v++) dp[v] = v == a[0] ? 0 : 1;\n            for (int i = 1; i < n; i++) {\n                Arrays.fill(ndp, inf);\n                for (int v = 1; v <= 6; v++) for (int u = 1; u <= 6; u++)\n                    if (u != v && u + v != 7)\n                        ndp[v] = Math.min(ndp[v], dp[u] + (v == a[i] ? 0 : 1));\n                int[] tmp = dp; dp = ndp; ndp = tmp;\n            }\n            int ans = inf;\n            for (int v = 1; v <= 6; v++) ans = Math.min(ans, dp[v]);\n            out.append(ans).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t, pos = data[0], 1\n    out = []\n    inf = 10**9\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        a = data[pos:pos + n]\n        pos += n\n        dp = [inf] * 7\n        for v in range(1, 7):\n            dp[v] = int(v != a[0])\n        for i in range(1, n):\n            ndp = [inf] * 7\n            for v in range(1, 7):\n                for u in range(1, 7):\n                    if u != v and u + v != 7:\n                        ndp[v] = min(ndp[v], dp[u] + (v != a[i]))\n            dp = ndp\n        out.append(str(min(dp[1:])))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2193,
+      "index": "C",
+      "name": "Replace and Sum",
+      "rating": 1000,
+      "idea": "An element can copy its right neighbor repeatedly, and can also take its own b_i value. Processing right to left shows that the maximum reachable value at i is the maximum of a_i, b_i, and the already-maximized value at i+1.",
+      "approach": [
+        "Each test case gives arrays a and b plus range-sum queries. Operations let position i take b_i or copy the current value at i+1, and each query asks for the largest achievable sum on its interval.",
+        "Because positions only copy to the left, maximize a from right to left. Set a_i to max(a_i,b_i,a_{i+1}); this captures the best value originating at i or anywhere to its right.",
+        "All positions can be maximized independently using this recurrence, so build prefix sums of the resulting array. Answer each interval [l,r] as prefix[r]-prefix[l-1] in constant time."
+      ],
+      "complexity": {
+        "time": "O(n+q) per test case",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Process the recurrence from right to left.",
+        "The copy operation only moves values leftward.",
+        "Use 64-bit prefix sums."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        int n, q; cin >> n >> q;\n        vector<long long> a(n), b(n);\n        for (auto &x : a) cin >> x;\n        for (auto &x : b) cin >> x;\n        for (int i = n - 2; i >= 0; --i) a[i] = max({a[i], b[i], a[i + 1]});\n        vector<long long> pref(n + 1);\n        for (int i = 0; i < n; ++i) pref[i + 1] = pref[i] + a[i];\n        while (q--) {\n            int l, r; cin >> l >> r;\n            cout << pref[r] - pref[l - 1] << (q ? ' ' : '\\n');\n        }\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws Exception { return Integer.parseInt(next()); }\n        long nextLong() throws Exception { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt(), q = fs.nextInt();\n            long[] a = new long[n], b = new long[n], pref = new long[n + 1];\n            for (int i = 0; i < n; i++) a[i] = fs.nextLong();\n            for (int i = 0; i < n; i++) b[i] = fs.nextLong();\n            for (int i = n - 2; i >= 0; i--) a[i] = Math.max(a[i], Math.max(b[i], a[i + 1]));\n            for (int i = 0; i < n; i++) pref[i + 1] = pref[i] + a[i];\n            for (int j = 0; j < q; j++) {\n                int l = fs.nextInt(), r = fs.nextInt();\n                if (j > 0) out.append(' ');\n                out.append(pref[r] - pref[l - 1]);\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t, pos = data[0], 1\n    out = []\n    for _ in range(t):\n        n, q = data[pos:pos + 2]\n        pos += 2\n        a = data[pos:pos + n]\n        pos += n\n        b = data[pos:pos + n]\n        pos += n\n        for i in range(n - 2, -1, -1):\n            a[i] = max(a[i], b[i], a[i + 1])\n        pref = [0] * (n + 1)\n        for i, x in enumerate(a):\n            pref[i + 1] = pref[i] + x\n        vals = []\n        for _ in range(q):\n            l, r = data[pos:pos + 2]\n            pos += 2\n            vals.append(str(pref[r] - pref[l - 1]))\n        out.append(\" \".join(vals))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2190,
+      "index": "A",
+      "name": "Sorting Game",
+      "rating": 1200,
+      "idea": "A sorted binary string has no legal move, so it is a losing state. If it is not sorted, choose exactly the positions that differ from its sorted form: their original bits are all 1s followed by 0s, and sorting that chosen subsequence fixes the whole string immediately.",
+      "approach": [
+        "Each test case gives a binary string for an alternating game. On a turn, a player selects a non-increasing subsequence containing both symbols and sorts its selected positions; output the winner and, for Alice, a winning first move.",
+        "If the string is already nondecreasing, no selected subsequence can contain a 1 before a 0, so no legal move exists and Bob wins. Otherwise, compare the string with its sorted target, which consists of all its zeros followed by all its ones.",
+        "Choose every index where the current bit differs from the target. Within the target's zero block, every chosen character is 1; within its one block, every chosen character is 0, so these selected characters form a non-increasing sequence.",
+        "The two groups have equal size because the string and target contain the same number of each bit. Sorting the selected positions exchanges those misplaced groups and makes the entire string sorted, leaving Bob with no move."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "If already sorted, print only Bob.",
+        "Alice's move must list indices in increasing order.",
+        "The selected index count is at least two whenever the string is unsorted."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        int n; string s;\n        cin >> n >> s;\n        int zeros = count(s.begin(), s.end(), '0');\n        vector<int> ids;\n        for (int i = 0; i < n; ++i)\n            if (s[i] != (i < zeros ? '0' : '1')) ids.push_back(i + 1);\n        if (ids.empty()) cout << \"Bob\\n\";\n        else {\n            cout << \"Alice\\n\" << ids.size() << '\\n';\n            for (int x : ids) cout << x << ' ';\n            cout << '\\n';\n        }\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws Exception { return Integer.parseInt(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            String s = fs.next();\n            int zeros = 0;\n            for (int i = 0; i < n; i++) if (s.charAt(i) == '0') zeros++;\n            ArrayList<Integer> ids = new ArrayList<>();\n            for (int i = 0; i < n; i++)\n                if (s.charAt(i) != (i < zeros ? '0' : '1')) ids.add(i + 1);\n            if (ids.isEmpty()) out.append(\"Bob\\n\");\n            else {\n                out.append(\"Alice\\n\").append(ids.size()).append('\\n');\n                for (int x : ids) out.append(x).append(' ');\n                out.append('\\n');\n            }\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    lines = sys.stdin.buffer.read().split()\n    t, pos = int(lines[0]), 1\n    out = []\n    for _ in range(t):\n        n = int(lines[pos])\n        s = lines[pos + 1].decode()\n        pos += 2\n        zeros = s.count(\"0\")\n        ids = [i + 1 for i, c in enumerate(s) if c != (\"0\" if i < zeros else \"1\")]\n        if not ids:\n            out.append(\"Bob\")\n        else:\n            out.append(\"Alice\")\n            out.append(str(len(ids)))\n            out.append(\" \".join(map(str, ids)))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2189,
+      "index": "B",
+      "name": "The Curse of the Frog",
+      "rating": 1200,
+      "idea": "For each jump type, the frog can first make b_i-1 jumps without a rollback, for total free progress a_i(b_i-1). After that, each rollback followed by a full cycle of that type yields net progress a_i*b_i-c_i, so use the best positive net gain repeatedly.",
+      "approach": [
+        "Each test case gives a target x and jump types (a_i,b_i,c_i): a jump advances by at most a_i, and every b_i-th use of that type first rolls the frog back by c_i. The goal is to reach x with as few rollbacks as possible.",
+        "Before any rollback, type i can be used b_i-1 times, contributing up to a_i(b_i-1) progress. Sum this free progress across all types; if it already reaches x, the answer is zero.",
+        "Otherwise let r be the remaining distance. Each type's rollback event can be paired with its b_i-th jump, giving net progress a_i*b_i-c_i before the same state of that type's cycle repeats.",
+        "Choose the maximum such gain. If it is nonpositive, the frog cannot make positive progress to the target; otherwise the minimum number of rollback cycles is ceil(r/gain). The final jump may be shortened to land exactly at x."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Free jumps total a_i times (b_i-1), not a_i*b_i.",
+        "Compute a_i*b_i-c_i in 64-bit arithmetic.",
+        "Use ceiling division only after confirming the best gain is positive."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        int n;\n        long long x;\n        cin >> n >> x;\n        long long freeMove = 0, best = LLONG_MIN;\n        for (int i = 0; i < n; ++i) {\n            long long a, b, c; cin >> a >> b >> c;\n            freeMove += a * (b - 1);\n            best = max(best, a * b - c);\n        }\n        if (freeMove >= x) cout << 0 << '\\n';\n        else if (best <= 0) cout << -1 << '\\n';\n        else {\n            long long r = x - freeMove;\n            cout << (r + best - 1) / best << '\\n';\n        }\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        long nextLong() throws Exception { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = (int) fs.nextLong();\n        while (t-- > 0) {\n            int n = (int) fs.nextLong();\n            long x = fs.nextLong(), freeMove = 0, best = Long.MIN_VALUE;\n            for (int i = 0; i < n; i++) {\n                long a = fs.nextLong(), b = fs.nextLong(), c = fs.nextLong();\n                freeMove += a * (b - 1);\n                best = Math.max(best, a * b - c);\n            }\n            if (freeMove >= x) out.append(0);\n            else if (best <= 0) out.append(-1);\n            else {\n                long r = x - freeMove;\n                out.append((r + best - 1) / best);\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t, pos = data[0], 1\n    out = []\n    for _ in range(t):\n        n, x = data[pos:pos + 2]\n        pos += 2\n        free_move = 0\n        best = -10**30\n        for _ in range(n):\n            a, b, c = data[pos:pos + 3]\n            pos += 3\n            free_move += a * (b - 1)\n            best = max(best, a * b - c)\n        if free_move >= x:\n            out.append(\"0\")\n        elif best <= 0:\n            out.append(\"-1\")\n        else:\n            r = x - free_move\n            out.append(str((r + best - 1) // best))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2187,
+      "index": "A",
+      "name": "Restricted Sorting",
+      "rating": 1300,
+      "idea": "A misplaced value can be exchanged through an extreme value only when their difference is at least k. For each misplaced position, the largest possible difference to the global minimum or maximum is its limiting threshold; the smallest such threshold is the largest k that permits sorting.",
+      "approach": [
+        "Each test case gives an array and asks for the largest threshold k such that swaps of values differing by at least k can sort it. If the array is already sorted, every k works because zero swaps are allowed, so the answer is -1.",
+        "Sort a copy to identify the desired value at every position and the global minimum and maximum. A value already in its final position does not need to participate in a swap.",
+        "For each mismatched value v, it must be able to swap with at least one global extreme, so k cannot exceed max(v-min,max-v). Taking the minimum of these bounds over mismatches gives the maximum feasible threshold.",
+        "At that threshold, the extremes provide allowed swaps to move each misplaced value into the sorting process; swapping through them allows the full permutation to be corrected. Print the minimum bound."
+      ],
+      "complexity": {
+        "time": "O(n log n) per test case",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Return -1 if the input is already sorted.",
+        "Compute bounds only for mismatched positions.",
+        "The allowed difference is inclusive: it must be at least k."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        int n; cin >> n;\n        vector<long long> a(n), b;\n        for (auto &x : a) cin >> x;\n        b = a;\n        sort(b.begin(), b.end());\n        if (a == b) {\n            cout << -1 << '\\n';\n            continue;\n        }\n        long long ans = LLONG_MAX, lo = b.front(), hi = b.back();\n        for (int i = 0; i < n; ++i) if (a[i] != b[i])\n            ans = min(ans, max(a[i] - lo, hi - a[i]));\n        cout << ans << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws Exception { return Integer.parseInt(next()); }\n        long nextLong() throws Exception { return Long.parseLong(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt();\n            long[] a = new long[n], b = new long[n];\n            for (int i = 0; i < n; i++) a[i] = b[i] = fs.nextLong();\n            Arrays.sort(b);\n            if (Arrays.equals(a, b)) {\n                out.append(-1).append('\\n');\n                continue;\n            }\n            long ans = Long.MAX_VALUE, lo = b[0], hi = b[n - 1];\n            for (int i = 0; i < n; i++) if (a[i] != b[i])\n                ans = Math.min(ans, Math.max(a[i] - lo, hi - a[i]));\n            out.append(ans).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t, pos = data[0], 1\n    out = []\n    for _ in range(t):\n        n = data[pos]\n        pos += 1\n        a = data[pos:pos + n]\n        pos += n\n        b = sorted(a)\n        if a == b:\n            out.append(\"-1\")\n        else:\n            lo, hi = b[0], b[-1]\n            ans = min(max(v - lo, hi - v) for v, target in zip(a, b) if v != target)\n            out.append(str(ans))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2183,
+      "index": "B",
+      "name": "Yet Another MEX Problem",
+      "rating": 1100,
+      "idea": "The final sequence has only k-1 elements, so its MEX cannot exceed k-1, and deletions cannot make a value absent from the original array reappear. Conversely, all values below min(original MEX,k-1) can be preserved because every chosen length-k window contains at least one element outside those at most k-1 required values.",
+      "approach": [
+        "Each test case gives an array and window length k. Repeatedly, a maximum-MEX window of length k is selected, one element inside it is deleted, and the goal is the largest final MEX.",
+        "Let M=min(mex(a),k-1). The final sequence has k-1 elements, and it began without any value at or above its original MEX, so no final MEX can exceed M.",
+        "To attain M, preserve at least one copy of every value 0 through M-1. In any selected window of k positions, at most M distinct positions are needed to retain these values, and M≤k-1, so there is always some position whose deletion does not remove the last required copy.",
+        "Compute the original MEX with a presence array and print min(mex,k-1). The maximum-MEX rule selects which window is eligible, but the same spare-position argument works for every length-k window."
+      ],
+      "complexity": {
+        "time": "O(n) per test case",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "The final length is k-1, giving the k-1 upper bound.",
+        "The answer cannot exceed the original array's MEX.",
+        "Preserve one copy of every value below the target MEX, not every occurrence."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        int n, k; cin >> n >> k;\n        vector<char> seen(n + 1, false);\n        for (int i = 0, x; i < n; ++i) {\n            cin >> x;\n            if (x <= n) seen[x] = true;\n        }\n        int mex = 0;\n        while (seen[mex]) ++mex;\n        cout << min(mex, k - 1) << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws Exception { return Integer.parseInt(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt(), k = fs.nextInt();\n            boolean[] seen = new boolean[n + 1];\n            for (int i = 0; i < n; i++) {\n                int x = fs.nextInt();\n                if (x <= n) seen[x] = true;\n            }\n            int mex = 0;\n            while (seen[mex]) mex++;\n            out.append(Math.min(mex, k - 1)).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t, pos = data[0], 1\n    out = []\n    for _ in range(t):\n        n, k = data[pos:pos + 2]\n        pos += 2\n        a = data[pos:pos + n]\n        pos += n\n        seen = [False] * (n + 1)\n        for x in a:\n            if x <= n:\n                seen[x] = True\n        mex = 0\n        while seen[mex]:\n            mex += 1\n        out.append(str(min(mex, k - 1)))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2269,
+      "index": "A",
+      "name": "SauSaGe Bank",
+      "rating": 800,
+      "idea": "If Hamed waits d days between withdrawals, the money collected on that withdrawal is 2^d. Thus the problem is to split n days into k positive waiting periods and maximize the sum of their powers of two; shifting a day from a shorter period greater than one to a longer one increases the sum.",
+      "approach": [
+        "Each test case gives the number of open days n and exactly k withdrawal days. The balance doubles at the start of each day and resets to one after a withdrawal, so each gap of d days contributes 2^d to the card.",
+        "The k positive waiting periods must sum to n. For two periods a≤b with a>1, changing them to a-1 and b+1 increases their contribution because 2^(a-1)+2^(b+1) is greater than 2^a+2^b.",
+        "Repeat this exchange until k-1 periods are as small as possible, namely 1, and the remaining period is n-k+1. The maximum is therefore 2^(n-k+1)+2(k-1), computed directly."
+      ],
+      "complexity": {
+        "time": "O(1) per test case",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "All waiting periods are positive because withdrawals happen on distinct days.",
+        "There are exactly k contributions of powers of two.",
+        "Use 64-bit integer arithmetic for 2^30."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t; cin >> t;\n    while (t--) {\n        int n, k; cin >> n >> k;\n        long long ans = (1LL << (n - k + 1)) + 2LL * (k - 1);\n        cout << ans << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\npublic class Main {\n    static class FastScanner {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        StringTokenizer st;\n        String next() throws Exception {\n            while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n            return st.nextToken();\n        }\n        int nextInt() throws Exception { return Integer.parseInt(next()); }\n    }\n    public static void main(String[] args) throws Exception {\n        FastScanner fs = new FastScanner();\n        StringBuilder out = new StringBuilder();\n        int t = fs.nextInt();\n        while (t-- > 0) {\n            int n = fs.nextInt(), k = fs.nextInt();\n            long ans = (1L << (n - k + 1)) + 2L * (k - 1);\n            out.append(ans).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    t = data[0]\n    out = []\n    for i in range(t):\n        n, k = data[1 + 2 * i:3 + 2 * i]\n        out.append(str((1 << (n - k + 1)) + 2 * (k - 1)))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()"
+      },
+      "reviewNote": null
+    }
+  ]
+}

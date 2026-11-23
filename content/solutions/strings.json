@@ -1,0 +1,410 @@
+{
+  "section": "Strings",
+  "problems": [
+    {
+      "contestId": 2121,
+      "index": "B",
+      "name": "Above the Clouds",
+      "rating": 800,
+      "idea": "The middle piece can be chosen as a single character. It appears in the outside pieces exactly when that character occurs at another position in the whole string, so only repeated characters at interior positions can make the answer Yes.",
+      "approach": [
+        "Each test case gives n and a lowercase string, and asks whether it can be split into three non-empty pieces a, b, c so that b occurs in a+c. We only need to find one valid split, so consider making b just one character.",
+        "If an interior character occurs at least twice in s, choose that position as b and split the remaining prefix and suffix into a and c. The other occurrence lies in a+c, so b is a substring there.",
+        "Conversely, any valid non-empty b has a first character at an interior position, and its occurrence in a+c means that character appears at another position. Count all letters once, then scan only interior positions for a frequency of at least two."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Only positions 1 through n-2 can be the middle piece.",
+        "Check whether the character occurs somewhere else, not whether a particular split works.",
+        "The string length is at least three, so a one-character middle is always permitted."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        string s;\n        cin >> n >> s;\n        int freq[26] = {};\n        for (char ch : s) ++freq[ch - 'a'];\n        bool possible = false;\n        for (int i = 1; i + 1 < n; ++i) {\n            if (freq[s[i] - 'a'] >= 2) possible = true;\n        }\n        cout << (possible ? \"Yes\" : \"No\") << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            String s = next();\n            int[] freq = new int[26];\n            for (int i = 0; i < n; i++) freq[s.charAt(i) - 'a']++;\n            boolean possible = false;\n            for (int i = 1; i + 1 < n; i++) {\n                if (freq[s.charAt(i) - 'a'] >= 2) possible = true;\n            }\n            out.append(possible ? \"Yes\" : \"No\").append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    t = int(data[0])\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = int(data[pos])\n        s = data[pos + 1].decode()\n        pos += 2\n        freq = [0] * 26\n        for ch in s:\n            freq[ord(ch) - ord('a')] += 1\n        possible = any(freq[ord(s[i]) - ord('a')] >= 2 for i in range(1, n - 1))\n        out.append(\"Yes\" if possible else \"No\")\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 520,
+      "index": "A",
+      "name": "Pangram",
+      "rating": 800,
+      "idea": "A pangram is determined by which letters appear, not by their order or case. Mark each letter after converting it to lowercase, then all 26 marks must be present.",
+      "approach": [
+        "The input is a length n and a string of Latin letters; output YES exactly when every alphabet letter occurs in the string. Uppercase and lowercase versions represent the same letter.",
+        "Use a 26-entry boolean array indexed by the lowercase letter offset from a. Mark an entry for every character, converting its case first.",
+        "Scan the array once at the end. Any unmarked letter proves the string is not a pangram; if none are missing, every required letter appeared."
+      ],
+      "complexity": {
+        "time": "O(n + 26)",
+        "space": "O(26)"
+      },
+      "pitfalls": [
+        "Treat uppercase and lowercase as the same letter.",
+        "Repeated letters do not compensate for a missing letter.",
+        "Read the string token after n; the string contains no spaces."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int n;\n    string s;\n    cin >> n >> s;\n    bool seen[26] = {};\n    for (char ch : s) {\n        char c = (char)tolower((unsigned char)ch);\n        seen[c - 'a'] = true;\n    }\n    bool all = true;\n    for (bool present : seen) all = all && present;\n    cout << (all ? \"YES\" : \"NO\") << '\\n';\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        int n = nextInt();\n        String s = next();\n        boolean[] seen = new boolean[26];\n        for (int i = 0; i < s.length(); i++) {\n            char c = Character.toLowerCase(s.charAt(i));\n            seen[c - 'a'] = true;\n        }\n        boolean all = true;\n        for (boolean present : seen) all &= present;\n        StringBuilder result = new StringBuilder();\n        result.append(all ? \"YES\" : \"NO\").append('\\n');\n        System.out.print(result);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    s = data[1].decode()\n    print(\"YES\" if len(set(s.lower())) == 26 else \"NO\")\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 208,
+      "index": "A",
+      "name": "Dubstep",
+      "rating": 900,
+      "idea": "Every inserted marker is exactly WUB, and the original words never contain that pattern. Replacing each marker with a separator recovers the words, while collapsing separators removes leading, trailing, or repeated markers.",
+      "approach": [
+        "The input is one uppercase remix string, and the output is the original words in order with one space between neighboring words. The remix may begin or end with markers and may contain repeated markers between words.",
+        "Scan left to right, treating each WUB occurrence as a boundary between words. Append ordinary characters to the current word; when a marker is reached, emit a non-empty current word and clear it.",
+        "Emit the final word after the scan. Empty chunks are ignored, which handles any number of consecutive markers without creating extra spaces."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Do not print spaces for leading or trailing WUB markers.",
+        "Consecutive WUB markers still represent just one word boundary.",
+        "The original song is guaranteed to contain at least one word."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    string s;\n    cin >> s;\n    vector<string> words;\n    string current;\n    for (int i = 0; i < (int)s.size();) {\n        if (i + 2 < (int)s.size() && s.compare(i, 3, \"WUB\") == 0) {\n            if (!current.empty()) {\n                words.push_back(current);\n                current.clear();\n            }\n            i += 3;\n        } else {\n            current.push_back(s[i]);\n            ++i;\n        }\n    }\n    if (!current.empty()) words.push_back(current);\n    for (int i = 0; i < (int)words.size(); ++i) {\n        if (i) cout << ' ';\n        cout << words[i];\n    }\n    cout << '\\n';\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        String s = next();\n        StringTokenizer words = new StringTokenizer(s.replace(\"WUB\", \" \"));\n        StringBuilder out = new StringBuilder();\n        while (words.hasMoreTokens()) {\n            if (out.length() > 0) out.append(' ');\n            out.append(words.nextToken());\n        }\n        out.append('\\n');\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    s = sys.stdin.buffer.readline().decode().strip()\n    print(\" \".join(s.replace(\"WUB\", \" \").split()))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2254,
+      "index": "B",
+      "name": "Evanescent",
+      "rating": 900,
+      "idea": "The compressed length is one plus the number of adjacent character changes. Deleting an interior character only removes its two adjacent comparisons and adds the comparison between its former neighbors, so every candidate can be evaluated locally.",
+      "approach": [
+        "Each test case supplies n and a string; output the smallest compressed length after deleting exactly one position other than the first or last. First count the original runs, equivalently one plus the number of unequal adjacent pairs.",
+        "For a candidate index i, remove the comparisons (i-1,i) and (i,i+1), then add (i-1,i+1) because the remaining characters become adjacent. Each unequal comparison contributes one to the run count.",
+        "Try every legal i, apply this constant-time change to the original run count, and keep the minimum. The string need not actually be rebuilt for any candidate."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The first and last characters cannot be deleted.",
+        "If the two neighbors are equal, the newly joined boundary contributes no run change.",
+        "The result counts runs, not distinct letters."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        string s;\n        cin >> n >> s;\n        int runs = 1;\n        for (int i = 1; i < n; ++i) if (s[i] != s[i - 1]) ++runs;\n        int answer = n;\n        for (int i = 1; i + 1 < n; ++i) {\n            int current = runs;\n            if (s[i] != s[i - 1]) --current;\n            if (s[i] != s[i + 1]) --current;\n            if (s[i - 1] != s[i + 1]) ++current;\n            answer = min(answer, current);\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            String s = next();\n            int runs = 1;\n            for (int i = 1; i < n; i++) if (s.charAt(i) != s.charAt(i - 1)) runs++;\n            int answer = n;\n            for (int i = 1; i + 1 < n; i++) {\n                int current = runs;\n                if (s.charAt(i) != s.charAt(i - 1)) current--;\n                if (s.charAt(i) != s.charAt(i + 1)) current--;\n                if (s.charAt(i - 1) != s.charAt(i + 1)) current++;\n                answer = Math.min(answer, current);\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    t = int(data[0])\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = int(data[pos])\n        s = data[pos + 1].decode()\n        pos += 2\n        runs = 1 + sum(s[i] != s[i - 1] for i in range(1, n))\n        answer = n\n        for i in range(1, n - 1):\n            current = runs\n            current -= s[i] != s[i - 1]\n            current -= s[i] != s[i + 1]\n            current += s[i - 1] != s[i + 1]\n            answer = min(answer, current)\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 1800,
+      "index": "B",
+      "name": "Count the Number of Pairs",
+      "rating": 1000,
+      "idea": "For each letter, every existing lowercase-uppercase pair contributes one immediately. After pairing as many as possible, two leftover copies on the same case can be turned into one additional pair with one change, so surplus copies are useful in groups of two.",
+      "approach": [
+        "Each test case gives n, an operation budget k, and a mixed-case string; output the maximum number of non-overlapping matching-case pairs. Count lowercase and uppercase occurrences separately for each of the 26 letters.",
+        "For a letter with counts L and U, min(L,U) pairs already exist. The remaining abs(L-U) copies are all on one side, and changing one copy flips it to the other side.",
+        "Each extra pair therefore costs one operation and consumes two surplus copies. Add at most floor(abs(L-U)/2) extra pairs for each letter, limited by the remaining global budget."
+      ],
+      "complexity": {
+        "time": "O(n + 26)",
+        "space": "O(26)"
+      },
+      "pitfalls": [
+        "Pair only matching letters with opposite cases.",
+        "One operation creates at most one additional pair, and two surplus characters are required.",
+        "The operation budget is shared across all letters."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, k;\n        string s;\n        cin >> n >> k >> s;\n        int lower[26] = {}, upper[26] = {};\n        for (char ch : s) {\n            if (ch >= 'a' && ch <= 'z') ++lower[ch - 'a'];\n            else ++upper[ch - 'A'];\n        }\n        int answer = 0, remaining = k;\n        for (int i = 0; i < 26; ++i) {\n            answer += min(lower[i], upper[i]);\n            int used = min(abs(lower[i] - upper[i]) / 2, remaining);\n            answer += used;\n            remaining -= used;\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt(), k = nextInt();\n            String s = next();\n            int[] lower = new int[26], upper = new int[26];\n            for (int i = 0; i < n; i++) {\n                char ch = s.charAt(i);\n                if (ch >= 'a' && ch <= 'z') lower[ch - 'a']++;\n                else upper[ch - 'A']++;\n            }\n            int answer = 0, remaining = k;\n            for (int i = 0; i < 26; i++) {\n                answer += Math.min(lower[i], upper[i]);\n                int used = Math.min(Math.abs(lower[i] - upper[i]) / 2, remaining);\n                answer += used;\n                remaining -= used;\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    t = int(data[0])\n    pos = 1\n    out = []\n    for _ in range(t):\n        n, k = int(data[pos]), int(data[pos + 1])\n        s = data[pos + 2].decode()\n        pos += 3\n        lower, upper = [0] * 26, [0] * 26\n        for ch in s:\n            if 'a' <= ch <= 'z':\n                lower[ord(ch) - ord('a')] += 1\n            else:\n                upper[ord(ch) - ord('A')] += 1\n        answer, remaining = 0, k\n        for i in range(26):\n            answer += min(lower[i], upper[i])\n            used = min(abs(lower[i] - upper[i]) // 2, remaining)\n            answer += used\n            remaining -= used\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2192,
+      "index": "B",
+      "name": "Flipping Binary String",
+      "rating": 1000,
+      "idea": "If x indices are selected, every unselected bit flips x times and every selected bit flips x-1 times. Thus for even x we must select exactly the original 1 positions, while for odd x we must select exactly the original 0 positions; the parity of that selected set must agree with x.",
+      "approach": [
+        "Each test case gives a binary string, and the output is either -1 or a valid list of distinct indices to operate on. Let x be the number of chosen indices and consider each position's total number of flips.",
+        "When x is even, an original 1 must be selected and an original 0 must remain unselected, so selecting all 1 positions works exactly when the number of ones is even. When x is odd, selecting all zero positions works exactly when the number of zeros is odd.",
+        "Try the even case first, then the odd case. If neither parity condition holds, the transformation is impossible; otherwise print the selected indices, using an empty second line when no operations are needed."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Each index may be selected at most once.",
+        "Print the number of operations and then the indices on the next line, even when the list is empty.",
+        "If both the number of ones is odd and n is odd, neither parity construction works."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        string s;\n        cin >> n >> s;\n        int ones = count(s.begin(), s.end(), '1');\n        vector<int> operations;\n        if (ones % 2 == 0) {\n            for (int i = 0; i < n; ++i) if (s[i] == '1') operations.push_back(i + 1);\n        } else if ((n - ones) % 2 == 1) {\n            for (int i = 0; i < n; ++i) if (s[i] == '0') operations.push_back(i + 1);\n        } else {\n            cout << -1 << '\\n';\n            continue;\n        }\n        cout << operations.size() << '\\n';\n        for (int i = 0; i < (int)operations.size(); ++i) {\n            if (i) cout << ' ';\n            cout << operations[i];\n        }\n        cout << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            String s = next();\n            int ones = 0;\n            for (int i = 0; i < n; i++) if (s.charAt(i) == '1') ones++;\n            ArrayList<Integer> operations = new ArrayList<>();\n            if (ones % 2 == 0) {\n                for (int i = 0; i < n; i++) if (s.charAt(i) == '1') operations.add(i + 1);\n            } else if ((n - ones) % 2 == 1) {\n                for (int i = 0; i < n; i++) if (s.charAt(i) == '0') operations.add(i + 1);\n            } else {\n                out.append(-1).append('\\n');\n                continue;\n            }\n            out.append(operations.size()).append('\\n');\n            for (int i = 0; i < operations.size(); i++) {\n                if (i > 0) out.append(' ');\n                out.append(operations.get(i));\n            }\n            out.append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    t = int(data[0])\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = int(data[pos])\n        s = data[pos + 1].decode()\n        pos += 2\n        ones = s.count(\"1\")\n        if ones % 2 == 0:\n            operations = [str(i + 1) for i, ch in enumerate(s) if ch == \"1\"]\n        elif (n - ones) % 2 == 1:\n            operations = [str(i + 1) for i, ch in enumerate(s) if ch == \"0\"]\n        else:\n            out.append(\"-1\")\n            continue\n        out.append(str(len(operations)))\n        out.append(\" \".join(operations))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 41,
+      "index": "A",
+      "name": "Translation",
+      "rating": 800,
+      "idea": "The translated word must be the source word read from right to left, with every character preserved. Comparing the reversed source directly avoids any language-dependent word-order or case rules.",
+      "approach": [
+        "The input contains two non-empty lowercase words s and t; print YES if t is exactly s reversed, and NO otherwise. A reversal preserves length, so unequal lengths can be rejected immediately.",
+        "For each position i in t, compare t[i] with s[n-1-i]. These are the corresponding characters under reversal.",
+        "The words match only if every corresponding pair is equal. Stop at the first mismatch, or report YES after the full comparison."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The direction is reversed: compare t from left to s from right.",
+        "Do not reverse both strings or compare them in the same order.",
+        "The comparison is case-sensitive, though the input uses lowercase letters."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    string s, t;\n    cin >> s >> t;\n    bool same = s.size() == t.size();\n    if (same) {\n        for (int i = 0; i < (int)s.size(); ++i) {\n            if (t[i] != s[s.size() - 1 - i]) {\n                same = false;\n                break;\n            }\n        }\n    }\n    cout << (same ? \"YES\" : \"NO\") << '\\n';\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        String s = next(), t = next();\n        boolean same = s.length() == t.length();\n        if (same) {\n            for (int i = 0; i < s.length(); i++) {\n                if (t.charAt(i) != s.charAt(s.length() - 1 - i)) {\n                    same = false;\n                    break;\n                }\n            }\n        }\n        StringBuilder result = new StringBuilder();\n        result.append(same ? \"YES\" : \"NO\").append('\\n');\n        System.out.print(result);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    tokens = iter(sys.stdin.buffer.read().split())\n    s = next(tokens).decode()\n    t = next(tokens).decode()\n    print(\"YES\" if len(s) == len(t) and all(t[i] == s[-1 - i] for i in range(len(s))) else \"NO\")\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 59,
+      "index": "A",
+      "name": "Word",
+      "rating": 800,
+      "idea": "Changing a word's case costs one operation per changed letter. The better uniform case is therefore the one already used by more letters, with ties resolved in favor of lowercase.",
+      "approach": [
+        "The input is one mixed-case Latin word, and the output is that word converted entirely to one case. Count the uppercase letters; the lowercase count is the total length minus that value.",
+        "If uppercase letters are strictly more numerous, convert every character to uppercase. Otherwise convert all characters to lowercase, which implements the required tie rule.",
+        "A single pass can count the case and another can build or update the output. This minimizes the number of changed positions because the majority case requires fewer flips."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Use lowercase when the counts are equal.",
+        "The threshold is strictly more than half for uppercase.",
+        "Convert every letter after choosing the target case."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    string s;\n    cin >> s;\n    int upper = 0;\n    for (char ch : s) if (ch >= 'A' && ch <= 'Z') ++upper;\n    if (upper > (int)s.size() - upper) {\n        for (char &ch : s) ch = (char)toupper((unsigned char)ch);\n    } else {\n        for (char &ch : s) ch = (char)tolower((unsigned char)ch);\n    }\n    cout << s << '\\n';\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        String s = next();\n        int upper = 0;\n        for (int i = 0; i < s.length(); i++) {\n            if (Character.isUpperCase(s.charAt(i))) upper++;\n        }\n        boolean makeUpper = upper > s.length() - upper;\n        StringBuilder out = new StringBuilder();\n        for (int i = 0; i < s.length(); i++) {\n            char ch = s.charAt(i);\n            out.append(makeUpper ? Character.toUpperCase(ch) : Character.toLowerCase(ch));\n        }\n        out.append('\\n');\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    s = sys.stdin.buffer.readline().decode().strip()\n    upper = sum(\"A\" <= ch <= \"Z\" for ch in s)\n    print(s.upper() if upper > len(s) - upper else s.lower())\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 112,
+      "index": "A",
+      "name": "Petya and Strings",
+      "rating": 800,
+      "idea": "Case does not affect the comparison, so normalize corresponding letters before applying ordinary lexicographic order. Since the strings have equal length, the first unequal normalized character determines the answer.",
+      "approach": [
+        "The input contains two equal-length mixed-case strings. Print -1 when the first is lexicographically smaller, 1 when it is larger, and 0 when they are equal ignoring case.",
+        "Scan positions from left to right and convert each pair of letters to lowercase. At the first position where they differ, their alphabetical order gives the result.",
+        "If the scan reaches the end without finding a difference, the normalized strings are identical. This follows the standard lexicographic rule that earlier positions take priority."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Normalize case before comparing each character.",
+        "Return at the first difference; later characters cannot change lexicographic order.",
+        "The required outputs are -1, 0, and 1, not YES or NO."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    string a, b;\n    cin >> a >> b;\n    int answer = 0;\n    for (int i = 0; i < (int)a.size(); ++i) {\n        char x = (char)tolower((unsigned char)a[i]);\n        char y = (char)tolower((unsigned char)b[i]);\n        if (x < y) {\n            answer = -1;\n            break;\n        }\n        if (x > y) {\n            answer = 1;\n            break;\n        }\n    }\n    cout << answer << '\\n';\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        String a = next(), b = next();\n        int answer = 0;\n        for (int i = 0; i < a.length(); i++) {\n            char x = Character.toLowerCase(a.charAt(i));\n            char y = Character.toLowerCase(b.charAt(i));\n            if (x < y) {\n                answer = -1;\n                break;\n            }\n            if (x > y) {\n                answer = 1;\n                break;\n            }\n        }\n        StringBuilder result = new StringBuilder();\n        result.append(answer).append('\\n');\n        System.out.print(result);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    tokens = iter(sys.stdin.buffer.read().split())\n    a = next(tokens).decode().lower()\n    b = next(tokens).decode().lower()\n    print(-1 if a < b else (1 if a > b else 0))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 96,
+      "index": "A",
+      "name": "Football",
+      "rating": 900,
+      "idea": "A dangerous situation exists exactly when some maximal run of one team has length at least seven. The order of other players is irrelevant once each consecutive run is counted.",
+      "approach": [
+        "The input is a non-empty binary string representing the teams, and the output is YES if seven equal characters occur consecutively. Otherwise output NO.",
+        "Scan the string while tracking the current run length of the same character. Reset the length to one when the character changes and increment it when the character repeats.",
+        "As soon as the run reaches seven, the condition is satisfied. If the scan finishes first, no team has a dangerous consecutive group."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "The threshold is seven, not six.",
+        "A total of seven ones or zeroes is insufficient unless they are consecutive.",
+        "The input is one string with no test-case count."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    string s;\n    cin >> s;\n    int run = 0;\n    char previous = 0;\n    bool dangerous = false;\n    for (char ch : s) {\n        if (ch == previous) ++run;\n        else {\n            previous = ch;\n            run = 1;\n        }\n        if (run >= 7) dangerous = true;\n    }\n    cout << (dangerous ? \"YES\" : \"NO\") << '\\n';\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        String s = next();\n        int run = 0;\n        char previous = 0;\n        boolean dangerous = false;\n        for (int i = 0; i < s.length(); i++) {\n            char ch = s.charAt(i);\n            if (ch == previous) run++;\n            else {\n                previous = ch;\n                run = 1;\n            }\n            if (run >= 7) dangerous = true;\n        }\n        StringBuilder result = new StringBuilder();\n        result.append(dangerous ? \"YES\" : \"NO\").append('\\n');\n        System.out.print(result);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    s = sys.stdin.buffer.readline().decode().strip()\n    run = 0\n    previous = None\n    dangerous = False\n    for ch in s:\n        if ch == previous:\n            run += 1\n        else:\n            previous = ch\n            run = 1\n        if run >= 7:\n            dangerous = True\n    print(\"YES\" if dangerous else \"NO\")\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2267,
+      "index": "A",
+      "name": "Turn Into a Palindrome",
+      "rating": 800,
+      "idea": "Only mirrored positions need to agree. For a mismatched pair, changing one side can fix it only when the other side already equals the allowed replacement character c; otherwise both sides must be replaced by c.",
+      "approach": [
+        "Each test case gives n, a target character c, and a lowercase string; output the minimum number of replacements needed for a palindrome. Compare positions i and n-1-i for the first half of the string.",
+        "Equal mirrored characters need no changes. For a mismatched pair containing c, replace the other character once; when neither character is c, both must be replaced, costing two operations.",
+        "Sum these costs across disjoint mirrored pairs. The middle character of an odd-length string has no partner and never needs to change."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Do not charge for an already equal pair, even if neither character is c.",
+        "A mismatched pair with neither side equal to c costs two replacements.",
+        "The center position of an odd-length string cannot cause a mismatch."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        char c;\n        string s;\n        cin >> n >> c >> s;\n        int answer = 0;\n        for (int i = 0; i < n / 2; ++i) {\n            int j = n - 1 - i;\n            if (s[i] != s[j]) answer += (s[i] == c || s[j] == c) ? 1 : 2;\n        }\n        cout << answer << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            char c = next().charAt(0);\n            String s = next();\n            int answer = 0;\n            for (int i = 0; i < n / 2; i++) {\n                int j = n - 1 - i;\n                if (s.charAt(i) != s.charAt(j)) {\n                    answer += (s.charAt(i) == c || s.charAt(j) == c) ? 1 : 2;\n                }\n            }\n            out.append(answer).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    t = int(data[0])\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = int(data[pos])\n        c = data[pos + 1].decode()\n        s = data[pos + 2].decode()\n        pos += 3\n        answer = 0\n        for i in range(n // 2):\n            j = n - 1 - i\n            if s[i] != s[j]:\n                answer += 1 if s[i] == c or s[j] == c else 2\n        out.append(str(answer))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2257,
+      "index": "A",
+      "name": "Creating Abbreviations",
+      "rating": 800,
+      "idea": "An abbreviation is buildable once every letter in it is the first letter of some currently available word. Creating an abbreviation adds its own first letter to the available set, so the problem is a monotone dependency closure that can be processed in any valid order.",
+      "approach": [
+        "Each test case gives n ordinary words and m proposed uppercase abbreviations. Output YES if some ordering lets every abbreviation be formed from first letters of words already available, and NO otherwise.",
+        "Mark the uppercase versions of the initial words' first letters as available. An abbreviation is currently buildable precisely when every character it contains is marked.",
+        "Repeatedly scan unprocessed abbreviations and accept any buildable one; accepting it adds its first character to the available set. Continue until a full scan makes no progress, then compare the number accepted with m."
+      ],
+      "complexity": {
+        "time": "O(m * total abbreviation length)",
+        "space": "O(total abbreviation length + m)"
+      },
+      "pitfalls": [
+        "Abbreviations may be given in an order different from the order they can be created.",
+        "Creating one abbreviation unlocks only its first letter.",
+        "Every character in an abbreviation must already be available; checking only its first character is insufficient."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, m;\n        cin >> n >> m;\n        bool available[26] = {};\n        for (int i = 0; i < n; ++i) {\n            string word;\n            cin >> word;\n            available[toupper((unsigned char)word[0]) - 'A'] = true;\n        }\n        vector<string> abbreviations(m);\n        for (string &abbr : abbreviations) cin >> abbr;\n        vector<bool> done(m, false);\n        int completed = 0;\n        bool progress = true;\n        while (progress) {\n            progress = false;\n            for (int i = 0; i < m; ++i) {\n                if (done[i]) continue;\n                bool canBuild = true;\n                for (char ch : abbreviations[i]) {\n                    if (!available[ch - 'A']) {\n                        canBuild = false;\n                        break;\n                    }\n                }\n                if (canBuild) {\n                    done[i] = true;\n                    ++completed;\n                    available[abbreviations[i][0] - 'A'] = true;\n                    progress = true;\n                }\n            }\n        }\n        cout << (completed == m ? \"YES\" : \"NO\") << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt(), m = nextInt();\n            boolean[] available = new boolean[26];\n            for (int i = 0; i < n; i++) {\n                String word = next();\n                available[Character.toUpperCase(word.charAt(0)) - 'A'] = true;\n            }\n            String[] abbreviations = new String[m];\n            for (int i = 0; i < m; i++) abbreviations[i] = next();\n            boolean[] done = new boolean[m];\n            int completed = 0;\n            boolean progress = true;\n            while (progress) {\n                progress = false;\n                for (int i = 0; i < m; i++) {\n                    if (done[i]) continue;\n                    boolean canBuild = true;\n                    for (int j = 0; j < abbreviations[i].length(); j++) {\n                        if (!available[abbreviations[i].charAt(j) - 'A']) {\n                            canBuild = false;\n                            break;\n                        }\n                    }\n                    if (canBuild) {\n                        done[i] = true;\n                        completed++;\n                        available[abbreviations[i].charAt(0) - 'A'] = true;\n                        progress = true;\n                    }\n                }\n            }\n            out.append(completed == m ? \"YES\" : \"NO\").append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    t = int(data[0])\n    pos = 1\n    out = []\n    for _ in range(t):\n        n, m = int(data[pos]), int(data[pos + 1])\n        pos += 2\n        available = set()\n        for _ in range(n):\n            available.add(data[pos].decode()[0].upper())\n            pos += 1\n        abbreviations = [data[pos + i].decode() for i in range(m)]\n        pos += m\n        done = [False] * m\n        completed = 0\n        progress = True\n        while progress:\n            progress = False\n            for i, abbr in enumerate(abbreviations):\n                if not done[i] and all(ch in available for ch in abbr):\n                    done[i] = True\n                    completed += 1\n                    available.add(abbr[0])\n                    progress = True\n        out.append(\"YES\" if completed == m else \"NO\")\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2244,
+      "index": "A",
+      "name": "Iskander and Drawings",
+      "rating": 800,
+      "idea": "Each second removes one centimeter from both ends of a continuous line, so a line of length L takes ceil(L/2) seconds to disappear. The longest line therefore determines the maximum time.",
+      "approach": [
+        "Each test case gives the page as a string of # and * characters. A maximal run of # represents one line, and the output is the greatest number of seconds needed to erase any line.",
+        "Scan the string and track the current consecutive # run and the longest run seen. For a run of length L, the simultaneous erasing process takes floor((L+1)/2), which is ceil(L/2).",
+        "Take the maximum over all runs. If the string has no # character, the maximum remains zero as required."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "A line of length one or two still takes one second.",
+        "Count maximal consecutive # runs, not the total number of # characters.",
+        "Return zero when no line exists."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        string s;\n        cin >> n >> s;\n        int current = 0, longest = 0;\n        for (char ch : s) {\n            if (ch == '#') {\n                ++current;\n                longest = max(longest, current);\n            } else current = 0;\n        }\n        cout << (longest + 1) / 2 << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            String s = next();\n            int current = 0, longest = 0;\n            for (int i = 0; i < n; i++) {\n                if (s.charAt(i) == '#') {\n                    current++;\n                    longest = Math.max(longest, current);\n                } else current = 0;\n            }\n            out.append((longest + 1) / 2).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    t = int(data[0])\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = int(data[pos])\n        s = data[pos + 1].decode()\n        pos += 2\n        current = longest = 0\n        for ch in s:\n            if ch == \"#\":\n                current += 1\n                longest = max(longest, current)\n            else:\n                current = 0\n        out.append(str((longest + 1) // 2))\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2236,
+      "index": "B",
+      "name": "Tatar TV Show",
+      "rating": 800,
+      "idea": "An operation toggles two bits in the same residue class modulo k, so the XOR of each such group is invariant. These groups form disjoint paths, and even parity is also sufficient because a path can be cleared from one end toward the other.",
+      "approach": [
+        "Each test case provides n, k, and a binary string; output YES if the string can be changed to all zeroes using flips at positions i and i+k. The graph of allowed pairs splits into paths by index residue modulo k.",
+        "Every move flips two vertices in one path, preserving that path's number of ones modulo two. Therefore each residue class must contain an even number of ones.",
+        "The condition is sufficient as well: process each path from its first position, flipping the edge to the next position whenever the current bit is one. This clears positions successively, and even total parity guarantees the final vertex is zero."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(1)"
+      },
+      "pitfalls": [
+        "Check each residue class separately; total parity of the whole string is not enough.",
+        "When k equals n, every position is an isolated component and must already be zero.",
+        "The operation pairs positions i and i+k, not adjacent positions."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n, k;\n        string s;\n        cin >> n >> k >> s;\n        bool possible = true;\n        for (int r = 0; r < k; ++r) {\n            int parity = 0;\n            for (int i = r; i < n; i += k) parity ^= s[i] - '0';\n            if (parity != 0) possible = false;\n        }\n        cout << (possible ? \"YES\" : \"NO\") << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt(), k = nextInt();\n            String s = next();\n            boolean possible = true;\n            for (int r = 0; r < k; r++) {\n                int parity = 0;\n                for (int i = r; i < n; i += k) parity ^= s.charAt(i) - '0';\n                if (parity != 0) possible = false;\n            }\n            out.append(possible ? \"YES\" : \"NO\").append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    t = int(data[0])\n    pos = 1\n    out = []\n    for _ in range(t):\n        n, k = int(data[pos]), int(data[pos + 1])\n        s = data[pos + 2].decode()\n        pos += 3\n        possible = True\n        for r in range(k):\n            parity = 0\n            for i in range(r, n, k):\n                parity ^= int(s[i])\n            if parity:\n                possible = False\n        out.append(\"YES\" if possible else \"NO\")\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    },
+    {
+      "contestId": 2207,
+      "index": "A",
+      "name": "1-1",
+      "rating": 800,
+      "idea": "Only an internal bit whose neighbors are both 1 can change. For the maximum, fill every isolated zero between ones; for the minimum, these same fills can merge runs, after which a run of length L can be reduced to floor((L+2)/2) ones by zeroing alternate interior positions.",
+      "approach": [
+        "Each test case gives n and a binary string. Every move may set an internal position to either value when both adjacent positions are 1, and the output asks for the minimum and maximum reachable counts of ones.",
+        "A zero can be turned on exactly when it is an isolated zero between two ones. Turning on every such zero gives the maximum; no zero run of length two or more can start changing, because none of its positions initially has two one-neighbors.",
+        "For the minimum, fill those isolated zeros first to merge neighboring one-runs; joining across one fillable zero cannot increase the minimum retained count. In a resulting one-run of length L, deletions must be non-adjacent interior positions, so at most ceil((L-2)/2) ones can be removed and the run contributes floor((L+2)/2). Sum that value over all runs."
+      ],
+      "complexity": {
+        "time": "O(n)",
+        "space": "O(n)"
+      },
+      "pitfalls": [
+        "Only internal positions can be changed.",
+        "A zero-run of length at least two is a barrier and cannot be filled from its ends.",
+        "For the minimum, count one-runs after filling the initially isolated zeros."
+      ],
+      "code": {
+        "cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin >> t;\n    while (t--) {\n        int n;\n        string s;\n        cin >> n >> s;\n        int ones = count(s.begin(), s.end(), '1');\n        string filled = s;\n        int added = 0;\n        for (int i = 1; i + 1 < n; ++i) {\n            if (s[i] == '0' && s[i - 1] == '1' && s[i + 1] == '1') {\n                filled[i] = '1';\n                ++added;\n            }\n        }\n        int maximum = ones + added;\n        int minimum = 0;\n        for (int i = 0; i < n;) {\n            if (filled[i] == '0') {\n                ++i;\n                continue;\n            }\n            int j = i;\n            while (j < n && filled[j] == '1') ++j;\n            minimum += (j - i + 2) / 2;\n            i = j;\n        }\n        cout << minimum << ' ' << maximum << '\\n';\n    }\n    return 0;\n}",
+        "java": "import java.io.*;\nimport java.util.*;\n\npublic class Main {\n    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n    static StringTokenizer st;\n\n    static String next() throws Exception {\n        while (st == null || !st.hasMoreTokens()) st = new StringTokenizer(br.readLine());\n        return st.nextToken();\n    }\n\n    static int nextInt() throws Exception {\n        return Integer.parseInt(next());\n    }\n\n    public static void main(String[] args) throws Exception {\n        int t = nextInt();\n        StringBuilder out = new StringBuilder();\n        while (t-- > 0) {\n            int n = nextInt();\n            String s = next();\n            int ones = 0;\n            for (int i = 0; i < n; i++) if (s.charAt(i) == '1') ones++;\n            char[] filled = s.toCharArray();\n            int added = 0;\n            for (int i = 1; i + 1 < n; i++) {\n                if (s.charAt(i) == '0' && s.charAt(i - 1) == '1' && s.charAt(i + 1) == '1') {\n                    filled[i] = '1';\n                    added++;\n                }\n            }\n            int maximum = ones + added;\n            int minimum = 0;\n            for (int i = 0; i < n;) {\n                if (filled[i] == '0') {\n                    i++;\n                    continue;\n                }\n                int j = i;\n                while (j < n && filled[j] == '1') j++;\n                minimum += (j - i + 2) / 2;\n                i = j;\n            }\n            out.append(minimum).append(' ').append(maximum).append('\\n');\n        }\n        System.out.print(out);\n    }\n}",
+        "python": "import sys\n\ndef main():\n    data = sys.stdin.buffer.read().split()\n    t = int(data[0])\n    pos = 1\n    out = []\n    for _ in range(t):\n        n = int(data[pos])\n        s = data[pos + 1].decode()\n        pos += 2\n        ones = s.count(\"1\")\n        chars = list(s)\n        added = 0\n        for i in range(1, n - 1):\n            if s[i] == \"0\" and s[i - 1] == \"1\" and s[i + 1] == \"1\":\n                chars[i] = \"1\"\n                added += 1\n        maximum = ones + added\n        minimum = 0\n        i = 0\n        while i < n:\n            if chars[i] == \"0\":\n                i += 1\n                continue\n            j = i\n            while j < n and chars[j] == \"1\":\n                j += 1\n            minimum += (j - i + 2) // 2\n            i = j\n        out.append(f\"{minimum} {maximum}\")\n    sys.stdout.write(\"\\n\".join(out))\n\nif __name__ == \"__main__\":\n    main()\n"
+      },
+      "reviewNote": null
+    }
+  ]
+}

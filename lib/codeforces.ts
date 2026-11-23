@@ -10,6 +10,8 @@ export interface CodeforcesSubmission {
 export interface CodeforcesUserProfile {
   rating: number | null;
   rank: string | null;
+  avatar: string | null;
+  lastOnlineAt: string | null;
 }
 
 interface CodeforcesResponse {
@@ -21,7 +23,7 @@ interface CodeforcesResponse {
 interface CodeforcesUserInfoResponse {
   status: string;
   comment?: string;
-  result?: Array<{ rank?: string; rating?: number }>;
+  result?: Array<{ handle?: string; rank?: string; rating?: number; avatar?: string; lastOnlineTimeSeconds?: number }>;
 }
 
 const CODEFORCES_API_INTERVAL_MS = 2_000;
@@ -109,10 +111,47 @@ export async function getUserInfo(handle: string): Promise<CodeforcesUserProfile
     const profile = {
       rating: typeof user.rating === "number" && Number.isInteger(user.rating) ? user.rating : null,
       rank: typeof user.rank === "string" ? user.rank : null,
+      avatar: typeof user.avatar === "string" && user.avatar.startsWith("https://") ? user.avatar : null,
+      lastOnlineAt: typeof user.lastOnlineTimeSeconds === "number" ? new Date(user.lastOnlineTimeSeconds * 1000).toISOString() : null,
     };
     userProfileCache.set(cacheKey, { profile, expiresAt: Date.now() + USER_PROFILE_CACHE_MS });
     return profile;
   });
+}
+
+// Looks up several handles in one Codeforces request. Profiles already cached
+// are reused, so only the missing handles are requested.
+export async function getUsersInfo(handles: string[]): Promise<Map<string, CodeforcesUserProfile>> {
+  const found = new Map<string, CodeforcesUserProfile>();
+  const missing: string[] = [];
+  for (const handle of handles) {
+    const cached = userProfileCache.get(handle.toLowerCase());
+    if (cached && cached.expiresAt > Date.now()) found.set(handle.toLowerCase(), cached.profile);
+    else missing.push(handle);
+  }
+  if (missing.length === 0) return found;
+
+  const url = new URL("https://codeforces.com/api/user.info");
+  url.searchParams.set("handles", missing.join(";"));
+  url.searchParams.set("lang", "en");
+  const payload = await fetchCodeforcesJson<CodeforcesUserInfoResponse>(url, 10_000);
+  if (payload.status !== "OK" || !Array.isArray(payload.result)) {
+    throw new Error(payload.comment || "Codeforces could not return these profiles.");
+  }
+
+  for (const user of payload.result) {
+    if (typeof user.handle !== "string") continue;
+    const profile: CodeforcesUserProfile = {
+      rating: typeof user.rating === "number" && Number.isInteger(user.rating) ? user.rating : null,
+      rank: typeof user.rank === "string" ? user.rank : null,
+      avatar: typeof user.avatar === "string" && user.avatar.startsWith("https://") ? user.avatar : null,
+      lastOnlineAt: typeof user.lastOnlineTimeSeconds === "number" ? new Date(user.lastOnlineTimeSeconds * 1000).toISOString() : null,
+    };
+    const key = user.handle.toLowerCase();
+    userProfileCache.set(key, { profile, expiresAt: Date.now() + USER_PROFILE_CACHE_MS });
+    found.set(key, profile);
+  }
+  return found;
 }
 
 export function statusFromVerdict(verdict: string | undefined): CodeforcesVerdict | null {

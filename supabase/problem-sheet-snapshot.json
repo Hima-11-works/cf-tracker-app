@@ -1,0 +1,1202 @@
+[
+  {
+    "contest_id": 2102,
+    "problem_index": "A",
+    "name": "Dinner Time",
+    "rating": 900,
+    "section": "Warm Up - Adhocs",
+    "order_index": 0
+  },
+  {
+    "contest_id": 2094,
+    "problem_index": "C",
+    "name": "Brr Brrr Patapim",
+    "rating": 900,
+    "section": "Warm Up - Adhocs",
+    "order_index": 1
+  },
+  {
+    "contest_id": 2093,
+    "problem_index": "B",
+    "name": "Expensive Number",
+    "rating": 900,
+    "section": "Warm Up - Adhocs",
+    "order_index": 2
+  },
+  {
+    "contest_id": 2085,
+    "problem_index": "A",
+    "name": "Serval and String Theory",
+    "rating": 900,
+    "section": "Warm Up - Adhocs",
+    "order_index": 3
+  },
+  {
+    "contest_id": 2072,
+    "problem_index": "B",
+    "name": "Having Been a Treasurer in the Past, I Help Goblins Deceive",
+    "rating": 900,
+    "section": "Warm Up - Adhocs",
+    "order_index": 4
+  },
+  {
+    "contest_id": 2060,
+    "problem_index": "C",
+    "name": "Game of Mathletes",
+    "rating": 900,
+    "section": "Warm Up - Adhocs",
+    "order_index": 5
+  },
+  {
+    "contest_id": 2048,
+    "problem_index": "B",
+    "name": "Kevin and Permutation",
+    "rating": 900,
+    "section": "Warm Up - Adhocs",
+    "order_index": 6
+  },
+  {
+    "contest_id": 2164,
+    "problem_index": "B",
+    "name": "Even Modulo Pair",
+    "rating": 1000,
+    "section": "Warm Up - Adhocs",
+    "order_index": 7
+  },
+  {
+    "contest_id": 2162,
+    "problem_index": "B",
+    "name": "Beautiful String",
+    "rating": 1000,
+    "section": "Warm Up - Adhocs",
+    "order_index": 8
+  },
+  {
+    "contest_id": 2154,
+    "problem_index": "B",
+    "name": "Make it Zigzag",
+    "rating": 1000,
+    "section": "Warm Up - Adhocs",
+    "order_index": 9
+  },
+  {
+    "contest_id": 2148,
+    "problem_index": "D",
+    "name": "Destruction of the Dandelion Fields",
+    "rating": 1000,
+    "section": "Warm Up - Adhocs",
+    "order_index": 10
+  },
+  {
+    "contest_id": 2147,
+    "problem_index": "B",
+    "name": "Multiple Construction",
+    "rating": 1000,
+    "section": "Warm Up - Adhocs",
+    "order_index": 11
+  },
+  {
+    "contest_id": 2143,
+    "problem_index": "B",
+    "name": "Discounts",
+    "rating": 1000,
+    "section": "Warm Up - Adhocs",
+    "order_index": 12
+  },
+  {
+    "contest_id": 363,
+    "problem_index": "B",
+    "name": "Fence",
+    "rating": 1100,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 14
+  },
+  {
+    "contest_id": 1903,
+    "problem_index": "A",
+    "name": "Halloumi Boxes",
+    "rating": 800,
+    "section": "Sorting",
+    "order_index": 15
+  },
+  {
+    "contest_id": 160,
+    "problem_index": "A",
+    "name": "Twins",
+    "rating": 900,
+    "section": "Sorting",
+    "order_index": 16
+  },
+  {
+    "contest_id": 1833,
+    "problem_index": "B",
+    "name": "Restore the Weather",
+    "rating": 900,
+    "section": "Sorting",
+    "order_index": 17
+  },
+  {
+    "contest_id": 1823,
+    "problem_index": "B",
+    "name": "Sort with Step",
+    "rating": 900,
+    "section": "Sorting",
+    "order_index": 18
+  },
+  {
+    "contest_id": 1955,
+    "problem_index": "B",
+    "name": "Progressive Square",
+    "rating": 1000,
+    "section": "Sorting",
+    "order_index": 19
+  },
+  {
+    "contest_id": 1834,
+    "problem_index": "A",
+    "name": "Unit Array",
+    "rating": 800,
+    "section": "Greedy",
+    "order_index": 20
+  },
+  {
+    "contest_id": 1806,
+    "problem_index": "A",
+    "name": "Walking Master",
+    "rating": 800,
+    "section": "Greedy",
+    "order_index": 21
+  },
+  {
+    "contest_id": 1875,
+    "problem_index": "A",
+    "name": "Jellyfish and Undertale",
+    "rating": 900,
+    "section": "Greedy",
+    "order_index": 22
+  },
+  {
+    "contest_id": 2033,
+    "problem_index": "B",
+    "name": "Sakurako and Water",
+    "rating": 900,
+    "section": "Greedy",
+    "order_index": 23
+  },
+  {
+    "contest_id": 1951,
+    "problem_index": "A",
+    "name": "Dual Trigger",
+    "rating": 900,
+    "section": "Greedy",
+    "order_index": 24
+  },
+  {
+    "contest_id": 2266,
+    "problem_index": "C",
+    "name": "AND, OR, Sort!",
+    "rating": 1000,
+    "section": "Greedy",
+    "order_index": 25
+  },
+  {
+    "contest_id": 2194,
+    "problem_index": "B",
+    "name": "Offshores",
+    "rating": 1000,
+    "section": "Greedy",
+    "order_index": 26
+  },
+  {
+    "contest_id": 2264,
+    "problem_index": "B",
+    "name": "Knife's Pill Farm",
+    "rating": 1000,
+    "section": "Greedy",
+    "order_index": 27
+  },
+  {
+    "contest_id": 2195,
+    "problem_index": "C",
+    "name": "Dice Roll Sequence",
+    "rating": 1100,
+    "section": "Greedy",
+    "order_index": 28
+  },
+  {
+    "contest_id": 2193,
+    "problem_index": "C",
+    "name": "Replace and Sum",
+    "rating": 1000,
+    "section": "Greedy",
+    "order_index": 29
+  },
+  {
+    "contest_id": 2190,
+    "problem_index": "A",
+    "name": "Sorting Game",
+    "rating": 1200,
+    "section": "Greedy",
+    "order_index": 30
+  },
+  {
+    "contest_id": 2189,
+    "problem_index": "B",
+    "name": "The Curse of the Frog",
+    "rating": 1200,
+    "section": "Greedy",
+    "order_index": 31
+  },
+  {
+    "contest_id": 2187,
+    "problem_index": "A",
+    "name": "Restricted Sorting",
+    "rating": 1300,
+    "section": "Greedy",
+    "order_index": 32
+  },
+  {
+    "contest_id": 2183,
+    "problem_index": "B",
+    "name": "Yet Another MEX Problem",
+    "rating": 1100,
+    "section": "Greedy",
+    "order_index": 33
+  },
+  {
+    "contest_id": 1791,
+    "problem_index": "C",
+    "name": "Prepend and Append",
+    "rating": 800,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 34
+  },
+  {
+    "contest_id": 2136,
+    "problem_index": "B",
+    "name": "Like the Bitset",
+    "rating": 900,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 35
+  },
+  {
+    "contest_id": 1840,
+    "problem_index": "C",
+    "name": "Ski Resort",
+    "rating": 1000,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 36
+  },
+  {
+    "contest_id": 1777,
+    "problem_index": "C",
+    "name": "Quiz Master",
+    "rating": 1700,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 37
+  },
+  {
+    "contest_id": 2034,
+    "problem_index": "B",
+    "name": "Rakhsh's Revival",
+    "rating": 1000,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 38
+  },
+  {
+    "contest_id": 2148,
+    "problem_index": "E",
+    "name": "Split",
+    "rating": 1200,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 39
+  },
+  {
+    "contest_id": 1559,
+    "problem_index": "A",
+    "name": "Mocha and Math",
+    "rating": 900,
+    "section": "Bit Manipulation",
+    "order_index": 40
+  },
+  {
+    "contest_id": 1805,
+    "problem_index": "A",
+    "name": "We Need the Zero",
+    "rating": 800,
+    "section": "Bit Manipulation",
+    "order_index": 41
+  },
+  {
+    "contest_id": 1699,
+    "problem_index": "B",
+    "name": "Almost Ternary Matrix",
+    "rating": 900,
+    "section": "Bit Manipulation",
+    "order_index": 42
+  },
+  {
+    "contest_id": 484,
+    "problem_index": "A",
+    "name": "Bits",
+    "rating": 1700,
+    "section": "Bit Manipulation",
+    "order_index": 43
+  },
+  {
+    "contest_id": 1421,
+    "problem_index": "A",
+    "name": "XORwice",
+    "rating": 800,
+    "section": "Bit Manipulation",
+    "order_index": 44
+  },
+  {
+    "contest_id": 1527,
+    "problem_index": "A",
+    "name": "And Then There Were K",
+    "rating": 800,
+    "section": "Bit Manipulation",
+    "order_index": 45
+  },
+  {
+    "contest_id": 1514,
+    "problem_index": "B",
+    "name": "AND 0, Sum Big",
+    "rating": 1200,
+    "section": "Bit Manipulation",
+    "order_index": 46
+  },
+  {
+    "contest_id": 1682,
+    "problem_index": "B",
+    "name": "AND Sorting",
+    "rating": 1100,
+    "section": "Bit Manipulation",
+    "order_index": 47
+  },
+  {
+    "contest_id": 1973,
+    "problem_index": "B",
+    "name": "Cat, Fox and the Lonely Array",
+    "rating": 1300,
+    "section": "Bit Manipulation",
+    "order_index": 48
+  },
+  {
+    "contest_id": 2121,
+    "problem_index": "B",
+    "name": "Above the Clouds",
+    "rating": 800,
+    "section": "Strings",
+    "order_index": 49
+  },
+  {
+    "contest_id": 520,
+    "problem_index": "A",
+    "name": "Pangram",
+    "rating": 800,
+    "section": "Strings",
+    "order_index": 50
+  },
+  {
+    "contest_id": 208,
+    "problem_index": "A",
+    "name": "Dubstep",
+    "rating": 900,
+    "section": "Strings",
+    "order_index": 51
+  },
+  {
+    "contest_id": 2254,
+    "problem_index": "B",
+    "name": "Evanescent",
+    "rating": 900,
+    "section": "Strings",
+    "order_index": 52
+  },
+  {
+    "contest_id": 1800,
+    "problem_index": "B",
+    "name": "Count the Number of Pairs",
+    "rating": 1000,
+    "section": "Strings",
+    "order_index": 53
+  },
+  {
+    "contest_id": 2192,
+    "problem_index": "B",
+    "name": "Flipping Binary String",
+    "rating": 1000,
+    "section": "Strings",
+    "order_index": 54
+  },
+  {
+    "contest_id": 1877,
+    "problem_index": "A",
+    "name": "Goals of Victory",
+    "rating": 800,
+    "section": "Math",
+    "order_index": 55
+  },
+  {
+    "contest_id": 2208,
+    "problem_index": "A",
+    "name": "Bingo Candies",
+    "rating": 800,
+    "section": "Math",
+    "order_index": 56
+  },
+  {
+    "contest_id": 1873,
+    "problem_index": "C",
+    "name": "Target Practice",
+    "rating": 800,
+    "section": "Math",
+    "order_index": 57
+  },
+  {
+    "contest_id": 1475,
+    "problem_index": "A",
+    "name": "Odd Divisor",
+    "rating": 900,
+    "section": "Math",
+    "order_index": 58
+  },
+  {
+    "contest_id": 1878,
+    "problem_index": "C",
+    "name": "Vasilije in Cacak",
+    "rating": 900,
+    "section": "Math",
+    "order_index": 59
+  },
+  {
+    "contest_id": 1883,
+    "problem_index": "C",
+    "name": "Raspberries",
+    "rating": 1000,
+    "section": "Math",
+    "order_index": 60
+  },
+  {
+    "contest_id": 1859,
+    "problem_index": "B",
+    "name": "Olya and Game with Arrays",
+    "rating": 1000,
+    "section": "Math",
+    "order_index": 61
+  },
+  {
+    "contest_id": 2197,
+    "problem_index": "A",
+    "name": "Friendly Numbers",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 62
+  },
+  {
+    "contest_id": 2114,
+    "problem_index": "A",
+    "name": "Square Year",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 63
+  },
+  {
+    "contest_id": 2051,
+    "problem_index": "B",
+    "name": "Journey",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 64
+  },
+  {
+    "contest_id": 2008,
+    "problem_index": "C",
+    "name": "Longest Good Array",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 65
+  },
+  {
+    "contest_id": 1996,
+    "problem_index": "A",
+    "name": "Legs",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 66
+  },
+  {
+    "contest_id": 1956,
+    "problem_index": "A",
+    "name": "Nene's Game",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 67
+  },
+  {
+    "contest_id": 2218,
+    "problem_index": "D",
+    "name": "The 67th OEIS Problem",
+    "rating": 1100,
+    "section": "Constructive Algorithm",
+    "order_index": 68
+  },
+  {
+    "contest_id": 2040,
+    "problem_index": "B",
+    "name": "Paint a Strip",
+    "rating": 1000,
+    "section": "Constructive Algorithm",
+    "order_index": 69
+  },
+  {
+    "contest_id": 2055,
+    "problem_index": "B",
+    "name": "Crafting",
+    "rating": 1000,
+    "section": "Constructive Algorithm",
+    "order_index": 70
+  },
+  {
+    "contest_id": 2051,
+    "problem_index": "C",
+    "name": "Preparing for the Exam",
+    "rating": 1000,
+    "section": "Constructive Algorithm",
+    "order_index": 71
+  },
+  {
+    "contest_id": 2211,
+    "problem_index": "B",
+    "name": "Mickey Mouse Constructive",
+    "rating": 1100,
+    "section": "Constructive Algorithm",
+    "order_index": 72
+  },
+  {
+    "contest_id": 2059,
+    "problem_index": "B",
+    "name": "Cost of the Array",
+    "rating": 1300,
+    "section": "Constructive Algorithm",
+    "order_index": 73
+  },
+  {
+    "contest_id": 2273,
+    "problem_index": "A",
+    "name": "Lavencia Oranges",
+    "rating": 1300,
+    "section": "Constructive Algorithm",
+    "order_index": 74
+  },
+  {
+    "contest_id": 1807,
+    "problem_index": "D",
+    "name": "Odd Queries",
+    "rating": 900,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 75
+  },
+  {
+    "contest_id": 1690,
+    "problem_index": "C",
+    "name": "Restoring the Duration of Tasks",
+    "rating": 800,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 76
+  },
+  {
+    "contest_id": 1985,
+    "problem_index": "C",
+    "name": "Good Prefixes",
+    "rating": 1000,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 77
+  },
+  {
+    "contest_id": 1791,
+    "problem_index": "D",
+    "name": "Distinct Split",
+    "rating": 1000,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 78
+  },
+  {
+    "contest_id": 1899,
+    "problem_index": "B",
+    "name": "250 Thousand Tons of TNT",
+    "rating": 1100,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 79
+  },
+  {
+    "contest_id": 1742,
+    "problem_index": "E",
+    "name": "Scuza",
+    "rating": 1200,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 80
+  },
+  {
+    "contest_id": 169,
+    "problem_index": "A",
+    "name": "Chores",
+    "rating": 800,
+    "section": "Sorting",
+    "order_index": 81
+  },
+  {
+    "contest_id": 339,
+    "problem_index": "A",
+    "name": "Helpful Maths",
+    "rating": 800,
+    "section": "Sorting",
+    "order_index": 82
+  },
+  {
+    "contest_id": 405,
+    "problem_index": "A",
+    "name": "Gravity Flip",
+    "rating": 900,
+    "section": "Sorting",
+    "order_index": 83
+  },
+  {
+    "contest_id": 572,
+    "problem_index": "A",
+    "name": "Arrays",
+    "rating": 900,
+    "section": "Sorting",
+    "order_index": 84
+  },
+  {
+    "contest_id": 1462,
+    "problem_index": "A",
+    "name": "Favorite Sequence",
+    "rating": 800,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 85
+  },
+  {
+    "contest_id": 1843,
+    "problem_index": "A",
+    "name": "Sasha and Array Coloring",
+    "rating": 800,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 86
+  },
+  {
+    "contest_id": 1968,
+    "problem_index": "B",
+    "name": "Prefiquence",
+    "rating": 800,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 87
+  },
+  {
+    "contest_id": 1896,
+    "problem_index": "B",
+    "name": "AB Flipping",
+    "rating": 900,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 88
+  },
+  {
+    "contest_id": 41,
+    "problem_index": "A",
+    "name": "Translation",
+    "rating": 800,
+    "section": "Strings",
+    "order_index": 89
+  },
+  {
+    "contest_id": 59,
+    "problem_index": "A",
+    "name": "Word",
+    "rating": 800,
+    "section": "Strings",
+    "order_index": 90
+  },
+  {
+    "contest_id": 112,
+    "problem_index": "A",
+    "name": "Petya and Strings",
+    "rating": 800,
+    "section": "Strings",
+    "order_index": 91
+  },
+  {
+    "contest_id": 96,
+    "problem_index": "A",
+    "name": "Football",
+    "rating": 900,
+    "section": "Strings",
+    "order_index": 92
+  },
+  {
+    "contest_id": 750,
+    "problem_index": "A",
+    "name": "New Year and Hurry",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 93
+  },
+  {
+    "contest_id": 1566,
+    "problem_index": "A",
+    "name": "Median Maximization",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 94
+  },
+  {
+    "contest_id": 1915,
+    "problem_index": "C",
+    "name": "Can I Square?",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 95
+  },
+  {
+    "contest_id": 1978,
+    "problem_index": "B",
+    "name": "New Bakery",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 96
+  },
+  {
+    "contest_id": 361,
+    "problem_index": "A",
+    "name": "Levko and Table",
+    "rating": 800,
+    "section": "Constructive Algorithm",
+    "order_index": 97
+  },
+  {
+    "contest_id": 595,
+    "problem_index": "A",
+    "name": "Vitaly and Night",
+    "rating": 800,
+    "section": "Constructive Algorithm",
+    "order_index": 98
+  },
+  {
+    "contest_id": 1088,
+    "problem_index": "A",
+    "name": "Ehab and another construction problem",
+    "rating": 800,
+    "section": "Constructive Algorithm",
+    "order_index": 99
+  },
+  {
+    "contest_id": 2258,
+    "problem_index": "B1",
+    "name": "Carrot Chopdown (Easy Version)",
+    "rating": 900,
+    "section": "Warm Up - Adhocs",
+    "order_index": 100
+  },
+  {
+    "contest_id": 2238,
+    "problem_index": "B",
+    "name": "Crimson Triples",
+    "rating": 900,
+    "section": "Warm Up - Adhocs",
+    "order_index": 101
+  },
+  {
+    "contest_id": 2151,
+    "problem_index": "A",
+    "name": "Incremental Subarray",
+    "rating": 800,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 102
+  },
+  {
+    "contest_id": 2171,
+    "problem_index": "B",
+    "name": "Yuu Koito and Minimum Absolute Sum",
+    "rating": 900,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 103
+  },
+  {
+    "contest_id": 2156,
+    "problem_index": "B",
+    "name": "Strange Machine",
+    "rating": 1000,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 104
+  },
+  {
+    "contest_id": 2123,
+    "problem_index": "C",
+    "name": "Prefix Min and Suffix Max",
+    "rating": 1000,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 105
+  },
+  {
+    "contest_id": 2137,
+    "problem_index": "C",
+    "name": "Maximum Even Sum",
+    "rating": 1100,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 106
+  },
+  {
+    "contest_id": 1986,
+    "problem_index": "C",
+    "name": "Update Queries",
+    "rating": 1100,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 107
+  },
+  {
+    "contest_id": 2135,
+    "problem_index": "A",
+    "name": "Against the Difference",
+    "rating": 1200,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 108
+  },
+  {
+    "contest_id": 2067,
+    "problem_index": "A",
+    "name": "Adjacent Digit Sums",
+    "rating": 800,
+    "section": "Prefix Sum & Difference Array",
+    "order_index": 109
+  },
+  {
+    "contest_id": 2267,
+    "problem_index": "B",
+    "name": "Fashionable Array",
+    "rating": 800,
+    "section": "Sorting",
+    "order_index": 110
+  },
+  {
+    "contest_id": 2264,
+    "problem_index": "A",
+    "name": "Rumb Needs a Hand",
+    "rating": 800,
+    "section": "Sorting",
+    "order_index": 111
+  },
+  {
+    "contest_id": 2256,
+    "problem_index": "A",
+    "name": "Three Numbers on the Blackboard",
+    "rating": 800,
+    "section": "Sorting",
+    "order_index": 112
+  },
+  {
+    "contest_id": 2195,
+    "problem_index": "B",
+    "name": "Heapify 1",
+    "rating": 900,
+    "section": "Sorting",
+    "order_index": 113
+  },
+  {
+    "contest_id": 2185,
+    "problem_index": "C",
+    "name": "Shifted MEX",
+    "rating": 900,
+    "section": "Sorting",
+    "order_index": 114
+  },
+  {
+    "contest_id": 2102,
+    "problem_index": "B",
+    "name": "The Picky Cat",
+    "rating": 900,
+    "section": "Sorting",
+    "order_index": 115
+  },
+  {
+    "contest_id": 2269,
+    "problem_index": "A",
+    "name": "SauSaGe Bank",
+    "rating": 800,
+    "section": "Greedy",
+    "order_index": 116
+  },
+  {
+    "contest_id": 2259,
+    "problem_index": "A",
+    "name": "Moo Language School",
+    "rating": 800,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 117
+  },
+  {
+    "contest_id": 2154,
+    "problem_index": "A",
+    "name": "Notelock",
+    "rating": 800,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 118
+  },
+  {
+    "contest_id": 2143,
+    "problem_index": "A",
+    "name": "All Lengths Subtraction",
+    "rating": 800,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 119
+  },
+  {
+    "contest_id": 2000,
+    "problem_index": "B",
+    "name": "Seating in a Bus",
+    "rating": 800,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 120
+  },
+  {
+    "contest_id": 1847,
+    "problem_index": "B",
+    "name": "Hamon Odyssey",
+    "rating": 1000,
+    "section": "Two Pointers & Sliding Window",
+    "order_index": 121
+  },
+  {
+    "contest_id": 2200,
+    "problem_index": "B",
+    "name": "Deletion Sort",
+    "rating": 800,
+    "section": "Bit Manipulation",
+    "order_index": 122
+  },
+  {
+    "contest_id": 2153,
+    "problem_index": "B",
+    "name": "Bitwise Reversion",
+    "rating": 800,
+    "section": "Bit Manipulation",
+    "order_index": 123
+  },
+  {
+    "contest_id": 2119,
+    "problem_index": "A",
+    "name": "Add or XOR",
+    "rating": 800,
+    "section": "Bit Manipulation",
+    "order_index": 124
+  },
+  {
+    "contest_id": 2261,
+    "problem_index": "B",
+    "name": "What's the Capital of France?",
+    "rating": 1100,
+    "section": "Bit Manipulation",
+    "order_index": 125
+  },
+  {
+    "contest_id": 2218,
+    "problem_index": "E",
+    "name": "The 67th XOR Problem",
+    "rating": 1200,
+    "section": "Bit Manipulation",
+    "order_index": 126
+  },
+  {
+    "contest_id": 2194,
+    "problem_index": "C",
+    "name": "Secret message",
+    "rating": 1300,
+    "section": "Bit Manipulation",
+    "order_index": 127
+  },
+  {
+    "contest_id": 2267,
+    "problem_index": "A",
+    "name": "Turn Into a Palindrome",
+    "rating": 800,
+    "section": "Strings",
+    "order_index": 128
+  },
+  {
+    "contest_id": 2257,
+    "problem_index": "A",
+    "name": "Creating Abbreviations",
+    "rating": 800,
+    "section": "Strings",
+    "order_index": 129
+  },
+  {
+    "contest_id": 2244,
+    "problem_index": "A",
+    "name": "Iskander and Drawings",
+    "rating": 800,
+    "section": "Strings",
+    "order_index": 130
+  },
+  {
+    "contest_id": 2236,
+    "problem_index": "B",
+    "name": "Tatar TV Show",
+    "rating": 800,
+    "section": "Strings",
+    "order_index": 131
+  },
+  {
+    "contest_id": 2207,
+    "problem_index": "A",
+    "name": "1-1",
+    "rating": 800,
+    "section": "Strings",
+    "order_index": 132
+  },
+  {
+    "contest_id": 2274,
+    "problem_index": "A",
+    "name": "The Projections of Paco",
+    "rating": 800,
+    "section": "Math",
+    "order_index": 133
+  },
+  {
+    "contest_id": 2271,
+    "problem_index": "A",
+    "name": "Robot Odd Moves",
+    "rating": 800,
+    "section": "Math",
+    "order_index": 134
+  },
+  {
+    "contest_id": 2266,
+    "problem_index": "B",
+    "name": "Three Piles",
+    "rating": 800,
+    "section": "Math",
+    "order_index": 135
+  },
+  {
+    "contest_id": 2246,
+    "problem_index": "B",
+    "name": "ezraft and Array",
+    "rating": 900,
+    "section": "Math",
+    "order_index": 136
+  },
+  {
+    "contest_id": 2232,
+    "problem_index": "B",
+    "name": "Cake Leveling",
+    "rating": 900,
+    "section": "Math",
+    "order_index": 137
+  },
+  {
+    "contest_id": 2261,
+    "problem_index": "C",
+    "name": "I Know About a Million Things",
+    "rating": 1000,
+    "section": "Math",
+    "order_index": 138
+  },
+  {
+    "contest_id": 2256,
+    "problem_index": "B",
+    "name": "Domino Tiles",
+    "rating": 1000,
+    "section": "Math",
+    "order_index": 139
+  },
+  {
+    "contest_id": 2261,
+    "problem_index": "A",
+    "name": "Hey, It's Me, Souvlakity",
+    "rating": 800,
+    "section": "Math",
+    "order_index": 140
+  },
+  {
+    "contest_id": 1611,
+    "problem_index": "B",
+    "name": "Team Composition: Programmers and Mathematicians",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 141
+  },
+  {
+    "contest_id": 1592,
+    "problem_index": "A",
+    "name": "Gamer Hemose",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 142
+  },
+  {
+    "contest_id": 202,
+    "problem_index": "A",
+    "name": "LLPS",
+    "rating": 800,
+    "section": "Binary Search",
+    "order_index": 143
+  },
+  {
+    "contest_id": 1138,
+    "problem_index": "A",
+    "name": "Sushi for Two",
+    "rating": 900,
+    "section": "Binary Search",
+    "order_index": 144
+  },
+  {
+    "contest_id": 2237,
+    "problem_index": "C",
+    "name": "Duck Surplus",
+    "rating": 1000,
+    "section": "Binary Search",
+    "order_index": 145
+  },
+  {
+    "contest_id": 2247,
+    "problem_index": "A",
+    "name": "Zero Sum",
+    "rating": 800,
+    "section": "Constructive Algorithm",
+    "order_index": 146
+  },
+  {
+    "contest_id": 2246,
+    "problem_index": "A",
+    "name": "farmpiggie and Subset Sum",
+    "rating": 800,
+    "section": "Constructive Algorithm",
+    "order_index": 147
+  },
+  {
+    "contest_id": 2234,
+    "problem_index": "B",
+    "name": "Palindrome, Twelve and Two Terms",
+    "rating": 800,
+    "section": "Constructive Algorithm",
+    "order_index": 148
+  },
+  {
+    "contest_id": 2259,
+    "problem_index": "C",
+    "name": "101",
+    "rating": 1000,
+    "section": "Constructive Algorithm",
+    "order_index": 149
+  },
+  {
+    "contest_id": 2250,
+    "problem_index": "B",
+    "name": "String Construction",
+    "rating": 1000,
+    "section": "Constructive Algorithm",
+    "order_index": 150
+  }
+]

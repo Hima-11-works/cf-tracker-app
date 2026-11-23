@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Check, LockKeyhole, LogIn, LogOut, Plus, Save, Search, Trash2, X } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, LockKeyhole, LogIn, LogOut, Plus, RefreshCw, Save, Search, Trash2, Undo2, X } from "lucide-react";
 import { fetchDeduped } from "@/lib/client-fetch";
 
 type Problem = { contestId: string; index: string; name: string; rating: string; section: string; orderIndex: number | null };
@@ -269,6 +269,45 @@ export function AdminPanel() {
     }
   }
 
+  // Asks the server to re-check each whitelisted handle, one at a time, so every request stays within
+  // Codeforces' rate limit and the time limit on the server.
+  async function refreshAllSolved() {
+    if (actionInFlight.current || problemLookupInFlight.current) return;
+    actionInFlight.current = true;
+    setBusy(true);
+    setError("");
+    setNotice("");
+    const failed: string[] = [];
+    try {
+      const data = (await readJson(await fetch("/api/admin/data", { cache: "no-store" }))) as AdminData;
+      const handles = data.whitelist.map((entry) => entry.replace(/^\*/, ""));
+      for (let index = 0; index < handles.length; index += 1) {
+        const handle = handles[index];
+        setNotice("Refreshing " + (index + 1) + " of " + handles.length + ": " + handle + "…");
+        try {
+          await readJson(await fetch("/api/admin/progress/refresh", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ handle }),
+          }));
+        } catch {
+          failed.push(handle);
+        }
+      }
+      if (failed.length === 0) {
+        setNotice("Updated solved counts for " + handles.length + " " + (handles.length === 1 ? "handle" : "handles") + ".");
+      } else {
+        setNotice("Updated " + (handles.length - failed.length) + " of " + handles.length + " handles.");
+        setError("Could not update: " + failed.join(", ") + ". Try again later.");
+      }
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not refresh solved counts.");
+    } finally {
+      actionInFlight.current = false;
+      setBusy(false);
+    }
+  }
+
   async function signOut() {
     if (actionInFlight.current || problemLookupInFlight.current) return;
     actionInFlight.current = true;
@@ -519,7 +558,7 @@ export function AdminPanel() {
           <Alert variant="destructive" className="form-error"><AlertDescription>{error}</AlertDescription></Alert>
           <div className="toolbar-controls">
             <Button type="button" onClick={() => void retryLoadAdminData()} disabled={busy}>{busy ? "Loading..." : "Retry loading"}</Button>
-            <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy}><LogOut data-icon="inline-start" aria-hidden="true" />Sign out</Button>
+            <Button variant="outline" size="icon" type="button" onClick={() => void signOut()} disabled={busy} aria-label="Sign out" title="Sign out"><LogOut aria-hidden="true" /></Button>
           </div>
         </CardContent>
       </Card>
@@ -564,11 +603,14 @@ export function AdminPanel() {
               <p className="admin-save-note">Removing a problem also removes its saved results. Removing a handle only hides it and keeps its progress.</p>
             </div>
             <div className="admin-toolbar-actions">
-              <Button variant="outline" type="button" onClick={() => void signOut()} disabled={busy || lookingUpProblem}>
-                <LogOut data-icon="inline-start" aria-hidden="true" />Sign out
+              <Button variant="outline" type="button" onClick={() => void refreshAllSolved()} disabled={busy || lookingUpProblem}>
+                <RefreshCw data-icon="inline-start" aria-hidden="true" className={busy ? "animate-spin" : undefined} />Refresh solved counts
               </Button>
-              <Button id="admin-save-button" type="button" onClick={() => void save()} disabled={busy || lookingUpProblem || !hasUnsavedChanges} title="Save changes (Ctrl/⌘ S)">
-                <Save data-icon="inline-start" aria-hidden="true" />{busy ? "Saving..." : "Save changes"}<kbd className="shortcut-hint">Ctrl/⌘ S</kbd>
+              <Button variant="outline" size="icon" type="button" onClick={() => void signOut()} disabled={busy || lookingUpProblem} aria-label="Sign out" title="Sign out">
+                <LogOut aria-hidden="true" />
+              </Button>
+              <Button id="admin-save-button" size="icon" type="button" onClick={() => void save()} disabled={busy || lookingUpProblem || !hasUnsavedChanges} aria-label={busy ? "Saving changes" : "Save changes"} aria-busy={busy} title="Save changes (Ctrl/⌘ S)">
+                <Save aria-hidden="true" />
               </Button>
             </div>
           </div>
@@ -713,9 +755,9 @@ export function AdminPanel() {
 
                 {totalProblemPages > 1 ? (
                   <nav className="admin-pagination" aria-label="Probation sheet pages">
-                    <Button variant="outline" size="sm" type="button" onClick={() => void loadProblemPage(problemPage - 1, problemQuery)} disabled={busy || loadingProblems || problemPage <= 1 || problemQuery !== loadedProblemQuery.current}>Previous</Button>
+                    <Button variant="outline" size="icon-sm" type="button" onClick={() => void loadProblemPage(problemPage - 1, problemQuery)} disabled={busy || loadingProblems || problemPage <= 1 || problemQuery !== loadedProblemQuery.current} aria-label="Previous page" title="Previous page"><ChevronLeft aria-hidden="true" /></Button>
                     <span aria-live="polite">Page {problemPage} of {totalProblemPages}</span>
-                    <Button variant="outline" size="sm" type="button" onClick={() => void loadProblemPage(problemPage + 1, problemQuery)} disabled={busy || loadingProblems || problemPage >= totalProblemPages || problemQuery !== loadedProblemQuery.current}>Next</Button>
+                    <Button variant="outline" size="icon-sm" type="button" onClick={() => void loadProblemPage(problemPage + 1, problemQuery)} disabled={busy || loadingProblems || problemPage >= totalProblemPages || problemQuery !== loadedProblemQuery.current} aria-label="Next page" title="Next page"><ChevronRight aria-hidden="true" /></Button>
                   </nav>
                 ) : null}
               </CardContent>
@@ -724,7 +766,7 @@ export function AdminPanel() {
           {undoToast ? (
             <div className="admin-undo-toast" role="status" aria-live="polite">
               <span>{undoToast.message}</span>
-              <Button variant="outline" size="sm" type="button" onClick={() => { undoToast.undo(); dismissUndoToast(); }} disabled={busy}>Undo</Button>
+              <Button variant="outline" size="icon-sm" type="button" onClick={() => { undoToast.undo(); dismissUndoToast(); }} disabled={busy} aria-label="Undo" title="Undo"><Undo2 aria-hidden="true" /></Button>
               <Button variant="ghost" size="icon-sm" type="button" onClick={dismissUndoToast} disabled={busy} aria-label="Dismiss undo message"><X aria-hidden="true" /></Button>
             </div>
           ) : null}
